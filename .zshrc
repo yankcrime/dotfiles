@@ -2,8 +2,8 @@
 # zshell config
 # nick@dischord.org
 
-# usual $PATH suspects
-export PATH=$PATH:~/bin/:/usr/local/bin:/usr/local/sbin
+# usual suspects
+export PATH=$PATH:~/bin/:/usr/local/bin:/usr/local/sbin:~/.rvm/bin
 
 # history stuff
 HISTSIZE=1000
@@ -24,6 +24,8 @@ alias view='vim -R'
 alias se='sudoedit'
 alias topmem='ps -eo pmem,pcpu,rss,vsize,args | sort -k 1 -r | less'
 alias df='df -x rootfs'
+alias rip='dvdbackup -i /dev/sr0 -o . -M'
+alias rake="noglob rake"
 
 # options
 umask 022
