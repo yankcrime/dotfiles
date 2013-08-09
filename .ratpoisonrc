@@ -1,0 +1,59 @@
+# use rxvt-unicode instead
+unbind c
+bind c exec urxvtc
+
+definekey top C-space exec
+
+# be like screen
+escape C-a
+bind s hsplit
+bind C-s hsplit
+bind S split
+bind C-S split
+# maximise current frame
+bind S-Return only
+
+# don't do that
+warp off
+
+# move cursor out of the way when task switching
+addhook key banish
+
+definekey top C-M-Up focusup
+definekey top C-M-Down focusdown
+definekey top C-M-Left focusleft
+definekey top C-M-Right focusright
+
+# swap workspaces
+bind F1 exec rpws 1
+bind F2 exec rpws 2
+bind F3 exec rpws 3
+bind F4 exec rpws 4
+bind F5 exec rpws 5
+bind F6 exec rpws 6
+
+# pop up a quick calendar
+# bin/showcal contains:
+#
+#  #!/bin/sh
+#  date +'%n      %r%n    %a %e %b %Y';
+#  cal | \
+#    tail +2 | \
+#    sed -e 's/.*/ & /' -e "s/\ $(date +%e)\ /\<$(date +%e)\>/"
+#    echo " "
+#
+bind d exec ratpoison -c "echo `/home/jonesn/bin/showcal`"
+
+# quickly show the current battery life left
+# bin/showapm contains:
+#
+#  #!/bin/sh
+#  echo "battery remaining: `/usr/sbin/apm -l`%"
+#
+#bind A exec ratpoison -c "echo `/var/home/jcs/bin/showapm`"
+
+# initialize the pointer
+exec xsetroot -cursor_name left_ptr
+
+# initialize workspaces
+exec rpws init 6 -k 
