@@ -1,58 +1,69 @@
 # nick's .bashrc
-# nick@dischord.org
 
 set -o vi
 set show-all-if-ambiguous on
+shopt -s checkwinsize
 
+# some {sensible,useful} shortcuts
+alias pg='ps auwwx | grep -i -e ^USER -e '
+alias publicip='curl http://ifconfig.me'
+alias webserver="ifconfig | grep 'inet ' | grep -v 127.0.0.1; python -m SimpleHTTPServer"
 alias cls='clear'
-alias ls='ls -F --color'
-
+alias ls='ls -FG'
 alias tma='tmux attach-session -t'
+alias mutt='mutt-kz'
+alias view='vim -R'
+alias trillian='mosh trillian.dischord.org'
+alias sshvpn='sshuttle --dns -N -v -r nick@212.13.197.13:53 0/0'
+alias mq='msmtp-queue'
 
-PATH=$PATH:/opt/local/bin:/usr/local/bin:~/bin/:~/.rvm/bin
-MANPATH=$MANPATH:/usr/share/man
+# <3 vagrant
+alias vup='vagrant up --provider=vmware_fusion'
+alias vprov='vagrant provision'
+alias vstat='vagrant status'
+alias vhalt='vagrant halt'
+alias vnuke='vagrant destroy'
+alias vssh='vagrant ssh'
+
+PATH=/usr/local/bin:$PATH:~/bin:~/.rvm/bin:/Applications/VMware\ Fusion.app/Contents/Library:/usr/local/sbin
 INFOPATH=$INFOPATH:/opt/local/share/info
 LSCOLORS='Exfxcxdxbxegedabagacad'
-#USERWM=`which ratpoison`
 
-LESS_TERMCAP_us=$'\e[32m'
-LESS_TERMCAP_ue=$'\e[0m'
-LESS_TERMCAP_md=$'\e[1;31m'
-LESS_TERMCAP_me=$'\e[0m'
-LESS=-R
-PAGER="less"
+export PATH LSCOLORS 
 
-export LESS_TERMCAP_us LESS_TERMCAP_ue LESS_TERMCAP_md LESS_TERMCAP_me
-export LESS PAGER
-
-export PATH MANPATH INFOPATH LSCOLORS 
-
+# set window title for xterm-a-likes
 case $TERM in
-        xterm* | rxvt* | screen )
+        xterm* | rxvt* )
                 XTITLE="\[\e]0;\u@\h (\w)\a\]" ;;
         * )
                 XTITLE="" ;;
 esac
 
-#PS1="$XTITLE""[\u@\h \W]\\$ "
-PS1="$XTITLE""[\u@\h:\w]\n\\$ "
+# Prompts
+# PS1="$XTITLE""┌─[\[\e[34m\]\h\[\e[0m\]][\[\e[32m\]\w\[\e[0m\]]\n└─╼ "
+# PS1="\[\033[0;31m\w\] \[\033[0;32m\]$\[\033[0m\] "
+# PS1='\[\033[0;31m\]\w \[\033[0;32m\]$\[\033[0m\] '
+# Keep it simple...
+PS1="$XTITLE"'\u@\h:\w> '
 
-# Set hostname in hardstatus line in screen
+# Set hostname in hardstatus line in tmux
 if [ "$TERM" == "screen-256color" ]; then
     function ssh() {
          echo -n -e "\033k$1\033\\"
          /usr/bin/ssh $@
-          echo -n -e "\033k`hostname -s`\033\\"
+         echo -n -e "\033k`hostname -s`\033\\"
     }
-    
-    function telnet() {
-        echo -n -e "\033k$1\033\\"
-        /usr/bin/telnet $@
-        echo -n -e "\033k`hostname -s`\033\\"
-    }
-    
+
+	function mosh() {
+		echo -n -e "\033k$1\033\\"
+		/usr/local/bin/mosh $@
+		echo -n -e "\033k`hostname -s`\033\\"
+	}
+
     # We're on localhost
     echo -e "\033k`hostname -s`\033\\"
 fi
 
+# rvm junk
+[[ -s "/Users/nick/.rvm/scripts/rvm" ]] && source "/Users/nick/.rvm/scripts/rvm"
 
