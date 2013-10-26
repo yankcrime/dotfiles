@@ -1,6 +1,9 @@
 " Nick's .vimrc
 " nick@dischord.org
-" Cribbed from various places over the years...
+" Mostly cribbed from various places over the years...
+
+" Pathogen for loading vim plugins from ~/.vim/bundle
+execute pathogen#infect()
 
 " Irrelevant these days?
 set nobackup
@@ -16,6 +19,9 @@ imap <ESC>[B <Down>
 
 " Enable paste mode so that the indenting doesn't mess everything up
 set pastetoggle=<F2>
+
+" Don't moan about changes when switching buffers
+set hidden
 
 " Add <> to % matching
 set matchpairs=(:),{:},[:],<:>
@@ -38,6 +44,10 @@ set tabstop=4
 set bs=2
 " For Python's .py files
 au BufRead,BufNewFile *.py set expandtab
+
+"tab mappings
+"map <C-t> :tabnew<CR>
+"map <C-w> :tabclose<CR>
 
 " When searching highlight and keep highlighted, the words you search for
 set hlsearch
@@ -116,20 +126,6 @@ map <C-j> <C-w>j
 map <C-k> <C-w>k
 map <C-l> <C-w>l
 
-" Tabs
-noremap <M-a> :tabprevious<CR>
-noremap <M-s> :tabnext<CR>
-noremap <M-1> :tabnext 1<CR>
-noremap <M-2> :tabnext 2<CR>
-noremap <M-3> :tabnext 3<CR>
-noremap <M-4> :tabnext 4<CR>
-noremap <M-5> :tabnext 5<CR>
-noremap <M-6> :tabnext 6<CR>
-noremap <M-7> :tabnext 7<CR>
-noremap <M-8> :tabnext 8<CR>
-noremap <M-9> :tabnext 9<CR>
-
-
 " Very handy option to write a file that we've forgotten to open via sudo
 " Just do w!! instead
 cmap w!! w !sudo tee % >/dev/null
@@ -140,7 +136,7 @@ map <F2> :mksession! .vim_session<CR>
 map <F3> :source .vim_session<CR>
 
 set t_Co=256 
-colorscheme mustang
+colorscheme badwolf
 
 set statusline=%<%F%h%m%r%h%w%y\ %{&ff}%=\ a:%b\ p:%o\ c:%c%V\ l:%l\/%L\ %P
 
@@ -148,7 +144,7 @@ set statusline=%<%F%h%m%r%h%w%y\ %{&ff}%=\ a:%b\ p:%o\ c:%c%V\ l:%l\/%L\ %P
 " OSX Specific *****************************************************************
 if has("gui_macvim")
   	set fuoptions=maxvert,maxhorz " fullscreen options (MacVim only), resized window when changed to fullscreen
-    set guifont=Menlo:h14
+    set guifont=PragmataPro:h14
 "	set noantialias
     set guioptions-=T  " remove toolbar
     set guioptions-=e " don't use gui tab apperance
@@ -163,7 +159,7 @@ if has("gui_macvim")
     set gtl=%t gtt=%F
 
     set background=dark
-    colorscheme mustang
+    colorscheme badwolf
 
 	set linespace=1
 
@@ -176,11 +172,20 @@ autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
 " vim-airline updates - https://github.com/bling/vim-airline
 let g:airline_theme='powerlineish'
 let g:airline_powerline_fonts=1
-let g:airline_left_sep = ''
-let g:airline_right_sep = ''
-let g:airline_branch_prefix = '⭠'
-let g:airline_readonly_symbol = '⭤'
-let g:airline_linecolumn_prefix = '⭡'
-let g:airline_paste_symbol = 'ρ'
+" let g:airline_left_sep = ''
+" let g:airline_right_sep = ''
+" let g:airline_branch_prefix = '⭠'
+" let g:airline_readonly_symbol = '⭤'
+" let g:airline_linecolumn_prefix = '⭡'
+" let g:airline_paste_symbol = 'ρ'
 let g:airline_detect_whitespace=0
+let g:airline#extensions#tabline#enabled = 1
+
+
+" NERDTree
+map <C-n> :NERDTreeToggle<CR>
+
+" Command-T
+map <C-f> :CommandT<CR>
+map <C-b> :CommandTBuffer<CR>
 
