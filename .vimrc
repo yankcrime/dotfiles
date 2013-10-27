@@ -140,7 +140,7 @@ end
 " Miscellaneous stuff from: http://stackoverflow.com/questions/164847/what-is-in-your-vimrc
 " Automatically cd into the directory that the file is in
 " Disabled for now as it makes Command-T slightly unweildy
-" autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
+autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
 
 " Statusline stuff
 " Using vim-airline - https://github.com/bling/vim-airline
