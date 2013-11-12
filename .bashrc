@@ -1,8 +1,15 @@
 # nick's .bashrc
+# nick@dischord.org
 
+# basics
 set -o vi
 set show-all-if-ambiguous on
 shopt -s checkwinsize
+PATH=/usr/local/bin:$PATH:~/bin:~/.rvm/bin:/Applications/VMware\ Fusion.app/Contents/Library:/usr/local/sbin
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+LSCOLORS='Exfxcxdxbxegedabagacad'
+
+export PATH LSCOLORS
 
 # some {sensible,useful} shortcuts
 alias pg='ps auwwx | grep -i -e ^USER -e '
@@ -25,11 +32,9 @@ alias vhalt='vagrant halt'
 alias vnuke='vagrant destroy'
 alias vssh='vagrant ssh'
 
-PATH=/usr/local/bin:$PATH:~/bin:~/.rvm/bin:/Applications/VMware\ Fusion.app/Contents/Library:/usr/local/sbin
-INFOPATH=$INFOPATH:/opt/local/share/info
-LSCOLORS='Exfxcxdxbxegedabagacad'
-
-export PATH LSCOLORS 
+# git stuff
+alias gitl='git log --pretty=format:"%h - %an, %ar : %s"'
+alias gits='git shortlog --numbered --summary'
 
 # set window title for xterm-a-likes
 case $TERM in
@@ -40,9 +45,11 @@ case $TERM in
 esac
 
 # Prompts
+
 # PS1="$XTITLE""┌─[\[\e[34m\]\h\[\e[0m\]][\[\e[32m\]\w\[\e[0m\]]\n└─╼ "
 # PS1="\[\033[0;31m\w\] \[\033[0;32m\]$\[\033[0m\] "
 # PS1='\[\033[0;31m\]\w \[\033[0;32m\]$\[\033[0m\] '
+
 # Keep it simple...
 PS1="$XTITLE"'\u@\h:\w> '
 
@@ -66,4 +73,6 @@ fi
 
 # rvm junk
 [[ -s "/Users/nick/.rvm/scripts/rvm" ]] && source "/Users/nick/.rvm/scripts/rvm"
+
+
 
