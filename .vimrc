@@ -133,7 +133,7 @@ if has("gui_macvim")
     set background=dark
     colorscheme badwolf
 
-	set linespace=1
+"	set linespace=1
 
 end
 
@@ -163,4 +163,5 @@ map <C-n> :NERDTreeToggle<CR>
 " Command-T
 map <C-f> :CommandT<CR>
 map <C-b> :CommandTBuffer<CR>
+set noautochdir
 

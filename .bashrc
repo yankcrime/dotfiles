@@ -18,7 +18,6 @@ alias webserver="ifconfig | grep 'inet ' | grep -v 127.0.0.1; python -m SimpleHT
 alias cls='clear'
 alias ls='ls -FG'
 alias tma='tmux attach-session -t'
-alias mutt='mutt-kz'
 alias view='vim -R'
 alias trillian='mosh trillian.dischord.org'
 alias sshvpn='sshuttle --dns -N -v -r nick@212.13.197.13:53 0/0'
