@@ -73,6 +73,12 @@ au BufEnter *.rb if getline(1) == "" | :call setline(1, "#!/usr/bin/env ruby") |
 " Ad-hoc C development while we're not using makefiles
 set makeprg=gcc\ -o\ %<\ %
 
+" Tell vim to look upwards in the directory hierarchy for a tags file until it finds one
+set tags=./tags;
+
+" For puppet, causes vim to treat ’:’ as part of the keyword for tag navigation purposes.
+au FileType puppet setlocal isk+=:
+
 " Easy window navigation
 map <C-h> <C-w>h
 map <C-j> <C-w>j
@@ -94,7 +100,7 @@ colorscheme badwolf
 " OSX Specific *****************************************************************
 if has("gui_macvim")
   	set fuoptions=maxvert,maxhorz " fullscreen options (MacVim only), resized window when changed to fullscreen
-    set guifont=Inconsolata\ for\ Powerline:h15
+    set guifont=PragmataPro:h15
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
     set guioptions-=r " don't show scrollbars
@@ -117,10 +123,10 @@ let g:airline_theme='powerlineish'
 let g:airline_powerline_fonts=1
 " let g:airline_left_sep = ''
 " let g:airline_right_sep = ''
-" let g:airline_branch_prefix = '⭠'
-" let g:airline_readonly_symbol = '⭤'
-" let g:airline_linecolumn_prefix = '⭡'
-" let g:airline_paste_symbol = 'ρ'
+let g:airline_branch_prefix = '⭠'
+let g:airline_readonly_symbol = '⭤'
+let g:airline_linecolumn_prefix = '⭡'
+let g:airline_paste_symbol = 'ρ'
 let g:airline_detect_whitespace=0
 let g:airline#extensions#tabline#enabled = 1
 
@@ -132,3 +138,7 @@ let g:ctrlp_match_window = 'bottom,order:ttb'
 let g:ctrlp_switch_buffer = 0
 let g:ctrlp_working_path_mode = 0
 let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+
+" Buffer manipulation
+nnoremap <silent> <C-x> :Sbd<CR>
+nnoremap <silent> <leader>bdm   :Sbdm<CR>
