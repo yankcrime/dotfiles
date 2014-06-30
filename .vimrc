@@ -76,8 +76,12 @@ set makeprg=gcc\ -o\ %<\ %
 " Tell vim to look upwards in the directory hierarchy for a tags file until it finds one
 set tags=./tags;
 
-" For puppet, causes vim to treat ’:’ as part of the keyword for tag navigation purposes.
+" For Puppet, causes vim to treat ’:’ as part of the keyword for tag navigation purposes.
 au FileType puppet setlocal isk+=:
+
+" Make vim deal with scoped identifiers instead of just hitting top-level
+" modules when using ctags with Puppet code
+set iskeyword=-,:,@,48-57,_,192-255
 
 " Easy window navigation
 map <C-h> <C-w>h
