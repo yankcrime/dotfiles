@@ -7,9 +7,8 @@ set show-all-if-ambiguous on
 shopt -s checkwinsize
 PATH=/usr/local/bin:$PATH:~/bin:~/.rvm/bin:/Applications/VMware\ Fusion.app/Contents/Library:/usr/local/sbin:/usr/texbin/
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-LSCOLORS='Exfxcxdxbxegedabagacad'
 
-export PATH LSCOLORS
+export PATH 
 
 # source some useful stuff
 source ~/bin/prompt.sh
@@ -27,18 +26,29 @@ alias trillian='mosh trillian.dischord.org'
 alias sshvpn='sshuttle --dns -N -v -r nick@212.13.197.13:53 0/0'
 alias mq='msmtp-queue'
 alias sshx='ssh -c arcfour,blowfish-cbc -XC'
+alias pwplz='apg -n 1 -m 12 -x 12 -M NC'
+alias vim='mvim -v'
 
 # <3 vagrant
 alias vup='vagrant up --provider=vmware_fusion'
 alias vprov='vagrant provision'
 alias vstat='vagrant status'
 alias vhalt='vagrant halt'
-alias vnuke='vagrant destroy'
+alias vnuke='vagrant destroy -f'
 alias vssh='vagrant ssh'
+alias vhosts='vagrant hostmanager --provider=vmware_fusion'
 
 # git stuff
 alias gitl='git log --pretty=format:"%h - %an, %ar : %s"'
 alias gits='git shortlog --numbered --summary'
+alias gitrs="git reset --soft 'HEAD^'"
+alias gitrsh='git reset --hard HEAD'
+alias gitsup='for foo in init sync update ; do git submodule $foo ; done'
+
+# hacks
+function getip () {
+	dig +short @10.10.192.250 $1
+}
 
 # Set hostname in hardstatus line in tmux
 if [ "$TERM" == "screen-256color" ]; then
@@ -60,3 +70,4 @@ fi
 
 # rvm junk
 [[ -s "/Users/nick/.rvm/scripts/rvm" ]] && source "/Users/nick/.rvm/scripts/rvm"
+
