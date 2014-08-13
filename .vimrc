@@ -36,6 +36,10 @@ set nowrap
 set tabstop=4
 set bs=2
 
+" Do something sensible with .swp files
+set backupdir=~/.vim/backup/
+set directory=~/.vim/backup/
+
 " For Python's .py files
 au BufRead,BufNewFile *.py set expandtab
 
@@ -118,7 +122,7 @@ if has("gui_macvim")
 end
 
 " Automatically cd into the directory that the file is in
-autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
+" autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
 
 " Statusline stuff
 " Using vim-airline - https://github.com/bling/vim-airline
@@ -146,3 +150,13 @@ let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
 " Buffer manipulation
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm   :Sbdm<CR>
+
+" Ultisnips
+
+" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
