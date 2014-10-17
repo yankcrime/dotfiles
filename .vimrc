@@ -107,6 +107,7 @@ colorscheme badwolf
 
 " OSX Specific *****************************************************************
 if has("gui_macvim")
+"	set linespace=0 " Adjust line height
   	set fuoptions=maxvert,maxhorz " fullscreen options (MacVim only), resized window when changed to fullscreen
     set guifont=PragmataPro:h15
     set guioptions-=e " don't use gui tab apperance
@@ -129,8 +130,8 @@ end
 set laststatus=2
 let g:airline_theme='powerlineish'
 let g:airline_powerline_fonts=1
-" let g:airline_left_sep = ''
-" let g:airline_right_sep = ''
+"let g:airline_left_sep = ''
+"let g:airline_right_sep = ''
 let g:airline_branch_prefix = '⭠'
 let g:airline_readonly_symbol = '⭤'
 let g:airline_linecolumn_prefix = '⭡'
