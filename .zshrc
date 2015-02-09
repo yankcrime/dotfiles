@@ -3,7 +3,8 @@
 # nick@dischord.org
 
 # usual suspects
-export PATH=$PATH:~/bin/:/usr/local/bin:/usr/local/sbin:~/.rvm/bin
+export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:
+export LSCOLORS=GxFxCxDxBxegedabagaced
 
 # history stuff
 HISTSIZE=1000
@@ -31,6 +32,7 @@ alias sshx='ssh -c arcfour,blowfish-cbc -XC'
 alias pwplz='apg -n 1 -m 12 -x 12 -M NC'
 alias keyplz='openssl rand -hex 10'
 alias vim='mvim -v'
+alias md='open -a Marked.app'
 
 # <3 vagrant
 alias vup='vagrant up --provider=vmware_fusion'
@@ -136,9 +138,34 @@ git_prompt_string() {
   [ -n "$git_where" ] && echo "$GIT_PROMPT_SYMBOL$(parse_git_state)$GIT_PROMPT_PREFIX%{$fg[yellow]%}${git_where#(refs/heads/|tags/)}$GIT_PROMPT_SUFFIX"
 }
 
+# ssh wrapper that rename current tmux window to the hostname of the
+# remote host.
+ssh() {
+    # Do nothing if we are not inside tmux or ssh is called without arguments
+    if [[ $# == 0 || -z $TMUX ]]; then
+        command ssh $@
+        return
+    fi
+    # The hostname is the last parameter (i.e. ${(P)#})
+    local remote=${${(P)#}%.*}
+    local old_name="$(tmux display-message -p '#W')"
+    local renamed=0
+    # Save the current name
+    if [[ $remote != -* ]]; then
+        renamed=1
+        tmux rename-window $remote
+    fi
+    command ssh $@
+    if [[ $renamed == 1 ]]; then
+        tmux rename-window "$old_name"
+    fi
+}
+
 RPROMPT='$(git_prompt_string)'
 # end git guff
 
-# rvm junk
-[[ -s "/Users/nick/.rvm/scripts/rvm" ]] && source "/Users/nick/.rvm/scripts/rvm"
+# rbenv junk
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
+# virtualenv junk
+[[ -s "/usr/local/bin/virtualenvwrapper.sh" ]] && source "/usr/local/bin/virtualenvwrapper.sh"
