@@ -10,7 +10,7 @@ set nobackup
 " Show linenumbers
 set number
 
-" Quickly enable paste mode 
+" Quickly enable paste mode
 set pastetoggle=<F2>
 
 " Don't moan about changes when switching buffers
@@ -24,6 +24,9 @@ set matchpairs=(:),{:},[:],<:>
 set background=dark
 syntax on
 
+" Enable modelines
+set modelines=5
+
 " See :help cpo for flags-explanation $ is that when you do cw on a word, a $
 " appears at the end an you can type over the word. All the others are
 " vim-default. See help.
@@ -31,7 +34,7 @@ set cpo=aABceFs$
 
 " Do not auto wrap lines
 " Set the size of a tab to match 4 spaces
-" Set backspace type as 2 
+" Set backspace type as 2
 set nowrap
 set tabstop=4
 set bs=2
@@ -65,6 +68,8 @@ nmap Q gqap
 " Clear highlighted searches by doing ,/
 " nmap <silent> ,/ :let @/=""<CR>
 nmap <silent> ,/ :noh<cr>
+
+let mapleader = ","
 
 " automatically insert shebangs in certain files
 au BufEnter *.sh if getline(1) == "" | :call setline(1, "#!/usr/bin/env bash") | endif 
@@ -107,9 +112,9 @@ colorscheme badwolf
 
 " OSX Specific *****************************************************************
 if has("gui_macvim")
-"	set linespace=0 " Adjust line height
+	set linespace=1 " Adjust line height
   	set fuoptions=maxvert,maxhorz " fullscreen options (MacVim only), resized window when changed to fullscreen
-    set guifont=PragmataPro:h15
+    set guifont=Consolas:h15
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
     set guioptions-=r " don't show scrollbars
@@ -122,22 +127,33 @@ if has("gui_macvim")
     colorscheme badwolf
 end
 
+" Focus
+":map K :set columns=999 lines=999 fullscreen<cr>
+
 " Automatically cd into the directory that the file is in
 " autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
 
 " Statusline stuff
 " Using vim-airline - https://github.com/bling/vim-airline
 set laststatus=2
-let g:airline_theme='powerlineish'
-let g:airline_powerline_fonts=1
-"let g:airline_left_sep = ''
-"let g:airline_right_sep = ''
-let g:airline_branch_prefix = '⭠'
-let g:airline_readonly_symbol = '⭤'
-let g:airline_linecolumn_prefix = '⭡'
-let g:airline_paste_symbol = 'ρ'
-let g:airline_detect_whitespace=0
+let g:airline_theme='badwolf'
+let g:airline_powerline_fonts=0
+if !exists('g:airline_symbols')
+  let g:airline_symbols = {}
+endif
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
+let g:airline_symbols.branch = '⭠'
+let g:airline_symbols_readonly = '⭤'
+let g:airline_symbols.linenr = '⭡'
+let g:airline_symbols.paste = 'ρ'
+let g:airline_detect_modified=1
+let g:airline_detect_paste=1
+let g:airline_inactive_collapse=0
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#show_buffers = 1
+
+" let g:airline_section_warning = 'syntastic'
 
 " NERDTree
 map <C-n> :NERDTreeToggle<CR>
@@ -146,14 +162,13 @@ map <C-n> :NERDTreeToggle<CR>
 let g:ctrlp_match_window = 'bottom,order:ttb'
 let g:ctrlp_switch_buffer = 0
 let g:ctrlp_working_path_mode = 0
-let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
 
 " Buffer manipulation
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm   :Sbdm<CR>
 
 " Ultisnips
-
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
@@ -161,3 +176,6 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
+
+" Previews via Marked
+nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
