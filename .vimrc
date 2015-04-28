@@ -10,6 +10,9 @@ set nobackup
 " Show linenumbers
 set number
 
+" Define leader key
+let mapleader = "\<Space>"
+
 " Quickly enable paste mode
 set pastetoggle=<F2>
 
@@ -38,6 +41,11 @@ set cpo=aABceFs$
 set nowrap
 set tabstop=4
 set bs=2
+set smarttab
+
+nmap <leader>l :set list!<CR>
+set listchars=tab:▸\ ,eol:¬,trail:-,
+set fillchars+=vert:\│
 
 " Do something sensible with .swp files
 set backupdir=~/.vim/backup/
@@ -45,6 +53,7 @@ set directory=~/.vim/backup/
 
 " For Python's .py files
 au BufRead,BufNewFile *.py set expandtab
+au BufRead,BufNewFile *.yaml,*.yml so ~/.vim/after/syntax/yaml.vim
 
 " When searching highlight and keep highlighted, the words you search for
 set hlsearch
@@ -55,10 +64,8 @@ set ignorecase
 " browseable menu
 set wildmenu
 
-" Enable filetype plugins so auto-wrapping works for mail and such but
-" Disable indent plugin
 filetype plugin on
-filetype indent off
+" filetype indent off
 set ai
 
 " Justify the paragraph
@@ -69,12 +76,10 @@ nmap Q gqap
 " nmap <silent> ,/ :let @/=""<CR>
 nmap <silent> ,/ :noh<cr>
 
-let mapleader = ","
-
 " automatically insert shebangs in certain files
-au BufEnter *.sh if getline(1) == "" | :call setline(1, "#!/usr/bin/env bash") | endif 
-au BufEnter *.py if getline(1) == "" | :call setline(1, "#!/usr/bin/env python") | endif 
-au BufEnter *.rb if getline(1) == "" | :call setline(1, "#!/usr/bin/env ruby") | endif 
+au BufEnter *.sh if getline(1) == "" | :call setline(1, "#!/usr/bin/env bash") | endif
+au BufEnter *.py if getline(1) == "" | :call setline(1, "#!/usr/bin/env python") | endif
+au BufEnter *.rb if getline(1) == "" | :call setline(1, "#!/usr/bin/env ruby") | endif
 
 " Quotes unquoted HTML tag properties throughout buffer.
 " map <F9> :%s/\([^&^?]\)\(\<[[:alnum:]-]\{-}\)=\([[:alnum:]-#%]\+\)/\1\2="\3"/g<Return>
@@ -93,28 +98,28 @@ au FileType puppet setlocal isk+=:
 set iskeyword=-,:,@,48-57,_,192-255
 
 " Easy window navigation
-map <C-h> <C-w>h
-map <C-j> <C-w>j
-map <C-k> <C-w>k
-map <C-l> <C-w>l
+" map <C-h> <C-w>h
+" map <C-j> <C-w>j
+" map <C-k> <C-w>k
+" map <C-l> <C-w>l
 
 " Very handy option to write a file that we've forgotten to open via sudo
 " Just do w!! instead
 cmap w!! w !sudo tee % >/dev/null
 
-" Quick write session with F2 
+" Quick write session with F2
 map <F2> :mksession! .vim_session<CR>
 " And load session with F3
 map <F3> :source .vim_session<CR>
 
-set t_Co=256 
-colorscheme badwolf
+set t_Co=256
+colorscheme jellybeans
 
 " OSX Specific *****************************************************************
 if has("gui_macvim")
 	set linespace=1 " Adjust line height
-  	set fuoptions=maxvert,maxhorz " fullscreen options (MacVim only), resized window when changed to fullscreen
-    set guifont=Consolas:h15
+	set fuoptions=maxvert,maxhorz " fullscreen options (MacVim only), resized window when changed to fullscreen
+    set guifont=PragmataPro:h16
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
     set guioptions-=r " don't show scrollbars
@@ -122,13 +127,10 @@ if has("gui_macvim")
     set guioptions-=R " don't show scrollbars
     set guioptions-=L " don't show scrollbars
     set stal=2 " turn on tabs by default
-    set gtl=%t gtt=%F " tab headings 
-    set background=dark
-    colorscheme badwolf
+    set gtl=%t gtt=%F " tab headings
+    set background=light
+    colorscheme jellybeans
 end
-
-" Focus
-":map K :set columns=999 lines=999 fullscreen<cr>
 
 " Automatically cd into the directory that the file is in
 " autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
@@ -136,7 +138,7 @@ end
 " Statusline stuff
 " Using vim-airline - https://github.com/bling/vim-airline
 set laststatus=2
-let g:airline_theme='badwolf'
+let g:airline_theme='jellybeans'
 let g:airline_powerline_fonts=0
 if !exists('g:airline_symbols')
   let g:airline_symbols = {}
@@ -153,10 +155,11 @@ let g:airline_inactive_collapse=0
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 1
 
-" let g:airline_section_warning = 'syntastic'
-
 " NERDTree
 map <C-n> :NERDTreeToggle<CR>
+let NERDTreeShowBookmarks=1
+let NERDTreeShowHiddern=1
+let NERDTreeBookmarksSort = 1
 
 " CtrlP settings
 let g:ctrlp_match_window = 'bottom,order:ttb'
@@ -166,7 +169,7 @@ let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
 
 " Buffer manipulation
 nnoremap <silent> <C-x> :Sbd<CR>
-nnoremap <silent> <leader>bdm   :Sbdm<CR>
+nnoremap <silent> <leader>bdm :Sbdm<CR>
 
 " Ultisnips
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
@@ -177,5 +180,8 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
 
-" Previews via Marked
+" Markdown stuff
 nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
+
+" tmux integration for better navigation between splits
+" see https://github.com/christoomey/vim-tmux-navigator
