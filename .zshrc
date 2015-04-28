@@ -5,7 +5,7 @@
 # usual suspects
 export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:
 # works with the 'Panic' terminal theme
-export LSCOLORS=GxFxCxDxBxegedabagaced
+# export LSCOLORS=GxFxCxDxBxegedabagaced
 #export LSCOLORS="exfxcxdxbxegedabagacad"
 
 # history stuff
