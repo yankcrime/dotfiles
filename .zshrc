@@ -4,17 +4,16 @@
 
 # usual suspects
 export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:
-# works with the 'Panic' terminal theme
-# export LSCOLORS=GxFxCxDxBxegedabagaced
-#export LSCOLORS="exfxcxdxbxegedabagacad"
+export LSCOLORS="exfxcxdxbxegedabagacad"
+export EDITOR="vim"
 
 # history stuff
 HISTSIZE=1000
 SAVEHIST=1000
 HISTFILE=~/.history
-
-# a sensible prompt
-PS1='%n@%m:%~%(!.#.>) '
+setopt APPEND_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt EXTENDED_HISTORY
 
 # some other {sensible,useful} shortcuts
 alias pg='ps auwwx | grep -i -e ^USER -e '
@@ -33,8 +32,9 @@ alias zarquon='mosh zarquon.dischord.org'
 alias sshx='ssh -c arcfour,blowfish-cbc -XC'
 alias pwplz='apg -n 1 -m 12 -x 12 -M NC'
 alias keyplz='openssl rand -hex 10'
-alias vim='mvim -v'
+alias vim='/usr/local/bin/vim'
 alias md='open -a Marked.app'
+alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 
 # <3 vagrant
 alias vup='vagrant up --provider=vmware_fusion'
@@ -54,17 +54,19 @@ alias gitsup='for foo in init sync update ; do git submodule $foo ; done'
 
 # options
 umask 022
-setopt PRINT_EXIT_VALUE
+#setopt PRINT_EXIT_VALUE
 TMOUT=0
 HISTSIZE=1000
 setopt nohup
 
-# set terminal title
-precmd () {print -Pn "\e]0;%n@%m: %~\a"}
-
 # stuff that makes zsh worthwhile
-autoload -U compinit
-compinit
+autoload -U compinit && compinit
+autoload -U promptinit && promptinit
+
+# a decent prompt
+# https://github.com/sindresorhus/pure
+prompt pure
+unsetopt prompt_cr
 
 # make it work like vim
 # thanks dougblack - http://dougblack.io/words/zsh-vi-mode.html
@@ -82,63 +84,8 @@ source ~/src/opp.zsh/opp.zsh
 # jumparound
 source ~/bin/z.sh
 
-# git status guff
-setopt prompt_subst
-autoload -U colors && colors
-GIT_PROMPT_SYMBOL="%{$fg[blue]%}±"
-GIT_PROMPT_PREFIX="%{$fg[green]%}[%{$reset_color%}"
-GIT_PROMPT_SUFFIX="%{$fg[green]%}]%{$reset_color%}"
-GIT_PROMPT_AHEAD="%{$fg[red]%}ANUM%{$reset_color%}"
-GIT_PROMPT_BEHIND="%{$fg[cyan]%}BNUM%{$reset_color%}"
-GIT_PROMPT_MERGING="%{$fg_bold[magenta]%}⚡︎%{$reset_color%}"
-GIT_PROMPT_UNTRACKED="%{$fg_bold[red]%}●%{$reset_color%}"
-GIT_PROMPT_MODIFIED="%{$fg_bold[yellow]%}●%{$reset_color%}"
-GIT_PROMPT_STAGED="%{$fg_bold[green]%}●%{$reset_color%}"
-
-parse_git_branch() {
-  (git symbolic-ref -q HEAD || git name-rev --name-only --no-undefined --always HEAD) 2> /dev/null
-}
-
-parse_git_state() {
-  # Compose this value via multiple conditional appends.
-  local GIT_STATE=""
-
-  local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
-  if [ "$NUM_AHEAD" -gt 0 ]; then
-    GIT_STATE=$GIT_STATE${GIT_PROMPT_AHEAD//NUM/$NUM_AHEAD}
-  fi
-
-  local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
-  if [ "$NUM_BEHIND" -gt 0 ]; then
-    GIT_STATE=$GIT_STATE${GIT_PROMPT_BEHIND//NUM/$NUM_BEHIND}
-  fi
-
-  local GIT_DIR="$(git rev-parse --git-dir 2> /dev/null)"
-  if [ -n $GIT_DIR ] && test -r $GIT_DIR/MERGE_HEAD; then
-    GIT_STATE=$GIT_STATE$GIT_PROMPT_MERGING
-  fi
-
-  if [[ -n $(git ls-files --other --exclude-standard 2> /dev/null) ]]; then
-    GIT_STATE=$GIT_STATE$GIT_PROMPT_UNTRACKED
-  fi
-
-  if ! git diff --quiet 2> /dev/null; then
-    GIT_STATE=$GIT_STATE$GIT_PROMPT_MODIFIED
-  fi
-
-  if ! git diff --cached --quiet 2> /dev/null; then
-    GIT_STATE=$GIT_STATE$GIT_PROMPT_STAGED
-  fi
-
-  if [[ -n $GIT_STATE ]]; then
-    echo "$GIT_PROMPT_PREFIX$GIT_STATE$GIT_PROMPT_SUFFIX"
-  fi
-}
-
-git_prompt_string() {
-  local git_where="$(parse_git_branch)"
-  [ -n "$git_where" ] && echo "$GIT_PROMPT_SYMBOL$(parse_git_state)$GIT_PROMPT_PREFIX%{$fg[yellow]%}${git_where#(refs/heads/|tags/)}$GIT_PROMPT_SUFFIX"
-}
+# syntax highlighting
+source ~/src/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # ssh wrapper that rename current tmux window to the hostname of the
 # remote host.
@@ -163,11 +110,9 @@ ssh() {
     fi
 }
 
-RPROMPT='$(git_prompt_string)'
-# end git guff
-
 # rbenv junk
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 # virtualenv junk
 [[ -s "/usr/local/bin/virtualenvwrapper.sh" ]] && source "/usr/local/bin/virtualenvwrapper.sh"
+
