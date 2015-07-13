@@ -24,7 +24,7 @@ set matchpairs=(:),{:},[:],<:>
 
 " Set background = dark makes all colors show up brighter
 " Also, set syntax on whenever possible
-set background=dark
+set background=light
 syntax on
 
 " Enable modelines
@@ -54,6 +54,7 @@ set directory=~/.vim/backup/
 " For Python's .py files
 au BufRead,BufNewFile *.py set expandtab
 au BufRead,BufNewFile *.yaml,*.yml so ~/.vim/after/syntax/yaml.vim
+au BufRead,BufNewFile *.md,*.markdown setlocal textwidth=100
 
 " When searching highlight and keep highlighted, the words you search for
 set hlsearch
@@ -90,12 +91,10 @@ set makeprg=gcc\ -o\ %<\ %
 " Tell vim to look upwards in the directory hierarchy for a tags file until it finds one
 set tags=./tags;
 
-" For Puppet, causes vim to treat ’:’ as part of the keyword for tag navigation purposes.
-au FileType puppet setlocal isk+=:
-
 " Make vim deal with scoped identifiers instead of just hitting top-level
 " modules when using ctags with Puppet code
 set iskeyword=-,:,@,48-57,_,192-255
+au FileType puppet setlocal isk+=:
 
 " Easy window navigation
 " map <C-h> <C-w>h
@@ -113,13 +112,13 @@ map <F2> :mksession! .vim_session<CR>
 map <F3> :source .vim_session<CR>
 
 set t_Co=256
-colorscheme jellybeans
+colorscheme PaperColor
 
 " OSX Specific *****************************************************************
 if has("gui_macvim")
 	set linespace=1 " Adjust line height
 	set fuoptions=maxvert,maxhorz " fullscreen options (MacVim only), resized window when changed to fullscreen
-    set guifont=PragmataPro:h16
+    set guifont=Menlo:h12
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
     set guioptions-=r " don't show scrollbars
@@ -129,7 +128,7 @@ if has("gui_macvim")
     set stal=2 " turn on tabs by default
     set gtl=%t gtt=%F " tab headings
     set background=light
-    colorscheme jellybeans
+    colorscheme PaperColor
 end
 
 " Automatically cd into the directory that the file is in
@@ -138,7 +137,7 @@ end
 " Statusline stuff
 " Using vim-airline - https://github.com/bling/vim-airline
 set laststatus=2
-let g:airline_theme='jellybeans'
+let g:airline_theme='PaperColor'
 let g:airline_powerline_fonts=0
 if !exists('g:airline_symbols')
   let g:airline_symbols = {}
@@ -185,3 +184,10 @@ nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
 
 " tmux integration for better navigation between splits
 " see https://github.com/christoomey/vim-tmux-navigator
+"
+" Geeknote settings
+let g:GeeknoteFormat="markdown"
+noremap <F8> :VirtualEnvActivate geeknote<CR>:Geeknote<CR>
+nnoremap <leader>gn :Geeknote<cr>
+nnoremap <leader>gcn :GeeknoteCreateNote
+
