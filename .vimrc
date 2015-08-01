@@ -1,43 +1,45 @@
 " .vimrc
 " nick@dischord.org
 
-" Pathogen for loading vim plugins from ~/.vim/bundle
-execute pathogen#infect()
+" Vundle plugin manager
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
 
-" Irrelevant these days
-set nobackup
+Plugin 'gmarik/Vundle.vim'
+Plugin 'bling/vim-airline'
+Plugin 'kien/ctrlp.vim'
+Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-unimpaired'
+Plugin 'tpope/vim-commentary'
+Plugin 'scrooloose/nerdtree'
+Plugin 'scrooloose/syntastic'
+Plugin 'rodjek/vim-puppet'
+Plugin 'rking/ag.vim'
+Plugin 'cespare/vim-sbd'
+Plugin 'godlygeek/tabular'
+Plugin 'SirVer/ultisnips'
+Plugin 'neilagabriel/vim-geeknote'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'honza/vim-snippets'
+Plugin 'jmcantrell/vim-virtualenv'
 
-" Show linenumbers
-set number
+call vundle#end()
 
-" Define leader key
-let mapleader = "\<Space>"
+set nobackup " Irrelevant these days
+set number " Show linenumbers
+let mapleader = "\<Space>" " Define leader key
+set pastetoggle=<F2> " Quickly enable paste mode
+set hidden " Don't moan about changes when switching buffers
+set matchpairs=(:),{:},[:],<:> " Add <> to % matching
 
-" Quickly enable paste mode
-set pastetoggle=<F2>
-
-" Don't moan about changes when switching buffers
-set hidden
-
-" Add <> to % matching
-set matchpairs=(:),{:},[:],<:>
-
-" Set background = dark makes all colors show up brighter
-" Also, set syntax on whenever possible
-set background=light
+set background=dark
 syntax on
 
-" Enable modelines
-set modelines=5
+set modelines=5 " Enable modelines
 
-" See :help cpo for flags-explanation $ is that when you do cw on a word, a $
-" appears at the end an you can type over the word. All the others are
-" vim-default. See help.
 set cpo=aABceFs$
 
-" Do not auto wrap lines
-" Set the size of a tab to match 4 spaces
-" Set backspace type as 2
 set nowrap
 set tabstop=4
 set bs=2
@@ -47,77 +49,55 @@ nmap <leader>l :set list!<CR>
 set listchars=tab:▸\ ,eol:¬,trail:-,
 set fillchars+=vert:\│
 
-" Do something sensible with .swp files
 set backupdir=~/.vim/backup/
 set directory=~/.vim/backup/
 
-" For Python's .py files
 au BufRead,BufNewFile *.py set expandtab
 au BufRead,BufNewFile *.yaml,*.yml so ~/.vim/after/syntax/yaml.vim
 au BufRead,BufNewFile *.md,*.markdown setlocal textwidth=100
 
-" When searching highlight and keep highlighted, the words you search for
 set hlsearch
 set incsearch
 set ignorecase
 
-" When reading files or doing actions on files, press TAB to show a
-" browseable menu
 set wildmenu
 
 filetype plugin on
-" filetype indent off
 set ai
 
-" Justify the paragraph
 vmap Q gq
 nmap Q gqap
 
-" Clear highlighted searches by doing ,/
-" nmap <silent> ,/ :let @/=""<CR>
-nmap <silent> ,/ :noh<cr>
+nmap <silent> ,/ :noh<cr> 
 
-" automatically insert shebangs in certain files
 au BufEnter *.sh if getline(1) == "" | :call setline(1, "#!/usr/bin/env bash") | endif
 au BufEnter *.py if getline(1) == "" | :call setline(1, "#!/usr/bin/env python") | endif
 au BufEnter *.rb if getline(1) == "" | :call setline(1, "#!/usr/bin/env ruby") | endif
 
-" Quotes unquoted HTML tag properties throughout buffer.
-" map <F9> :%s/\([^&^?]\)\(\<[[:alnum:]-]\{-}\)=\([[:alnum:]-#%]\+\)/\1\2="\3"/g<Return>
 
-" Ad-hoc C development while we're not using makefiles
-set makeprg=gcc\ -o\ %<\ %
-
-" Tell vim to look upwards in the directory hierarchy for a tags file until it finds one
-set tags=./tags;
+set tags=./tags; " Tell vim to look upwards in the directory hierarchy for a tags file until it finds one
 
 " Make vim deal with scoped identifiers instead of just hitting top-level
 " modules when using ctags with Puppet code
 set iskeyword=-,:,@,48-57,_,192-255
 au FileType puppet setlocal isk+=:
 
-" Easy window navigation
-" map <C-h> <C-w>h
-" map <C-j> <C-w>j
-" map <C-k> <C-w>k
-" map <C-l> <C-w>l
+map <C-h> <C-w>h
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
 
-" Very handy option to write a file that we've forgotten to open via sudo
-" Just do w!! instead
-cmap w!! w !sudo tee % >/dev/null
+cmap w!! w !sudo tee % >/dev/null 
 
-" Quick write session with F2
 map <F2> :mksession! .vim_session<CR>
-" And load session with F3
 map <F3> :source .vim_session<CR>
 
 set t_Co=256
-colorscheme PaperColor
+colorscheme jellybeans
 
-" OSX Specific *****************************************************************
 if has("gui_macvim")
-	set linespace=1 " Adjust line height
-	set fuoptions=maxvert,maxhorz " fullscreen options (MacVim only), resized window when changed to fullscreen
+	set linespace=1
+	set fuoptions=maxvert,maxhorz 
     set guifont=Menlo:h12
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
@@ -127,17 +107,13 @@ if has("gui_macvim")
     set guioptions-=L " don't show scrollbars
     set stal=2 " turn on tabs by default
     set gtl=%t gtt=%F " tab headings
-    set background=light
-    colorscheme PaperColor
+    set background=dark
+    colorscheme jellybeans
 end
 
-" Automatically cd into the directory that the file is in
-" autocmd BufEnter * execute "chdir ".escape(expand("%:p:h"), ' ')
-
-" Statusline stuff
-" Using vim-airline - https://github.com/bling/vim-airline
+" vim-airline
 set laststatus=2
-let g:airline_theme='PaperColor'
+let g:airline_theme='jellybeans'
 let g:airline_powerline_fonts=0
 if !exists('g:airline_symbols')
   let g:airline_symbols = {}
@@ -157,7 +133,7 @@ let g:airline#extensions#tabline#show_buffers = 1
 " NERDTree
 map <C-n> :NERDTreeToggle<CR>
 let NERDTreeShowBookmarks=1
-let NERDTreeShowHiddern=1
+let NERDTreeShowHidden=1
 let NERDTreeBookmarksSort = 1
 
 " CtrlP settings
@@ -166,7 +142,7 @@ let g:ctrlp_switch_buffer = 0
 let g:ctrlp_working_path_mode = 0
 let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
 
-" Buffer manipulation
+" Buffer manipulation via sbd (smart buffer delete)
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
 
@@ -182,9 +158,6 @@ let g:UltiSnipsEditSplit="vertical"
 " Markdown stuff
 nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
 
-" tmux integration for better navigation between splits
-" see https://github.com/christoomey/vim-tmux-navigator
-"
 " Geeknote settings
 let g:GeeknoteFormat="markdown"
 noremap <F8> :VirtualEnvActivate geeknote<CR>:Geeknote<CR>
