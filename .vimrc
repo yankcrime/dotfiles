@@ -1,30 +1,32 @@
 " .vimrc
 " nick@dischord.org
 
-" Vundle plugin manager
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+" vim-plug plugin manager
+call plug#begin('~/.vim/plugged')
 
-Plugin 'gmarik/Vundle.vim'
-Plugin 'bling/vim-airline'
-Plugin 'kien/ctrlp.vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'tpope/vim-commentary'
-Plugin 'scrooloose/nerdtree'
-Plugin 'scrooloose/syntastic'
-Plugin 'rodjek/vim-puppet'
-Plugin 'rking/ag.vim'
-Plugin 'cespare/vim-sbd'
-Plugin 'godlygeek/tabular'
-Plugin 'SirVer/ultisnips'
-Plugin 'neilagabriel/vim-geeknote'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'honza/vim-snippets'
-Plugin 'jmcantrell/vim-virtualenv'
+Plug 'gmarik/Vundle.vim'
+Plug 'bling/vim-airline'
+Plug 'kien/ctrlp.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-commentary'
+Plug 'scrooloose/nerdtree'
+Plug 'scrooloose/syntastic'
+Plug 'rodjek/vim-puppet'
+Plug 'rking/ag.vim'
+Plug 'cespare/vim-sbd'
+Plug 'godlygeek/tabular'
+Plug 'SirVer/ultisnips'
+Plug 'neilagabriel/vim-geeknote'
+Plug 'airblade/vim-gitgutter'
+Plug 'honza/vim-snippets'
+Plug 'jmcantrell/vim-virtualenv'
+Plug 'nanotech/jellybeans.vim'
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'sjl/badwolf'
 
-call vundle#end()
+call plug#end()
 
 set nobackup " Irrelevant these days
 set number " Show linenumbers
@@ -32,9 +34,6 @@ let mapleader = "\<Space>" " Define leader key
 set pastetoggle=<F2> " Quickly enable paste mode
 set hidden " Don't moan about changes when switching buffers
 set matchpairs=(:),{:},[:],<:> " Add <> to % matching
-
-set background=dark
-syntax on
 
 set modelines=5 " Enable modelines
 
@@ -49,8 +48,8 @@ nmap <leader>l :set list!<CR>
 set listchars=tab:▸\ ,eol:¬,trail:-,
 set fillchars+=vert:\│
 
-set backupdir=~/.vim/backup/
-set directory=~/.vim/backup/
+set backupdir=/tmp//,.
+set directory=/tmp//,.
 
 au BufRead,BufNewFile *.py set expandtab
 au BufRead,BufNewFile *.yaml,*.yml so ~/.vim/after/syntax/yaml.vim
@@ -68,12 +67,12 @@ set ai
 vmap Q gq
 nmap Q gqap
 
-nmap <silent> ,/ :noh<cr> 
+" Clear search
+nmap <silent> ,/ :noh<cr>
 
 au BufEnter *.sh if getline(1) == "" | :call setline(1, "#!/usr/bin/env bash") | endif
 au BufEnter *.py if getline(1) == "" | :call setline(1, "#!/usr/bin/env python") | endif
 au BufEnter *.rb if getline(1) == "" | :call setline(1, "#!/usr/bin/env ruby") | endif
-
 
 set tags=./tags; " Tell vim to look upwards in the directory hierarchy for a tags file until it finds one
 
@@ -87,39 +86,28 @@ map <C-j> <C-w>j
 map <C-k> <C-w>k
 map <C-l> <C-w>l
 
-cmap w!! w !sudo tee % >/dev/null 
+cmap w!! w !sudo tee % >/dev/null
 
 map <F2> :mksession! .vim_session<CR>
 map <F3> :source .vim_session<CR>
 
+set background=dark
+syntax on
+
 set t_Co=256
 colorscheme jellybeans
-
-if has("gui_macvim")
-	set linespace=1
-	set fuoptions=maxvert,maxhorz 
-    set guifont=Menlo:h12
-    set guioptions-=e " don't use gui tab apperance
-    set guioptions-=T " hide toolbar
-    set guioptions-=r " don't show scrollbars
-    set guioptions-=l " don't show scrollbars
-    set guioptions-=R " don't show scrollbars
-    set guioptions-=L " don't show scrollbars
-    set stal=2 " turn on tabs by default
-    set gtl=%t gtt=%F " tab headings
-    set background=dark
-    colorscheme jellybeans
-end
 
 " vim-airline
 set laststatus=2
 let g:airline_theme='jellybeans'
-let g:airline_powerline_fonts=0
+let g:airline_powerline_fonts=1
 if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
-let g:airline_left_sep = ''
-let g:airline_right_sep = ''
+if !has("gui_macvim")
+  let g:airline_left_sep = ''
+  let g:airline_right_sep = ''
+end
 let g:airline_symbols.branch = '⭠'
 let g:airline_symbols_readonly = '⭤'
 let g:airline_symbols.linenr = '⭡'
@@ -164,3 +152,20 @@ noremap <F8> :VirtualEnvActivate geeknote<CR>:Geeknote<CR>
 nnoremap <leader>gn :Geeknote<cr>
 nnoremap <leader>gcn :GeeknoteCreateNote
 
+" MacVim GUI overrides
+if has("gui_macvim")
+	set linespace=1
+	set fuoptions=maxvert,maxhorz
+    set guifont=Hasklig:h13
+    set guioptions-=e " don't use gui tab apperance
+    set guioptions-=T " hide toolbar
+    set guioptions-=r " don't show scrollbars
+    set guioptions-=l " don't show scrollbars
+    set guioptions-=R " don't show scrollbars
+    set guioptions-=L " don't show scrollbars
+    set stal=2 " turn on tabs by default
+    set gtl=%t gtt=%F " tab headings
+    set background=light
+    colorscheme PaperColor
+	let g:airline_theme='papercolor'
+end
