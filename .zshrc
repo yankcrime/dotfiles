@@ -6,6 +6,10 @@
 export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:
 export LSCOLORS="exfxcxdxbxegedabagacad"
 export EDITOR="vim"
+export HOMEBREW_GITHUB_API_TOKEN="yearight"
+
+# get colors right
+source ~/src/base16-shell/base16-ocean.dark.sh
 
 # history stuff
 HISTSIZE=1000
@@ -62,6 +66,10 @@ setopt nohup
 # stuff that makes zsh worthwhile
 autoload -U compinit && compinit
 autoload -U promptinit && promptinit
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
 
 # a decent prompt
 # https://github.com/sindresorhus/pure
@@ -71,14 +79,13 @@ unsetopt prompt_cr
 # make it work like vim
 # thanks dougblack - http://dougblack.io/words/zsh-vi-mode.html
 bindkey -v
-bindkey '^P' up-history
-bindkey '^N' down-history
+bindkey '^P' up-line-or-beginning-search
+bindkey '^N' down-line-or-beginning-search
 bindkey '^?' backward-delete-char
 bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
-bindkey '^r' history-incremental-search-backward
+bindkey '^r' history-incremental-pattern-search-backward
 export KEYTIMEOUT=1
-source ~/src/opp.zsh/opp.zsh
 # end vim guff
 
 # jumparound

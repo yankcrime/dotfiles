@@ -4,7 +4,6 @@
 " vim-plug plugin manager
 call plug#begin('~/.vim/plugged')
 
-Plug 'gmarik/Vundle.vim'
 Plug 'bling/vim-airline'
 Plug 'kien/ctrlp.vim'
 Plug 'tpope/vim-fugitive'
@@ -18,15 +17,20 @@ Plug 'rking/ag.vim'
 Plug 'cespare/vim-sbd'
 Plug 'godlygeek/tabular'
 Plug 'SirVer/ultisnips'
-Plug 'neilagabriel/vim-geeknote'
 Plug 'airblade/vim-gitgutter'
 Plug 'honza/vim-snippets'
-Plug 'jmcantrell/vim-virtualenv'
 Plug 'nanotech/jellybeans.vim'
-Plug 'NLKNguyen/papercolor-theme'
 Plug 'sjl/badwolf'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'stephpy/vim-yaml'
+Plug 'chriskempson/base16-vim'
+Plug 'jmcantrell/vim-virtualenv'
+Plug 'neilagabriel/vim-geeknote'
+Plug 'edkolev/tmuxline.vim'
 
 call plug#end()
+
+filetype indent off
 
 set nobackup " Irrelevant these days
 set number " Show linenumbers
@@ -52,7 +56,6 @@ set backupdir=/tmp//,.
 set directory=/tmp//,.
 
 au BufRead,BufNewFile *.py set expandtab
-au BufRead,BufNewFile *.yaml,*.yml so ~/.vim/after/syntax/yaml.vim
 au BufRead,BufNewFile *.md,*.markdown setlocal textwidth=100
 
 set hlsearch
@@ -81,6 +84,13 @@ set tags=./tags; " Tell vim to look upwards in the directory hierarchy for a tag
 set iskeyword=-,:,@,48-57,_,192-255
 au FileType puppet setlocal isk+=:
 
+if has('nvim')
+    nmap <BS> <C-w>h
+	tnoremap <C-h> <C-\><C-n><C-w>h
+    tnoremap <C-j> <C-\><C-n><C-w>j
+    tnoremap <C-k> <C-\><C-n><C-w>k
+    tnoremap <C-l> <C-\><C-n><C-w>l
+endif
 map <C-h> <C-w>h
 map <C-j> <C-w>j
 map <C-k> <C-w>k
@@ -91,23 +101,22 @@ cmap w!! w !sudo tee % >/dev/null
 map <F2> :mksession! .vim_session<CR>
 map <F3> :source .vim_session<CR>
 
-set background=dark
 syntax on
 
+let base16colorspace=256
 set t_Co=256
-colorscheme jellybeans
+set background=dark
+colorscheme base16-ocean
 
 " vim-airline
 set laststatus=2
-let g:airline_theme='jellybeans'
-let g:airline_powerline_fonts=1
+let g:airline_theme='base16'
+let g:airline_powerline_fonts=0
 if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
-if !has("gui_macvim")
-  let g:airline_left_sep = ''
-  let g:airline_right_sep = ''
-end
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
 let g:airline_symbols.branch = '⭠'
 let g:airline_symbols_readonly = '⭤'
 let g:airline_symbols.linenr = '⭡'
@@ -117,6 +126,17 @@ let g:airline_detect_paste=1
 let g:airline_inactive_collapse=0
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_buffers = 1
+
+" tmuxline
+let g:tmuxline_preset = {
+      \'a'    : '#S',
+      \'win'  : '#I #W',
+      \'cwin' : '#I #W',
+      \'z'    : '#h',
+	  \ 'options': {
+	  \'status-justify': 'left'}
+	  \}
+let g:tmuxline_powerline_separators = 0
 
 " NERDTree
 map <C-n> :NERDTreeToggle<CR>
@@ -133,6 +153,8 @@ let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
 " Buffer manipulation via sbd (smart buffer delete)
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
+
+nnoremap <leader>s :Ag 
 
 " Ultisnips
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
@@ -156,7 +178,7 @@ nnoremap <leader>gcn :GeeknoteCreateNote
 if has("gui_macvim")
 	set linespace=1
 	set fuoptions=maxvert,maxhorz
-    set guifont=Hasklig:h13
+    set guifont=Menlo:h12
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
     set guioptions-=r " don't show scrollbars
@@ -166,6 +188,6 @@ if has("gui_macvim")
     set stal=2 " turn on tabs by default
     set gtl=%t gtt=%F " tab headings
     set background=light
-    colorscheme PaperColor
-	let g:airline_theme='papercolor'
+    colorscheme jellybeans
+	let g:airline_theme='jellybeans'
 end
