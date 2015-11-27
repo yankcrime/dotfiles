@@ -4,12 +4,11 @@
 
 # usual suspects
 export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:
-export LSCOLORS="exfxcxdxbxegedabagacad"
+# export LSCOLORS="exfxcxdxbxegedabagacad"
 export EDITOR="vim"
-export HOMEBREW_GITHUB_API_TOKEN="yearight"
-
-# get colors right
-source ~/src/base16-shell/base16-ocean.dark.sh
+export HOMEBREW_GITHUB_API_TOKEN=""
+export GOPATH=~/src/golang/work
+export NVIM_TUI_ENABLE_TRUE_COLOR=1
 
 # history stuff
 HISTSIZE=1000
@@ -36,7 +35,6 @@ alias zarquon='mosh zarquon.dischord.org'
 alias sshx='ssh -c arcfour,blowfish-cbc -XC'
 alias pwplz='apg -n 1 -m 12 -x 12 -M NC'
 alias keyplz='openssl rand -hex 10'
-alias vim='/usr/local/bin/vim'
 alias md='open -a Marked.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 
@@ -91,9 +89,6 @@ export KEYTIMEOUT=1
 # jumparound
 source ~/bin/z.sh
 
-# syntax highlighting
-source ~/src/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
 # ssh wrapper that rename current tmux window to the hostname of the
 # remote host.
 ssh() {
@@ -117,9 +112,11 @@ ssh() {
     fi
 }
 
-# rbenv junk
+# pyenv and rbenv junk
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
-# virtualenv junk
-[[ -s "/usr/local/bin/virtualenvwrapper.sh" ]] && source "/usr/local/bin/virtualenvwrapper.sh"
-
+# syntax highlighting
+source ~/src/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=yellow'
+ZSH_HIGHLIGHT_STYLES[path]='bold'
