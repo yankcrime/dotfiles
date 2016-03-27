@@ -1,5 +1,5 @@
 # vim:ts=3:et:ft=zsh
-# zshell config
+# .zshrc
 # nick@dischord.org
 
 # usual suspects
@@ -8,7 +8,7 @@ export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:
 export EDITOR="vim"
 export HOMEBREW_GITHUB_API_TOKEN=""
 export GOPATH=~/src/golang/work
-export NVIM_TUI_ENABLE_TRUE_COLOR=1
+# export NVIM_TUI_ENABLE_TRUE_COLOR=1
 
 # history stuff
 HISTSIZE=1000
@@ -39,7 +39,7 @@ alias md='open -a Marked.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 
 # <3 vagrant
-alias vup='vagrant up --provider=vmware_fusion'
+alias vup='vagrant up --no-install-provider'
 alias vprov='vagrant provision'
 alias vstat='vagrant status'
 alias vhalt='vagrant halt'
@@ -52,7 +52,7 @@ alias gitl='git log --pretty=format:"%h - %an, %ar : %s"'
 alias gits='git shortlog --numbered --summary'
 alias gitrs="git reset --soft 'HEAD^'"
 alias gitrsh='git reset --hard HEAD'
-alias gitsup='for foo in init sync update ; do git submodule $foo ; done'
+alias gitsup='git submodule sync ; git submodule update --init'
 
 # options
 umask 022
@@ -120,3 +120,6 @@ if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 source ~/src/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 ZSH_HIGHLIGHT_STYLES[globbing]='fg=yellow'
 ZSH_HIGHLIGHT_STYLES[path]='bold'
+
+# added by travis gem
+[ -f /Users/nick/.travis/travis.sh ] && source /Users/nick/.travis/travis.sh
