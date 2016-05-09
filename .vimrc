@@ -271,6 +271,10 @@ function! s:syntastic()
   call lightline#update()
 endfunction
 " }}}
+" {{{ BufTabLine
+let g:buftabline_indicators=1
+let g:buftabline_numbers=1
+" }}}
 " {{{ NERDTree
 map <C-n> :NERDTreeToggle<CR>
 let NERDTreeShowBookmarks=1
