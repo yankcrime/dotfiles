@@ -24,10 +24,12 @@ Plug 'stephpy/vim-yaml'
 Plug 'lambdalisue/vim-pyenv'
 Plug 'plasticboy/vim-markdown'
 Plug 'itchyny/lightline.vim'
+Plug 'majutsushi/tagbar'
 Plug 'ap/vim-buftabline'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/vim-emoji'
 " Themes and colorschemes
+Plug 'nelstrom/vim-mac-classic-theme'
 Plug 'morhetz/gruvbox'
 Plug 'nanotech/jellybeans.vim'
 Plug 'sjl/badwolf'
@@ -335,6 +337,23 @@ au FileType go nmap <Leader>gd <Plug>(go-doc)
 au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
 let g:go_term_enabled = 1
 " }}}
+" {{{ ctags / Tagbar
+" Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
+" prefixed with '::' which don't match to a file directly when used in
+" conjunction with ctags
+au FileType puppet nnoremap <c-]> :exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>  
+au FileType puppet nnoremap <c-w><c-]> :tab split<CR>:exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>
+let g:tagbar_type_puppet = {
+  \ 'ctagstype': 'puppet',
+  \ 'kinds': [
+    \'c:class',
+    \'s:site',
+    \'n:node',
+    \'d:definition',
+    \'r:resource',
+    \'f:default'
+  \]
+\}
 " {{{ MacVim GUI overrides
 if has("gui_macvim")
 	set linespace=1
