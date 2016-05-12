@@ -4,20 +4,20 @@
 " {{{ vim-plug
 call plug#begin('~/.vim/plugged')
 
-Plug 'kien/ctrlp.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
-Plug 'scrooloose/nerdtree'
-Plug 'fatih/vim-go'
-Plug 'scrooloose/syntastic'
-Plug 'rodjek/vim-puppet'
+Plug 'kien/ctrlp.vim'
 Plug 'rking/ag.vim'
-Plug 'cespare/vim-sbd'
+Plug 'scrooloose/nerdtree'
+Plug 'scrooloose/syntastic'
 Plug 'godlygeek/tabular'
-Plug 'SirVer/ultisnips'
 Plug 'airblade/vim-gitgutter'
+Plug 'fatih/vim-go'
+Plug 'rodjek/vim-puppet'
+Plug 'cespare/vim-sbd'
+Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'stephpy/vim-yaml'
@@ -29,16 +29,11 @@ Plug 'ap/vim-buftabline'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/vim-emoji'
 " Themes and colorschemes
-Plug 'nelstrom/vim-mac-classic-theme'
-Plug 'morhetz/gruvbox'
 Plug 'nanotech/jellybeans.vim'
 Plug 'sjl/badwolf'
 Plug 'chriskempson/base16-vim'
 Plug 'reedes/vim-colors-pencil'
 Plug 'fxn/vim-monochrome'
-Plug 'croaker/mustang-vim'
-Plug 'sts10/vim-mustard'
-Plug 'endel/vim-github-colorscheme'
 
 call plug#end()
 " }}} end vim-plug
@@ -181,7 +176,8 @@ let g:lightline = {
 
 function! LightLineMode()
   let fname = expand('%:t')
-  return fname == 'ControlP' ? 'CtrlP' :
+  return fname == '__Tagbar__' ? 'Tagbar' :
+		\ fname == 'ControlP' ? 'CtrlP' :
         \ fname =~ 'NERD_tree' ? 'NERDTree' :
         \ winwidth(0) > 60 ? lightline#mode() : ''
 endfunction
@@ -209,16 +205,21 @@ function! LightLineReadonly()
 endfunction
 
 function! LightLineFugitive()
-  if exists("*fugitive#head")
-    let _ = fugitive#head()
-    return strlen(_) ? ' '._ : ''
-  endif
+  try
+    if expand('%:t') !~? 'Tagbar\|Gundo\|NERD' && &ft !~? 'vimfiler' && exists('*fugitive#head')
+      let mark = ' '  " edit here for cool mark
+      let _ = fugitive#head()
+      return _ !=# '' ? mark._ : ''
+    endif
+  catch
+  endtry
   return ''
 endfunction
 
 function! LightLineFilename()
   let fname = expand('%:t')
   return fname == 'ControlP' && has_key(g:lightline, 'ctrlp_item') ? g:lightline.ctrlp_item :
+		\ fname == '__Tagbar__' ? g:lightline.fname :
         \ fname =~ '__Gundo\|NERD_tree' ? '' :
         \ ('' != LightLineReadonly() ? LightLineReadonly() . ' ' : '') .
         \ ('' != fname ? fname : '[No Name]') .
@@ -272,6 +273,12 @@ function! s:syntastic()
   SyntasticCheck
   call lightline#update()
 endfunction
+let g:tagbar_status_func = 'TagbarStatusFunc'
+
+function! TagbarStatusFunc(current, sort, fname, ...) abort
+    let g:lightline.fname = a:fname
+  return lightline#statusline(0)
+endfunction
 " }}}
 " {{{ BufTabLine
 let g:buftabline_indicators=1
@@ -294,7 +301,7 @@ nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
 " }}}
 " {{{ Silver Searcher (Ag)
-nnoremap <leader>s :Ag 
+nnoremap <C-s> :Ag 
 " }}}
 " {{{ Ultisnips
 let g:UltiSnipsExpandTrigger="<tab>"
@@ -341,6 +348,7 @@ let g:go_term_enabled = 1
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
 " prefixed with '::' which don't match to a file directly when used in
 " conjunction with ctags
+nnoremap <C-t> :TagbarToggle<CR>
 au FileType puppet nnoremap <c-]> :exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>  
 au FileType puppet nnoremap <c-w><c-]> :tab split<CR>:exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>
 let g:tagbar_type_puppet = {
