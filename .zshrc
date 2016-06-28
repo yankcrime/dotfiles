@@ -1,4 +1,3 @@
-# vim:ts=4:sw=4:ft=zsh
 # .zshrc
 # nick@dischord.org
 
@@ -14,13 +13,18 @@ export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
 
 # history and general options
 #
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=10000000
+SAVEHIST=10000000
 TMOUT=0
 HISTFILE=~/.history
 setopt APPEND_HISTORY
-setopt HIST_EXPIRE_DUPS_FIRST
+setopt SHARE_HISTORY
 setopt EXTENDED_HISTORY
+setopt INC_APPEND_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
 setopt nohup
 umask 022
 
@@ -44,6 +48,7 @@ alias pwplz='apg -n 1 -m 12 -x 12 -M NC'
 alias keyplz='openssl rand -hex 10'
 alias md='open -a Marked.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
+alias mutt='cd ~/Desktop && mutt'
 
 # <3 vagrant
 #
@@ -72,9 +77,13 @@ autoload -U up-line-or-beginning-search
 autoload -U down-line-or-beginning-search
 zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
+local knownhosts
+knownhosts=( ${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[0-9]*}%%\ *}%%,*} )
+zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
 
 # make it work like vim
 # thanks dougblack - http://dougblack.io/words/zsh-vi-mode.html
+#
 bindkey -v
 bindkey '^P' up-line-or-beginning-search
 bindkey '^N' down-line-or-beginning-search
@@ -97,3 +106,15 @@ if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 # https://github.com/tarjoilija/zgen
 #
 source "${HOME}/.zgen/zgen.zsh"
+if ! zgen saved; then
+  echo "Creating a zgen save"
+
+  zgen load mafredri/zsh-async
+  zgen load sindresorhus/pure
+  zgen load junegunn/fzf
+  zgen load rupa/z
+
+  zgen save
+fi
+
+# vim:ts=4:sw=4:ft=zsh:et
