@@ -1,0 +1,19 @@
+# Settings specific to dischord.org
+#
+set from="nick@dischord.org"
+set mbox="+dischord.org/ALL"
+set spoolfile="+dischord.org/INBOX"
+set trash="+dischord.org/Bin"
+
+unset record
+unset copy
+
+send-hook . my_hdr From: Nick Jones <nick@dischord.org>
+
+set sendmail="/usr/local/bin/msmtp -a dischord"
+
+mailboxes +dischord.org/INBOX +dischord.org/Sent
+
+macro index,pager y "<save-message>=dischord.org/ALL<enter>" "Archive"
+
+# vim:ts=4:sw=4:et:ft=muttrc

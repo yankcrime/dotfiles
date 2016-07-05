@@ -1,0 +1,24 @@
+# Settings for datacentred.co.uk
+#
+set from="nick.jones@datacentred.co.uk"
+set mbox="+datacentred.co.uk/ALL"
+set spoolfile="+datacentred.co.uk/INBOX"
+set trash="+datacentred.co.uk/Bin"
+
+unset record
+unset copy
+
+send-hook . my_hdr From: Nick Jones <nick.jones@datacentred.co.uk>
+
+set sendmail="/usr/local/bin/msmtp -a datacentred"
+
+mailboxes +datacentred.co.uk/INBOX \
+		  +datacentred.co.uk/Sent \
+		  +datacentred.co.uk/Alerts \
+		  +datacentred.co.uk/GitHub \
+		  +datacentred.co.uk/Lists.OpenStack-Ops \
+		  +datacentred.co.uk/Lists.OpenStack-Dev
+
+macro index,pager y "<save-message>=datacentred.co.uk/ALL<enter>" "Archive"
+
+# vim:ts=4:sw=4:et:ft=muttrc

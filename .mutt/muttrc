@@ -1,0 +1,199 @@
+# .muttrc
+# nick@dischord.org
+#
+set folder           = ~/Mail/
+set alias_file       = ~/.mutt/aliases         # where to store aliases
+set header_cache     = ~/.mutt/cache/headers # where to store headers
+set message_cachedir = ~/.mutt/cache/bodies  # where to store bodies
+set mailcap_path     = ~/.mutt/mailcap       # entries for filetypes
+set tmpdir           = ~/.mutt/tmp          # where to keep temp files
+set signature        = ~/.signature           # my signature file
+
+set editor="nvim -c 'normal! }' -c 'redraw'"
+
+set query_command = "contacts -Sf '%eTOKEN%n' '%s' | sed -e 's/TOKEN/\t/g'"
+bind editor <Tab> complete-query
+bind editor ^T    complete
+
+source ~/.mutt/accounts/default
+source ~/.mutt/colours
+
+color progress white red
+
+set wait_key = no
+set mbox_type = Maildir
+set timeout = 3
+set mail_check = 0
+unset move
+set delete
+unset confirmappend
+set quit
+unset mark_old
+set pipe_decode
+set thorough_search
+set auto_tag = yes
+
+set askcc = no
+
+set record=""
+
+set status_chars  = " *%A"
+set status_format = "───[ Folder: %f ]───[%r%m messages%?n? (%n new)?%?d? (%d to delete)?%?t? (%t tagged)? ]───%>─%?p?( %p postponed )?───"
+
+set folder_format = "%2C %t %N %8s %f"
+set folder_format="%N %F %2l %-8.8u %-8.8g %8s %d %f"
+
+set date_format = "%d/%m"
+set index_format = "[%Z]  %D  %-20.20F  %s"
+# set index_format='%4C %S %<[1y?%<[2d?%<[1d?    Today&Yesterday>&%[   %b %d]>&%[ %y.%m.%d]> %<M?(%2M)&    > %-18.18n %<GF?%GF&%<GC?%GC&%<GU?%GU&  >>> %<GX?%GX&  >%<Gq?%Gq&%<Gp?%Gp&  >> %<GA?%GA& >%<GI?%GI& > %s%> %g'
+set sort = threads                         # like gmail
+set sort_aux = reverse-last-date-received  # like gmail
+set uncollapse_jump                        # don't collapse on an unread message
+set sort_re                                # thread based on regex
+set reply_regexp = "^(([Rr][Ee]?(\[[0-9]+\])?: *)?(\[[^]]+\] *)?)*"
+set quote_regexp = "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"
+set pager_index_lines = 10 # number of index lines to show
+set pager_context = 3      # number of context lines to show
+set pager_stop             # don't go to next message automatically
+set menu_scroll            # scroll in menus
+set tilde                  # show tildes like in vim
+set text_flowed
+unset markers              # no ugly plus signs
+alternative_order text/plain text/enriched text/html
+auto_view text/html
+
+set realname = "Nick Jones"
+set envelope_from
+set sig_dashes
+set edit_headers
+set fast_reply
+set fcc_attach
+unset mime_forward
+set forward_format = "Fwd: %s"
+set forward_decode
+set attribution = "On %d, %n wrote:"
+set reply_to
+set reverse_name
+set include
+set forward_quote
+
+ignore *
+unignore from: to: cc: date: subject:
+unhdr_order *
+hdr_order from: to: cc: date: subject:
+
+send-hook . my_hdr X-Operating-System: Mac OS X/`uname -r` (`uname -m`)
+
+set sendmail_wait = 0
+
+bind attach ' ' select-entry
+
+bind index,pager \t   next-new
+bind index,pager ' '  next-unread
+bind index,pager V    show-version
+
+bind index gg       first-entry
+bind index G        last-entry
+bind index <space>  collapse-thread
+
+bind editor <space> noop
+
+macro index,pager gi "<change-folder>!<enter>" "Go to inbox"
+macro index,pager gl "<change-folder>^<enter>" "Go to last"
+
+bind index,pager  d   delete-message
+
+bind pager zA  toggle-quoted   # toggle quote section, similar to vim folding
+bind pager za  toggle-quoted   # toggle quote section, similar to vim folding
+
+macro index,pager I           "c!\n" "Go to Inbox"
+
+bind index   P          recall-message
+bind index   s          save-message
+bind browser x          check-new
+bind index   <pagedown> next-page
+bind index   <pageup>   previous-page
+bind index   x          sync-mailbox
+bind index   \;         tag-entry
+
+bind pager       /           search
+bind pager       L           list-reply
+bind pager	     B	        bounce-message
+bind pager       f           forward-message
+bind pager       m           mail
+bind index,pager R           group-reply
+bind pager       :           enter-command
+bind pager       p           previous-undeleted
+bind pager       n           next-undeleted
+bind pager       \n          next-unread
+bind compose     <return>    send-message
+bind compose     s           send-message
+bind pager       ,p          print-message
+
+bind generic,index,pager J   next-entry
+bind generic,index,pager K   previous-entry
+bind generic,index       j   next-entry
+bind generic,index       k   previous-entry
+bind pager               j   next-line
+bind pager               k   previous-line
+bind index,pager         l   next-thread
+bind index,pager         h   previous-thread
+bind generic,index,pager J   next-entry
+bind generic,index,pager K   previous-entry
+bind index,pager         {   previous-thread
+bind index,pager         }   next-thread
+bind pager               G   bottom
+bind index               G   last-entry
+bind index               H   top-page
+bind index               M   middle-page
+bind index               L   bottom-page
+bind pager               H   top
+bind pager               <space> next-page
+bind pager               ]   skip-quoted
+bind index               L   limit
+
+macro index,pager \CD "<tag-thread>"
+
+macro index C   "<copy-message>?<toggle-mailboxes>" "copy a message to a mailbox"
+macro index M   "<save-message>?<toggle-mailboxes>" "move a message to a mailbox"
+
+bind generic,pager,browser,attach,compose,pgp,smime,postpone,query <esc> exit 
+
+macro index <f5> '<sync-mailbox><enter-command>source ~/.mutt/accounts/datacentred<enter><change-folder>!<enter>'
+macro index <f6> '<sync-mailbox><enter-command>source ~/.mutt/accounts/dischord<enter><change-folder>!<enter>'
+
+macro index,pager \" "<enter-command> \
+    unset wait_key<enter><shell-escape> \
+    tmux split-window -h \"mutt -R\"<enter>" "open new mutt"
+
+macro pager \Cu "|urlview<enter>" "call urlview to open links"<Paste>
+
+macro index q "<vfolder-from-query">
+
+set nm_default_uri="notmuch:///Users/nick/Mail/"
+# set virtual_spoolfile=yes
+# set vfolder_format = "%6n (%6N) %f "
+set vfolder_format=" %<N?%-4N&    > %f"
+virtual-mailboxes \
+    "INBOX"                 "notmuch://?query=tag:inbox and NOT tag:archive" \
+    "Alerts"                "notmuch://?query=tag:autobot and NOT tag:deleted" \
+    "GitHub"                "notmuch://?query=tag:github and NOT tag:deleted" \
+    "Lists/OpenStack Ops"   "notmuch://?query=tag:openstack-ops" \
+    "Lists/OpenStack Dev"   "notmuch://?query=tag:openstack-dev" \
+    "Unread"                "notmuch://?query=tag:unread and NOT tag:deleted" \
+    "Sent"                  "notmuch://?query=tag:sent" \
+    "Archive"               "notmuch://?query=tag:archive" \
+    "Starred"               "notmuch://?query=tag:*"
+
+tag-transforms             \
+    "inbox"          "∙"   \
+    "unread"         "⚀ "  \
+    "flagged"        "★ "  \
+    "replied"        "↻ "  \
+    "sent"           "➥ "  \
+    "signed"         "✔ "  \
+    "attachment"     "✛ "  \
+    "archive"        "A"   \
+    "deleted"        "D"
+
+# vim:ts=4:sw=4:et:ft=muttrc

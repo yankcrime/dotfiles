@@ -1,0 +1,13 @@
+notmuch new
+notmuch tag -inbox +work +archive folder:datacentred.co.uk/ALL
+notmuch tag -inbox +personal +archive folder:dischord.org/ALL
+notmuch tag -inbox -archive +work +openstack-ops to:openstack-ops@lists.openstack.org
+notmuch tag -inbox -archive +work +openstack-dev to:openstack-dev@lists.openstack.org
+notmuch tag -inbox -archive +work +autobot from:autobot@datacentred.co.uk
+notmuch tag -inbox -archive +work +github to:puppet@noreply.github.com
+notmuch tag -inbox -archive +work +sent folder:datacentred.co.uk/Sent
+notmuch tag -inbox -archive +work +deleted folder:datacentred.co.uk/Bin
+notmuch tag -inbox -archive +personal +sent folder:dischord.org/Sent
+notmuch tag -inbox -archive +personal +deleted folder:dischord.org/Bin
+notmuch tag +inbox -archive +work folder:datacentred.co.uk/INBOX
+notmuch tag +inbox -archive +personal folder:dischord.org/INBOX

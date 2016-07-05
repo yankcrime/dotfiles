@@ -1,0 +1,19 @@
+# .mutt.mailcap - defines how mutt handles certain file types
+
+text/html; w3m -I %{charset} -T text/html; copiousoutput;
+#text/html; /usr/bin/links %s; nametemplate=%s.html
+# text/html; /usr/bin/links -dump %s; nametemplate=%s.html; copiousoutput 
+text/x-vcard; ~/.mutt/bin/mutt.vcard.filter; copiousoutput
+application/octet-stream; ~/.mutt/bin/mutt.octet.filter.pl %s; copiousoutput
+application/postscript; ps2ascii %s; copiousoutput
+application/ms-tnef; tnef2txt %s; copiousoutput
+application/ms-rtf; rtfreader; copiousoutput
+application/ms-word; /usr/bin/catdoc %s; copiousoutput
+application/msword; /usr/bin/catdoc %s; copiousoutput
+application/vnd.openxm; /usr/local/bin/catdoc %s; copiousoutput
+application/vnd.ms-excel; /usr/bin/open -a "/Applications/Microsoft Office 2011/Microsoft Excel.app" %s
+image/jpeg; /usr/bin/open -a /Applications/Preview.app %s
+image/gif; ~/.mutt/bin/view_attachment.sh %s
+image/png; ~/.mutt/bin/view_attachment.sh %s
+text/calendar; ~/.mutt/bin/mutt-ical.py -i -e "nick.jones@datacentred.co.uk" %s
+application/ics; ~/.mutt/bin/mutt-ical.py -i -e "nick.jones@datacentred.co.uk" %s

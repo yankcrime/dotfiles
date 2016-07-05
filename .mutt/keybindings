@@ -1,0 +1,120 @@
+# keybindings - keybindings for mutt specific to Gmail
+# nick.jones@datacentred.co.uk
+
+## ========================
+## Bindings for attach menu
+## ========================
+
+bind attach ' ' select-entry
+
+## ============================
+## Bindings for index and pager
+## ============================
+
+## Jumping to the next mail that is still unread.
+bind index,pager   \t      next-new
+bind index,pager   ' '     next-unread
+bind index,pager   V       show-version
+
+bind editor <space> noop
+macro index,pager gi  "<change-folder>!<enter>"           "Go to inbox"
+macro index,pager gl  "<change-folder>^<enter>"           "Go to last"
+macro index,pager ga  "<change-folder>=Archive<enter>"   "Go to all mail"
+macro index,pager gd  "<change-folder>=Drafts<enter>"     "Go to drafts"
+macro index,pager gs  "<change-folder>=Sent<enter>"       "Go to sent"
+
+macro index,pager "!" "<save-message>=Spam<enter>"        "Mark message as spam"
+
+macro index,pager d "<save-message>=Bin<enter>" "Move message to bin"
+bind index,pager  a   delete-message
+
+macro index,pager \CD "<tag-thread>"
+
+macro index S "<enter-command>unset wait_key<enter><shell-escape>~/.mutt/bin/mutt-notmuch-py.py ~/.mutt/tmp/search<enter><change-folder-readonly>~/.mutt/tmp/search<enter>" "search mail (using notmuch)"
+
+# Thread management
+bind  index		  zA  collapse-thread # toggle thread, similar to vim folding (though inverted)
+bind  index       za  collapse-all    # toggle all thread, similar to vim folding
+bind  pager       zA  toggle-quoted   # toggle quote section, similar to vim folding
+bind  pager       za  toggle-quoted   # toggle quote section, similar to vim folding
+
+## ======================
+## Bindings for index
+## ======================
+
+bind index   P          recall-message
+bind index   s          save-message
+bind browser x          check-new
+bind index   <pagedown> next-page
+bind index   <pageup>   previous-page
+bind index   x          sync-mailbox
+# bind index   a          tag-prefix
+bind index   \;         tag-entry
+
+# ======================================
+# Quickly change to my favorite folders:
+# ======================================
+
+macro index,pager  I      "c!\n" "Go to Inbox"
+
+# ===========================
+#    Bindings for pager
+# ===========================
+
+bind pager     /   search
+bind pager     L   list-reply
+bind pager	   B	bounce-message
+bind pager     f   forward-message
+bind pager     m   mail
+bind index,pager     R   group-reply
+bind pager     :   enter-command
+bind pager     p   previous-undeleted
+bind pager     n   next-undeleted
+bind pager     \n  next-unread
+bind compose   <return>  send-message
+bind compose   s   send-message
+bind pager ,p print-message
+
+macro pager J "!gpg --keyserver wwwkeys.eu.pgp.net --recv-key " "Get PGP Key"
+macro pager K "!gpg --lsign-key " "Sign PGP Key"
+macro pager \Cu "|urlview<enter>" "call urlview to open links"
+
+## ======================
+## Movement 
+## ======================
+
+bind generic,index,pager    J   next-entry
+bind generic,index,pager    K   previous-entry
+bind generic,index          j   next-entry
+bind generic,index          k   previous-entry
+bind pager                  j   next-line
+bind pager                  k   previous-line
+bind index,pager            l   next-thread
+bind index,pager            h   previous-thread
+bind generic,index,pager    J   next-entry
+bind generic,index,pager    K   previous-entry
+bind index,pager            {   previous-thread
+bind index,pager            }   next-thread
+bind pager                  G   bottom
+bind index                  G   last-entry
+bind index                  H   top-page
+bind index                  M   middle-page
+bind index                  L   bottom-page
+bind pager                  H   top
+bind pager                  <space> next-page
+bind pager                  ]   skip-quoted
+bind index					L	limit
+bind generic,pager,browser,attach,compose,pgp,smime,postpone,query <esc> exit 
+
+bind index,pager <down>   sidebar-next
+bind index,pager <up>     sidebar-prev
+bind index,pager <right>  sidebar-open
+
+# sidebar toggle
+macro index ,@) "<enter-command> set sidebar_visible=no; macro index ~ ,@( 'Toggle sidebar'<Enter>"
+macro index ,@( "<enter-command> set sidebar_visible=yes; macro index ~ ,@) 'Toggle sidebar'<Enter>"
+macro index ~ ,@( 'Toggle sidebar'      # toggle the sidebar
+
+
+macro index <f5> '<sync-mailbox><enter-command>source ~/.mutt/personal.dc.imap<enter><change-folder>!<enter>'
+macro index <f6> '<sync-mailbox><enter-command>source ~/.mutt/personal.dischord<enter><change-folder>!<enter>'

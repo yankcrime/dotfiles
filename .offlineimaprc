@@ -1,0 +1,93 @@
+# offlineimap configuration
+# Refs: http://stevelosh.com/blog/2012/10/the-homely-mutt/
+#
+[general]
+ui = TTY.TTYUI
+accounts = datacentred, dischord
+pythonfile=~/.mutt/offlineimap.py
+fsync = False
+socktimeout = 30
+
+[mbnames]
+enabled = no
+filename = ~/.mutt/mailboxes
+header = "mailboxes "
+peritem = =%(foldername)s
+sep = " "
+
+[Account datacentred]
+localrepository = datacentred-local
+remoterepository = datacentred-remote
+status_backend = sqlite
+postsynchook = ~/.mutt/bin/postsync
+#synclabels = yes
+
+[Account dischord]
+localrepository = dischord-local
+remoterepository = dischord-remote
+status_backend = sqlite
+
+[Repository datacentred-local]
+type = Maildir
+localfolders = ~/Mail/datacentred.co.uk
+nametrans = lambda folder: {'Drafts':  '[Gmail]/Drafts',
+                            'Sent':    '[Gmail]/Sent Mail',
+                            'Bin':   '[Gmail]/Bin',
+                            'ALL': '[Gmail]/All Mail',
+                            }.get(folder, folder)
+
+[Repository datacentred-remote]
+keepalive = 60
+holdconnectionopen = yes
+auth_mechanisms = LOGIN
+ssl = yes
+sslcacertfile = ~/.mutt/cacert.pem
+maxconnections = 1
+type = Gmail
+remoteuser = nick.jones@datacentred.co.uk
+remotepasseval = get_keychain_pass(account="nick.jones@datacentred.co.uk", server="imap.gmail.com")
+realdelete = no
+
+nametrans = lambda folder: {'[Gmail]/Drafts':    'Drafts',
+                            '[Gmail]/Sent Mail': 'Sent',
+                            '[Gmail]/Bin':     'Bin',
+                            '[Gmail]/All Mail':  'ALL',
+                            }.get(folder, folder)
+
+folderfilter = lambda folder: folder not in ['[Gmail]/Important',
+                                            '[Gmail]/Spam',
+                                            '[Gmail]/Starred',
+                                            ]
+
+[Repository dischord-local]
+type = Maildir
+localfolders = ~/Mail/dischord.org
+
+nametrans = lambda folder: {'Sent':	'[Google Mail]/Sent Mail',
+                            'Bin':	'[Google Mail]/Bin',
+                            'ALL':	'[Google Mail]/All Mail',
+                            }.get(folder, folder)
+
+[Repository dischord-remote]
+keepalive = 60
+holdconnectionopen = yes
+auth_mechanisms = LOGIN
+ssl = yes
+sslcacertfile = ~/.mutt/cacert.pem
+maxconnections = 1
+type = Gmail
+remoteuser = nick@dischord.org
+remotepasseval = get_keychain_pass(account="nick@dischord.org", server="imap.gmail.com")
+realdelete = no
+
+nametrans = lambda folder: {'[Google Mail]/Sent Mail':	'Sent',
+                            '[Google Mail]/Bin':		'Bin',
+                            '[Google Mail]/All Mail':	'ALL',
+                            }.get(folder, folder)
+
+folderfilter = lambda folder: folder not in ['[Google Mail]/Important',
+                                            '[Google Mail]/Spam',
+                                            '[Google Mail]/Starred',
+                                            '[Google Mail]/Drafts',
+                                            ]
+
