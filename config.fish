@@ -42,3 +42,10 @@ alias gits='git shortlog --numbered --summary'
 alias gitrs="git reset --soft 'HEAD^'"
 alias gitrsh='git reset --hard HEAD'
 alias gitsup='git submodule sync ; git submodule update --init'
+
+set EDITOR "nvim"
+set HOMEBREW_GITHUB_API_TOKEN ""
+set GOPATH ~/src/golang
+set KEYTIMEOUT 1
+
+export EDITOR HOMEBREW_GITHUB_API_TOKEN GOPATH KEYTIMEOUT
