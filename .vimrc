@@ -28,12 +28,15 @@ Plug 'majutsushi/tagbar'
 Plug 'ap/vim-buftabline'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/vim-emoji'
+Plug 'kassio/neoterm'
 " Themes and colorschemes
+" Plug 'godlygeek/csapprox'
 Plug 'nanotech/jellybeans.vim'
 Plug 'sjl/badwolf'
 Plug 'chriskempson/base16-vim'
 Plug 'reedes/vim-colors-pencil'
 Plug 'fxn/vim-monochrome'
+Plug 'cocopon/iceberg.vim'
 
 call plug#end()
 " }}} end vim-plug
@@ -44,6 +47,7 @@ filetype indent off
 set nobackup " Irrelevant these days
 set number " Show linenumbers
 let mapleader = "\<Space>" " Define leader key
+
 set pastetoggle=<F2> " Quickly enable paste mode
 set hidden " Don't moan about changes when switching buffers
 set matchpairs=(:),{:},[:],<:> " Add <> to % matching
@@ -56,6 +60,7 @@ set nowrap
 set tabstop=4
 set bs=2
 set smarttab
+set ttyfast
 
 nmap <leader>l :set list!<CR>
 set listchars=tab:▸\ ,eol:¬,trail:-,
@@ -88,6 +93,8 @@ au BufEnter *.sh if getline(1) == "" | :call setline(1, "#!/usr/bin/env bash") |
 au BufEnter *.py if getline(1) == "" | :call setline(1, "#!/usr/bin/env python") | endif
 au BufEnter *.rb if getline(1) == "" | :call setline(1, "#!/usr/bin/env ruby") | endif
 
+autocmd BufRead ~/.mutt/tmp/*      :source ~/.mutt/mail.vim
+
 set tags=./tags; " Tell vim to look upwards in the directory hierarchy for a tags file until it finds one
 
 " Make vim deal with scoped identifiers instead of just hitting top-level
@@ -112,7 +119,7 @@ colorscheme goodwolf
 " }}} End basic settings
 " {{{ NeoVim
 if has('nvim')
-"	let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+	let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 	set mouse=r
     nmap <BS> <C-w>h
     map <C-h> <C-w>h
@@ -170,8 +177,8 @@ let g:lightline = {
       \ 'component_type': {
       \   'syntastic': 'error',
       \ },
-      \ 'separator': { 'left': '', 'right': '' },
-      \ 'subseparator': { 'left': '', 'right': '' }
+	  \ 'separator': { 'left': '⮀', 'right': '⮂' },
+	  \ 'subseparator': { 'left': '⮁', 'right': '⮃' }
       \ }
 
 function! LightLineMode()
@@ -198,7 +205,7 @@ function! LightLineReadonly()
   if &filetype == "help"
     return ""
   elseif &readonly
-    return ""
+    return "⭤"
   else
     return ""
   endif
@@ -207,7 +214,7 @@ endfunction
 function! LightLineFugitive()
   try
     if expand('%:t') !~? 'Tagbar\|Gundo\|NERD' && &ft !~? 'vimfiler' && exists('*fugitive#head')
-      let mark = ' '  " edit here for cool mark
+      let mark = '⭠ '  " edit here for cool mark
       let _ = fugitive#head()
       return _ !=# '' ? mark._ : ''
     endif
@@ -282,7 +289,17 @@ endfunction
 " }}}
 " {{{ BufTabLine
 let g:buftabline_indicators=1
-let g:buftabline_numbers=1
+let g:buftabline_numbers=2
+nmap <A-1> <Plug>BufTabLine.Go(1)
+nmap <A-2> <Plug>BufTabLine.Go(2)
+nmap <A-3> <Plug>BufTabLine.Go(3)
+nmap <A-4> <Plug>BufTabLine.Go(4)
+nmap <A-5> <Plug>BufTabLine.Go(5)
+nmap <A-6> <Plug>BufTabLine.Go(6)
+nmap <A-7> <Plug>BufTabLine.Go(7)
+nmap <A-8> <Plug>BufTabLine.Go(8)
+nmap <A-9> <Plug>BufTabLine.Go(9)
+nmap <A-0> <Plug>BufTabLine.Go(10)
 " }}}
 " {{{ NERDTree
 map <C-n> :NERDTreeToggle<CR>
@@ -310,10 +327,6 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:UltiSnipsEditSplit="vertical"
 " }}}
 " {{{ Syntastic
-let g:syntastic_error_symbol=emoji#for('boom')
-let g:syntastic_warning_symbol=emoji#for('exclamation')
-" let g:syntastic_error_symbol='✗'
-" let g:syntastic_warning_symbol='⚠️'
 let g:syntastic_enable_ballons=has('ballon_eval')
 let g:syntastic_always_populate_loc_list=1
 let g:syntastic_auto_jump=1
@@ -364,18 +377,38 @@ let g:tagbar_type_puppet = {
 \}
 " {{{ MacVim GUI overrides
 if has("gui_macvim")
-	set linespace=1
-	set fuoptions=maxvert,maxhorz
-	set guifont=PragmataPro:h15
-	set guioptions-=e " don't use gui tab apperance
-	set guioptions-=T " hide toolbar
-	set guioptions-=r " don't show scrollbars
-	set guioptions-=l " don't show scrollbars
-	set guioptions-=R " don't show scrollbars
-	set guioptions-=L " don't show scrollbars
-	set stal=2 " turn on tabs by default
-	set gtl=%t gtt=%F " tab headings
-	set macligatures
-	nnoremap <leader>word :call DistractionFreeWriting()<cr>
+    set linespace=1
+    set fuoptions=maxvert,maxhorz
+    set guifont=Menlo\ for\ Powerline:h12
+    set guioptions-=e " don't use gui tab apperance
+    set guioptions-=T " hide toolbar
+    set guioptions-=r " don't show scrollbars
+    set guioptions-=l " don't show scrollbars
+    set guioptions-=R " don't show scrollbars
+    set guioptions-=L " don't show scrollbars
+    set stal=2 " turn on tabs by default
+    set gtl=%t gtt=%F " tab headings
+    " set macligatures
+    nnoremap <leader>word :call DistractionFreeWriting()<cr>
+    nmap <D-1> <Plug>BufTabLine.Go(1)
+    nmap <D-2> <Plug>BufTabLine.Go(2)
+    nmap <D-3> <Plug>BufTabLine.Go(3)
+    nmap <D-4> <Plug>BufTabLine.Go(4)
+    nmap <D-5> <Plug>BufTabLine.Go(5)
+    nmap <D-6> <Plug>BufTabLine.Go(6)
+    nmap <D-7> <Plug>BufTabLine.Go(7)
+    nmap <D-8> <Plug>BufTabLine.Go(8)
+    nmap <D-9> <Plug>BufTabLine.Go(9)
+    nmap <D-0> <Plug>BufTabLine.Go(10)
     end
+" }}}
+" {{{ neoterm
+let g:neoterm_position = 'horizontal'
+let g:neoterm_automap_keys = '<leader>tt'
+" hide/close terminal
+nnoremap <silent> <leader>th :call neoterm#close()<cr>
+" clear terminal
+nnoremap <silent> <leader>tl :call neoterm#clear()<cr>
+" kills the current job (send a <c-c>)
+nnoremap <silent> <leader>tc :call neoterm#kill()<cr>
 " }}}

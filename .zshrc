@@ -49,6 +49,7 @@ alias keyplz='openssl rand -hex 10'
 alias md='open -a Marked.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias mutt='cd ~/Desktop && mutt'
+alias vim='nvim'
 
 # <3 vagrant
 #
@@ -112,6 +113,8 @@ if ! zgen saved; then
   zgen load mafredri/zsh-async
   zgen load sindresorhus/pure
   zgen load junegunn/fzf
+  zgen load junegunn/fzf shell/completion.zsh
+  zgen load junegunn/fzf shell/key-bindings.zsh
   zgen load rupa/z
 
   zgen save
