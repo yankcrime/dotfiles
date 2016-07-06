@@ -16,4 +16,8 @@ mailboxes +dischord.org/INBOX +dischord.org/Sent
 
 macro index,pager y "<save-message>=dischord.org/ALL<enter>" "Archive"
 
+macro index ga "<change-folder>=dischord.org/ALL<enter>" "Go to all mail"
+macro index gs "<change-folder>=dischord.org/Sent<enter>" "Go to starred messages"
+macro index gd "<change-folder>=dischord.org/Drafts<enter>" "Go to drafts"
+
 # vim:ts=4:sw=4:et:ft=muttrc

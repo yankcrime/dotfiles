@@ -1,15 +1,14 @@
 " Sourced via .vimrc
-" autocmd BufRead /tmp/mutt*      :source ~/.vim/mail
+" autocmd BufRead ~/.mutt/tmp/mutt*      :source ~/.vim/mail
 " Refs: http://www.mdlerch.com/emailing-mutt-and-vim-advanced-config.html
 " http://wcm1.web.rice.edu/mutt-tips.html
 
-set ft=mail             " needless to say, vim had already guessed that alone :)
+set ft=mail
 
-setl tw=72	" max line length
-setl fo=aw
+setl tw=72
 
-set comments+=n:\|	" '|' is a quote char.
-set comments+=n:%	" '%' as well.
+set comments+=n:\|
+set comments+=n:%
 
 " * <F1> to re-format the current paragraph correctly
 " * <F2> to format a line which is too long, and go to the next line
@@ -32,13 +31,4 @@ function! Mail_Del_Empty_Quoted()
   exe "normal :%s/^>[[:space:]\%\|\#>]\\+$//e\<CR>"
 endfunction
 
-function! Mail_Begining()
-  exe "normal gg"
-  if getline (line ('.')) =~ '^From: '
-    " if we use edit_headers in Mutt, then go after the headers
-    exe "normal /^$\<CR>"
-  endif
-endfunction
-
 call Mail_Del_Empty_Quoted()
-call Mail_Begining()

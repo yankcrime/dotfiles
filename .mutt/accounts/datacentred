@@ -13,12 +13,17 @@ send-hook . my_hdr From: Nick Jones <nick.jones@datacentred.co.uk>
 set sendmail="/usr/local/bin/msmtp -a datacentred"
 
 mailboxes +datacentred.co.uk/INBOX \
-		  +datacentred.co.uk/Sent \
-		  +datacentred.co.uk/Alerts \
-		  +datacentred.co.uk/GitHub \
-		  +datacentred.co.uk/Lists.OpenStack-Ops \
-		  +datacentred.co.uk/Lists.OpenStack-Dev
+          +datacentred.co.uk/Helpdesk \
+          +datacentred.co.uk/Sent \
+          +datacentred.co.uk/Alerts \
+          +datacentred.co.uk/GitHub \
+          +datacentred.co.uk/Lists.OpenStack-Ops \
+          +datacentred.co.uk/Lists.OpenStack-Dev
 
 macro index,pager y "<save-message>=datacentred.co.uk/ALL<enter>" "Archive"
+macro index ga "<change-folder>=datacentred.co.uk/ALL<enter>" "Go to all mail"
+macro index gs "<change-folder>=datacentred.co.uk/Sent<enter>" "Go to starred messages"
+macro index gd "<change-folder>=datacentred.co.uk/Drafts<enter>" "Go to drafts"
+# macro index y "<modify-labels-then-hide>+archive -inbox\n<save-message>=datacentred.co.uk/ALL<enter><sync-mailbox>" "Archive message"
 
 # vim:ts=4:sw=4:et:ft=muttrc

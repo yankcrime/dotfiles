@@ -1,0 +1,59 @@
+# colors - color configuration for mutt
+# nick@dischord.org
+
+# general colors
+color attachment color71     default
+color bold       color95    default
+color error      red	   default
+color markers    color71     default
+color message    color148	   default
+color signature  color90   default
+color tilde      brightred default
+color tree       color71     default
+color underline  color95    default
+color status     black   color254
+
+# color email headers
+color header    color95     default  "^cc:"
+color header    color71      default  "^date:"
+color header    color95     default  "^from"
+color header    color25 	   default  "^from:"
+color header    color95     default  "^newsgroups:"
+color header    color95     default  "^reply-to:"
+color header    color25 	   default  "^subject:"
+color header    color70      default  "^to:"
+color header    color95     default  "^x-mailer:"
+color header    color95     default  "^message-id:"
+color header    color95     default  "^Organization:"
+color header    color95     default  "^Organisation:"
+color header    color95     default  "^User-Agent:"
+color header    color95     default  "^message-id: .*pine"
+
+# URLs
+color body       brightcolor25    default "(http|ftp|news|telnet|finger)://[^ \"\t\r\n]*"
+color body       brightcolor25    default "mailto:[-a-z_0-9.]+@[-a-z_0-9.]+"
+
+# email addresses
+color body       brightcolor90   default "[-a-z_0-9.%$]+@[-a-z_0-9.]+\\.[-a-z][-a-z]+"
+
+# text
+color quoted     color233     default
+color quoted1    color235      default
+color quoted2    color237       default
+color quoted3    color239   default
+color quoted4   color241      default
+
+# misc
+color index     color71		default  ~N      	# new
+color index     color71		default  ~O      	# old
+color index     color71    	default  '~s tgil'
+color index     default    	default  '~p'    	# mail to myself
+color index		color247		default '~Q'		# replied
+color index     color25     	default  '~P'    	# mail from myself
+color index     color90		default  ~F      	# flagged
+color index     blue		default  ~T      	# tagged
+color index     red			default  ~D      	# deleted
+color body      color95		default  "[;:]-[)/(|]"   # colorise smileys
+color body      color95		default  "[;:][)/(|]"
+color indicator		black	color153
+

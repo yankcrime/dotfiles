@@ -1,7 +1,7 @@
 notmuch new
 notmuch tag -inbox +work +archive folder:datacentred.co.uk/ALL
 notmuch tag -inbox +personal +archive folder:dischord.org/ALL
-notmuch tag -inbox -archive +work +openstack-ops to:openstack-ops@lists.openstack.org
+notmuch tag -inbox -archive +work +openstack-ops to:openstack-operators@lists.openstack.org
 notmuch tag -inbox -archive +work +openstack-dev to:openstack-dev@lists.openstack.org
 notmuch tag -inbox -archive +work +autobot from:autobot@datacentred.co.uk
 notmuch tag -inbox -archive +work +github to:puppet@noreply.github.com

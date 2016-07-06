@@ -23,14 +23,12 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'stephpy/vim-yaml'
 Plug 'lambdalisue/vim-pyenv'
 Plug 'plasticboy/vim-markdown'
-Plug 'itchyny/lightline.vim'
 Plug 'majutsushi/tagbar'
 Plug 'ap/vim-buftabline'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/vim-emoji'
-Plug 'kassio/neoterm'
 " Themes and colorschemes
-" Plug 'godlygeek/csapprox'
+Plug 'godlygeek/csapprox'
 Plug 'nanotech/jellybeans.vim'
 Plug 'sjl/badwolf'
 Plug 'chriskempson/base16-vim'
@@ -40,7 +38,7 @@ Plug 'cocopon/iceberg.vim'
 
 call plug#end()
 " }}} end vim-plug
-" {{{ General settings
+" {{{ General
 
 filetype indent off
 
@@ -110,184 +108,139 @@ map <F3> :source .vim_session<CR>
 " Appearance
 syntax on
 set t_Co=256
-set laststatus=2
-set background=dark
-let g:pencil_higher_contrast_ui = 0
-let g:pencil_gutter_color = 1
-colorscheme goodwolf
+set background=light
+colorscheme direwolf
+" set statusline=%<\ %n:%f\ %m%r%y%=%-35.(line:\ %l\ of\ %L,\ col:\ %c%V\ (%P)%)
 
-" }}} End basic settings
-" {{{ NeoVim
-if has('nvim')
-	let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-	set mouse=r
-    nmap <BS> <C-w>h
-    map <C-h> <C-w>h
-    map <C-j> <C-w>j
-    map <C-k> <C-w>k
-    map <C-l> <C-w>l
-    tnoremap <F12> <C-\><C-n> 
-    set switchbuf+=useopen
-    function! TermEnter()
-      let bufcount = bufnr("$")
-      let currbufnr = 1
-      let nummatches = 0
-      let firstmatchingbufnr = 0
-      while currbufnr <= bufcount
-        if(bufexists(currbufnr))
-          let currbufname = bufname(currbufnr)
-          if(match(currbufname, "term://") > -1)
-            echo currbufnr . ": ". bufname(currbufnr)
-            let nummatches += 1
-            let firstmatchingbufnr = currbufnr
-            break
-          endif
-        endif
-        let currbufnr = currbufnr + 1
-      endwhile
-      if(nummatches >= 1)
-        execute ":sbuffer ". firstmatchingbufnr
-        startinsert
-      else
-        execute ":terminal"
-      endif
-    endfunction
-    map <F12> :call TermEnter()<CR>
-endif
-"}}}
-" {{{ Lightline
-let g:lightline = {
-	  \ 'colorscheme': 'powerline',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ], ['ctrlpmark'] ],
-      \   'right': [ [ 'syntastic', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
-      \ },
-      \ 'component_function': {
-      \   'fugitive': 'LightLineFugitive',
-      \   'filename': 'LightLineFilename',
-      \   'fileformat': 'LightLineFileformat',
-      \   'filetype': 'LightLineFiletype',
-      \   'fileencoding': 'LightLineFileencoding',
-      \   'mode': 'LightLineMode',
-      \   'ctrlpmark': 'CtrlPMark',
-      \ },
-      \ 'component_expand': {
-      \   'syntastic': 'SyntasticStatuslineFlag',
-      \ },
-      \ 'component_type': {
-      \   'syntastic': 'error',
-      \ },
-	  \ 'separator': { 'left': '⮀', 'right': '⮂' },
-	  \ 'subseparator': { 'left': '⮁', 'right': '⮃' }
-      \ }
-
-function! LightLineMode()
-  let fname = expand('%:t')
-  return fname == '__Tagbar__' ? 'Tagbar' :
-		\ fname == 'ControlP' ? 'CtrlP' :
-        \ fname =~ 'NERD_tree' ? 'NERDTree' :
-        \ winwidth(0) > 60 ? lightline#mode() : ''
-endfunction
-
-function! LightLineModified()
-  if &filetype == "help"
-    return ""
-  elseif &modified
-    return "+"
-  elseif &modifiable
-    return ""
-  else
-    return ""
-  endif
-endfunction
-
-function! LightLineReadonly()
-  if &filetype == "help"
-    return ""
-  elseif &readonly
-    return "⭤"
-  else
-    return ""
-  endif
-endfunction
-
-function! LightLineFugitive()
-  try
-    if expand('%:t') !~? 'Tagbar\|Gundo\|NERD' && &ft !~? 'vimfiler' && exists('*fugitive#head')
-      let mark = '⭠ '  " edit here for cool mark
-      let _ = fugitive#head()
-      return _ !=# '' ? mark._ : ''
-    endif
-  catch
-  endtry
-  return ''
-endfunction
-
-function! LightLineFilename()
-  let fname = expand('%:t')
-  return fname == 'ControlP' && has_key(g:lightline, 'ctrlp_item') ? g:lightline.ctrlp_item :
-		\ fname == '__Tagbar__' ? g:lightline.fname :
-        \ fname =~ '__Gundo\|NERD_tree' ? '' :
-        \ ('' != LightLineReadonly() ? LightLineReadonly() . ' ' : '') .
-        \ ('' != fname ? fname : '[No Name]') .
-        \ ('' != LightLineModified() ? ' ' . LightLineModified() : '')
-endfunction
-
-function! LightLineFileformat()
-  return winwidth(0) > 70 ? &fileformat : ''
-endfunction
-
-function! LightLineFiletype()
-  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
-endfunction
-
-function! LightLineFileencoding()
-  return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
-endfunction
-
-function! CtrlPMark()
-  if expand('%:t') =~ 'ControlP' && has_key(g:lightline, 'ctrlp_item')
-    call lightline#link('iR'[g:lightline.ctrlp_regex])
-    return lightline#concatenate([g:lightline.ctrlp_prev, g:lightline.ctrlp_item
-          \ , g:lightline.ctrlp_next], 0)
+function! SL(function)
+  if exists('*'.a:function)
+    return call(a:function,[])
   else
     return ''
   endif
 endfunction
 
-let g:ctrlp_status_func = {
-  \ 'main': 'CtrlPStatusFunc_1',
-  \ 'prog': 'CtrlPStatusFunc_2',
-  \ }
-
-function! CtrlPStatusFunc_1(focus, byfname, regex, prev, item, next, marked)
-  let g:lightline.ctrlp_regex = a:regex
-  let g:lightline.ctrlp_prev = a:prev
-  let g:lightline.ctrlp_item = a:item
-  let g:lightline.ctrlp_next = a:next
-  return lightline#statusline(0)
+function! StatusGit()
+    let git = '⎇ ' . fugitive#head()
+    return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
 endfunction
 
-function! CtrlPStatusFunc_2(str)
-  return lightline#statusline(0)
-endfunction
+set statusline=[%n]
+set statusline+=\ ▶\ %<%.99f\ %h%w%m%r
+set statusline+=%{SL('StatusGit')}
+set statusline+=%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}
+set statusline+=%*%=%-14.(%r%y\ ⭡\ %l,%c%)\ %P\ 
 
-augroup AutoSyntastic
-  autocmd!
-  autocmd BufWritePost *.pp,*.c,*.cpp call s:syntastic()
+silent! if emoji#available()
+  function! S_modified()
+    if &modified
+      return emoji#for('kiss').' '
+    elseif !&modifiable
+      return emoji#for('construction').' '
+    else
+      return ''
+    endif
+  endfunction
+
+  function! S_fugitive()
+    if !exists('g:loaded_fugitive')
+      return ''
+    endif
+    let head = fugitive#head()
+    if empty(head)
+      return ''
+    else
+      return head == 'master' ? emoji#for('crown') : emoji#for('seedling').' '.head
+    endif
+  endfunction
+
+  function! S_filetype()
+    if empty(&filetype)
+      return emoji#for('grey_question')
+    else
+      return get(s:ft_emoji, &filetype, '['.&filetype.']')
+    endif
+  endfunction
+
+  function! MyStatusLine()
+    let mod = '%{S_modified()}'
+    let ro  = "%{&readonly ? emoji#for('lock') . ' ' : ''}"
+    let ft  = '%y'
+    let fug = ' %{S_fugitive()}'
+    let sep = ' %= '
+    let pos = ' ⭡ %l,%c%V '
+    let pct = ' %P '
+    return '[%n] %f %<'.mod.ro.ft.fug.sep.pos.pct
+  endfunction
+
+  set statusline=%!MyStatusLine()
+endif
+
+set laststatus=2
+
+set completefunc=emoji#complete
+
+" Space to toggle folds.
+nnoremap <Space> za
+vnoremap <Space> za
+
+augroup ft_vim
+    au!
+    au FileType vim setlocal foldmethod=marker keywordprg=:help
+    au FileType help setlocal textwidth=78
+    au BufWinEnter *.txt if &ft == 'help' | wincmd L | endif
 augroup END
-function! s:syntastic()
-  SyntasticCheck
-  call lightline#update()
-endfunction
-let g:tagbar_status_func = 'TagbarStatusFunc'
 
-function! TagbarStatusFunc(current, sort, fname, ...) abort
-    let g:lightline.fname = a:fname
-  return lightline#statusline(0)
-endfunction
+augroup ft_ruby
+    au!
+    au Filetype ruby setlocal foldmethod=syntax
+	au Filetype ruby set expandtab ts=4 sw=4 ai
+    au BufRead,BufNewFile Capfile setlocal filetype=ruby
+augroup END
+
+augroup ft_puppet
+    au!
+    au Filetype puppet setlocal foldmethod=marker
+    au Filetype puppet setlocal foldmarker={,}
+augroup END
+
+augroup ft_muttrc
+    au!
+    au BufRead,BufNewFile *.muttrc set ft=muttrc
+	au Filetype muttrc set expandtab ts=4 sw=4 ai
+    au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
+augroup END
+
+" }}} End basic settings
+" {{{ MacVim GUI overrides
+if has("gui_macvim")
+    set linespace=2
+    set fuoptions=maxvert,maxhorz
+    set guifont=Triplicate\ T4s:h14
+    set guioptions-=e " don't use gui tab apperance
+    set guioptions-=T " hide toolbar
+    set guioptions-=r " don't show scrollbars
+    set guioptions-=l " don't show scrollbars
+    set guioptions-=R " don't show scrollbars
+    set guioptions-=L " don't show scrollbars
+    set stal=2 " turn on tabs by default
+    set gtl=%t gtt=%F " tab headings
+    " set macligatures
+    nnoremap <leader>word :call DistractionFreeWriting()<cr>
+    nmap <D-1> <Plug>BufTabLine.Go(1)
+    nmap <D-2> <Plug>BufTabLine.Go(2)
+    nmap <D-3> <Plug>BufTabLine.Go(3)
+    nmap <D-4> <Plug>BufTabLine.Go(4)
+    nmap <D-5> <Plug>BufTabLine.Go(5)
+    nmap <D-6> <Plug>BufTabLine.Go(6)
+    nmap <D-7> <Plug>BufTabLine.Go(7)
+    nmap <D-8> <Plug>BufTabLine.Go(8)
+    nmap <D-9> <Plug>BufTabLine.Go(9)
+    nmap <D-0> <Plug>BufTabLine.Go(10)
+    end
 " }}}
 " {{{ BufTabLine
+let g:buftabline_show=1
 let g:buftabline_indicators=1
 let g:buftabline_numbers=2
 nmap <A-1> <Plug>BufTabLine.Go(1)
@@ -313,7 +266,7 @@ let g:ctrlp_switch_buffer = 0
 let g:ctrlp_working_path_mode = 0
 let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
 " }}}
-" {{{ Buffer manipulation via sbd (smart buffer delete)
+" {{{ SBD (Smart Buffer Delete)
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
 " }}}
@@ -375,40 +328,4 @@ let g:tagbar_type_puppet = {
     \'f:default'
   \]
 \}
-" {{{ MacVim GUI overrides
-if has("gui_macvim")
-    set linespace=1
-    set fuoptions=maxvert,maxhorz
-    set guifont=Menlo\ for\ Powerline:h12
-    set guioptions-=e " don't use gui tab apperance
-    set guioptions-=T " hide toolbar
-    set guioptions-=r " don't show scrollbars
-    set guioptions-=l " don't show scrollbars
-    set guioptions-=R " don't show scrollbars
-    set guioptions-=L " don't show scrollbars
-    set stal=2 " turn on tabs by default
-    set gtl=%t gtt=%F " tab headings
-    " set macligatures
-    nnoremap <leader>word :call DistractionFreeWriting()<cr>
-    nmap <D-1> <Plug>BufTabLine.Go(1)
-    nmap <D-2> <Plug>BufTabLine.Go(2)
-    nmap <D-3> <Plug>BufTabLine.Go(3)
-    nmap <D-4> <Plug>BufTabLine.Go(4)
-    nmap <D-5> <Plug>BufTabLine.Go(5)
-    nmap <D-6> <Plug>BufTabLine.Go(6)
-    nmap <D-7> <Plug>BufTabLine.Go(7)
-    nmap <D-8> <Plug>BufTabLine.Go(8)
-    nmap <D-9> <Plug>BufTabLine.Go(9)
-    nmap <D-0> <Plug>BufTabLine.Go(10)
-    end
-" }}}
-" {{{ neoterm
-let g:neoterm_position = 'horizontal'
-let g:neoterm_automap_keys = '<leader>tt'
-" hide/close terminal
-nnoremap <silent> <leader>th :call neoterm#close()<cr>
-" clear terminal
-nnoremap <silent> <leader>tl :call neoterm#clear()<cr>
-" kills the current job (send a <c-c>)
-nnoremap <silent> <leader>tc :call neoterm#kill()<cr>
 " }}}

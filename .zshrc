@@ -49,7 +49,6 @@ alias keyplz='openssl rand -hex 10'
 alias md='open -a Marked.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias mutt='cd ~/Desktop && mutt'
-alias vim='nvim'
 
 # <3 vagrant
 #
