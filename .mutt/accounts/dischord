@@ -8,8 +8,6 @@ set trash="+dischord.org/Bin"
 unset record
 unset copy
 
-send-hook . my_hdr From: Nick Jones <nick@dischord.org>
-
 set sendmail="/usr/local/bin/msmtp -a dischord"
 
 mailboxes +dischord.org/INBOX +dischord.org/Sent

@@ -10,6 +10,7 @@ export HOMEBREW_GITHUB_API_TOKEN=""
 export GOPATH=~/src/golang
 export NVIM_TUI_ENABLE_TRUE_COLOR=1
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
+export PURE_PROMPT_SYMBOL="$"
 
 # history and general options
 #
@@ -49,6 +50,8 @@ alias keyplz='openssl rand -hex 10'
 alias md='open -a Marked.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias mutt='cd ~/Desktop && mutt'
+alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
+alias docekr='docker'
 
 # <3 vagrant
 #
@@ -115,6 +118,7 @@ if ! zgen saved; then
   zgen load junegunn/fzf shell/completion.zsh
   zgen load junegunn/fzf shell/key-bindings.zsh
   zgen load rupa/z
+  zgen load felixr/docker-zsh-completion
 
   zgen save
 fi

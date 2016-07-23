@@ -9,14 +9,18 @@ set mailcap_path     = ~/.mutt/mailcap       # entries for filetypes
 set tmpdir           = ~/.mutt/tmp          # where to keep temp files
 set signature        = ~/.signature           # my signature file
 
-set editor="vim -c 'normal! }' -c 'redraw'"
+set editor="/usr/local/bin/vim -c 'normal! }' -c 'redraw'"
+# set editor = "mvim -f"
+# set editor="/usr/local/bin/mvim --remote-wait-silent "
+# set editor="/usr/bin/osascript /Users/nick/.mutt/bin/mutt_edit"
 
-set query_command = "contacts -Sf '%eTOKEN%n' '%s' | sed -e 's/TOKEN/\t/g'"
+set query_command = "/usr/local/bin/contacts -Sf '%eTOKEN%n' '%s' | sed -e 's/TOKEN/\t/g'"
 bind editor <Tab> complete-query
 bind editor ^T    complete
 
 source ~/.mutt/accounts/default
 source ~/.mutt/colours/nickpro
+source ~/.mutt/maillists
 
 color progress white red
 
@@ -156,6 +160,16 @@ bind pager               <space> next-page
 bind pager               ]   skip-quoted
 bind index               L   limit
 
+bind index <left> sidebar-prev
+bind index <right> sidebar-next
+bind index <space> sidebar-open
+bind index \Cs sidebar-toggle-virtual
+
+set sidebar_width	 = 35
+set sidebar_visible	 = yes
+set sidebar_sort_method  = unsorted
+set sidebar_divider_char = │
+
 macro index,pager \CD "<tag-thread>"
 
 macro index C   "<copy-message>?<toggle-mailboxes>" "copy a message to a mailbox"
@@ -170,7 +184,8 @@ macro index,pager \" "<enter-command> \
     unset wait_key<enter><shell-escape> \
     tmux split-window -h \"mutt -R\"<enter>" "open new mutt"
 
-macro pager \Cu "|urlview<enter>" "call urlview to open links"<Paste>
+
+macro pager \Cu "|/usr/local/bin/urlview<enter>" "call urlview to open links"<Paste>
 
 macro index q "<vfolder-from-query">
 
@@ -178,16 +193,6 @@ set nm_default_uri="notmuch:///Users/nick/Mail/"
 # set virtual_spoolfile=yes
 # set vfolder_format = "%6n (%6N) %f "
 set vfolder_format=" %<N?%-4N&    > %f"
-virtual-mailboxes \
-    "INBOX"                 "notmuch://?query=tag:inbox and NOT tag:archive" \
-    "Alerts"                "notmuch://?query=tag:autobot and NOT tag:deleted" \
-    "GitHub"                "notmuch://?query=tag:github and NOT tag:deleted" \
-    "Lists/OpenStack Ops"   "notmuch://?query=tag:openstack-ops" \
-    "Lists/OpenStack Dev"   "notmuch://?query=tag:openstack-dev" \
-    "Unread"                "notmuch://?query=tag:unread and NOT tag:deleted" \
-    "Sent"                  "notmuch://?query=tag:sent" \
-    "Archive"               "notmuch://?query=tag:archive" \
-    "Starred"               "notmuch://?query=tag:*"
 
 tag-transforms             \
     "inbox"          "∙"   \

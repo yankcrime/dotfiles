@@ -1,6 +1,6 @@
 # .mutt.mailcap - defines how mutt handles certain file types
 
-text/html; w3m -I %{charset} -T text/html; copiousoutput;
+text/html; /usr/local/bin/w3m -I %{charset} -T text/html; copiousoutput;
 #text/html; /usr/bin/links %s; nametemplate=%s.html
 # text/html; /usr/bin/links -dump %s; nametemplate=%s.html; copiousoutput 
 text/x-vcard; ~/.mutt/bin/mutt.vcard.filter; copiousoutput

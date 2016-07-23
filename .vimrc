@@ -37,6 +37,7 @@ Plug 'fxn/vim-monochrome'
 Plug 'cocopon/iceberg.vim'
 
 call plug#end()
+
 " }}} end vim-plug
 " {{{ General
 

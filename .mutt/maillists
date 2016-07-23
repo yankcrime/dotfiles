@@ -2,4 +2,6 @@
 #
 subscribe openstack-operators@lists.openstack.org
 subscribe openstack-deveopers@lists.openstack.org
+subscribe ubuntu-security-announce@lists.ubuntu.com
+subscribe rhsa-announce-request@redhat.com
 

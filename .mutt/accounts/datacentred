@@ -8,8 +8,6 @@ set trash="+datacentred.co.uk/Bin"
 unset record
 unset copy
 
-send-hook . my_hdr From: Nick Jones <nick.jones@datacentred.co.uk>
-
 set sendmail="/usr/local/bin/msmtp -a datacentred"
 
 mailboxes +datacentred.co.uk/INBOX \
@@ -18,12 +16,26 @@ mailboxes +datacentred.co.uk/INBOX \
           +datacentred.co.uk/Alerts \
           +datacentred.co.uk/GitHub \
           +datacentred.co.uk/Lists.OpenStack-Ops \
-          +datacentred.co.uk/Lists.OpenStack-Dev
+          +datacentred.co.uk/Lists.OpenStack-Dev \
+          +datacentred.co.uk/Lists.RHSA \
+          +datacentred.co.uk/Lists.USN
+
+virtual-mailboxes \
+    "INBOX"         "notmuch://?query=tag:inbox and tag:work and NOT tag:archive" \
+    "Alerts"        "notmuch://?query=tag:autobot and NOT tag:deleted" \
+    "GitHub"        "notmuch://?query=tag:github and NOT tag:deleted" \
+    "OpenStack-Ops" "notmuch://?query=tag:openstack-ops and NOT tag:deleted" \
+    "OpenStack-Dev" "notmuch://?query=tag:openstack-dev and NOT tag:deleted" \
+    "Security"      "notmuch://?query=tag:security and NOT tag:deleted" \
+    "Unread"        "notmuch://?query=tag:unread and tag:work and NOT tag:deleted" \
+    "Sent"          "notmuch://?query=tag:sent and tag:work" \
+    "Archive"       "notmuch://?query=tag:archive and tag:work" \
+    "Starred"       "notmuch://?query=tag:* and tag:work"
 
 macro index,pager y "<save-message>=datacentred.co.uk/ALL<enter>" "Archive"
+
 macro index ga "<change-folder>=datacentred.co.uk/ALL<enter>" "Go to all mail"
 macro index gs "<change-folder>=datacentred.co.uk/Sent<enter>" "Go to starred messages"
 macro index gd "<change-folder>=datacentred.co.uk/Drafts<enter>" "Go to drafts"
-# macro index y "<modify-labels-then-hide>+archive -inbox\n<save-message>=datacentred.co.uk/ALL<enter><sync-mailbox>" "Archive message"
 
 # vim:ts=4:sw=4:et:ft=muttrc
