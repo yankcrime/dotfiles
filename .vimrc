@@ -26,15 +26,14 @@ Plug 'plasticboy/vim-markdown'
 Plug 'majutsushi/tagbar'
 Plug 'ap/vim-buftabline'
 Plug 'junegunn/goyo.vim'
-Plug 'junegunn/vim-emoji'
+Plug 'cocopon/shadeline.vim'
 " Themes and colorschemes
 Plug 'godlygeek/csapprox'
 Plug 'nanotech/jellybeans.vim'
 Plug 'sjl/badwolf'
-Plug 'chriskempson/base16-vim'
-Plug 'reedes/vim-colors-pencil'
 Plug 'fxn/vim-monochrome'
 Plug 'cocopon/iceberg.vim'
+Plug 'pbrisbin/vim-colors-off'
 
 call plug#end()
 
@@ -111,75 +110,7 @@ syntax on
 set t_Co=256
 set background=light
 colorscheme direwolf
-" set statusline=%<\ %n:%f\ %m%r%y%=%-35.(line:\ %l\ of\ %L,\ col:\ %c%V\ (%P)%)
-
-function! SL(function)
-  if exists('*'.a:function)
-    return call(a:function,[])
-  else
-    return ''
-  endif
-endfunction
-
-function! StatusGit()
-    let git = '⎇ ' . fugitive#head()
-    return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
-endfunction
-
-set statusline=[%n]
-set statusline+=\ ▶\ %<%.99f\ %h%w%m%r
-set statusline+=%{SL('StatusGit')}
-set statusline+=%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}
-set statusline+=%*%=%-14.(%r%y\ ⭡\ %l,%c%)\ %P\ 
-
-silent! if emoji#available()
-  function! S_modified()
-    if &modified
-      return emoji#for('kiss').' '
-    elseif !&modifiable
-      return emoji#for('construction').' '
-    else
-      return ''
-    endif
-  endfunction
-
-  function! S_fugitive()
-    if !exists('g:loaded_fugitive')
-      return ''
-    endif
-    let head = fugitive#head()
-    if empty(head)
-      return ''
-    else
-      return head == 'master' ? emoji#for('crown') : emoji#for('seedling').' '.head
-    endif
-  endfunction
-
-  function! S_filetype()
-    if empty(&filetype)
-      return emoji#for('grey_question')
-    else
-      return get(s:ft_emoji, &filetype, '['.&filetype.']')
-    endif
-  endfunction
-
-  function! MyStatusLine()
-    let mod = '%{S_modified()}'
-    let ro  = "%{&readonly ? emoji#for('lock') . ' ' : ''}"
-    let ft  = '%y'
-    let fug = ' %{S_fugitive()}'
-    let sep = ' %= '
-    let pos = ' ⭡ %l,%c%V '
-    let pct = ' %P '
-    return '[%n] %f %<'.mod.ro.ft.fug.sep.pos.pct
-  endfunction
-
-  set statusline=%!MyStatusLine()
-endif
-
 set laststatus=2
-
-set completefunc=emoji#complete
 
 " Space to toggle folds.
 nnoremap <Space> za
@@ -213,33 +144,6 @@ augroup ft_muttrc
 augroup END
 
 " }}} End basic settings
-" {{{ MacVim GUI overrides
-if has("gui_macvim")
-    set linespace=2
-    set fuoptions=maxvert,maxhorz
-    set guifont=Triplicate\ T4s:h14
-    set guioptions-=e " don't use gui tab apperance
-    set guioptions-=T " hide toolbar
-    set guioptions-=r " don't show scrollbars
-    set guioptions-=l " don't show scrollbars
-    set guioptions-=R " don't show scrollbars
-    set guioptions-=L " don't show scrollbars
-    set stal=2 " turn on tabs by default
-    set gtl=%t gtt=%F " tab headings
-    " set macligatures
-    nnoremap <leader>word :call DistractionFreeWriting()<cr>
-    nmap <D-1> <Plug>BufTabLine.Go(1)
-    nmap <D-2> <Plug>BufTabLine.Go(2)
-    nmap <D-3> <Plug>BufTabLine.Go(3)
-    nmap <D-4> <Plug>BufTabLine.Go(4)
-    nmap <D-5> <Plug>BufTabLine.Go(5)
-    nmap <D-6> <Plug>BufTabLine.Go(6)
-    nmap <D-7> <Plug>BufTabLine.Go(7)
-    nmap <D-8> <Plug>BufTabLine.Go(8)
-    nmap <D-9> <Plug>BufTabLine.Go(9)
-    nmap <D-0> <Plug>BufTabLine.Go(10)
-    end
-" }}}
 " {{{ BufTabLine
 let g:buftabline_show=1
 let g:buftabline_indicators=1
@@ -267,6 +171,35 @@ let g:ctrlp_switch_buffer = 0
 let g:ctrlp_working_path_mode = 0
 let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
 " }}}
+" {{{ Statusline
+let g:shadeline = {}
+let g:shadeline.active = {
+			\ 	'left': [
+			\ 		'▸',
+			\ 		'fname',
+			\ 		'flags',
+			\ 		'ShadelineItemGitBranch',
+			\ 	],
+			\ 	'right': [
+			\ 		'<',
+			\ 		['ff', 'fenc', 'ft'],
+			\ 		'ruler',
+			\ 	],
+			\ }
+let g:shadeline.inactive = {
+			\ 	'left': [
+			\ 		'fname',
+			\ 		'flags',
+			\ 	],
+			\ }
+
+function! ShadelineItemGitBranch()
+	let name = exists('*fugitive#head')
+				\ ? fugitive#head()
+				\ : ''
+	return empty(name) ? '' : printf('(%s)', name)
+endfunction
+" }}}
 " {{{ SBD (Smart Buffer Delete)
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
@@ -293,13 +226,6 @@ nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
 let g:GeeknoteFormat="markdown"
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_toc_autofit = 1
-function! DistractionFreeWriting()
-        colorscheme pencil
-        set background=light
-        set gfn=Cousine:h14
-		set wrap linebreak textwidth=0 linespace=4 fullscreen
-		Goyo 110x40
-endfunction
 " }}}
 " {{{ Go
 au FileType go nmap <leader>r <Plug>(go-run)
@@ -330,3 +256,70 @@ let g:tagbar_type_puppet = {
   \]
 \}
 " }}}
+" {{{ MacVim GUI overrides
+if has('gui_running')
+    set linespace=2
+	set transparency=5
+    set fuoptions=maxvert,maxhorz
+	set background=light
+	colorscheme direwolf
+    set guifont=Triplicate\ T4s:h14
+    set guioptions-=e " don't use gui tab apperance
+    set guioptions-=T " hide toolbar
+    set guioptions-=r " don't show scrollbars
+    set guioptions-=l " don't show scrollbars
+    set guioptions-=R " don't show scrollbars
+    set guioptions-=L " don't show scrollbars
+    set stal=2 " turn on tabs by default
+    set gtl=%t gtt=%F " tab headings
+    " set macligatures
+    nmap <D-1> <Plug>BufTabLine.Go(1)
+    nmap <D-2> <Plug>BufTabLine.Go(2)
+    nmap <D-3> <Plug>BufTabLine.Go(3)
+    nmap <D-4> <Plug>BufTabLine.Go(4)
+    nmap <D-5> <Plug>BufTabLine.Go(5)
+    nmap <D-6> <Plug>BufTabLine.Go(6)
+    nmap <D-7> <Plug>BufTabLine.Go(7)
+    nmap <D-8> <Plug>BufTabLine.Go(8)
+    nmap <D-9> <Plug>BufTabLine.Go(9)
+    nmap <D-0> <Plug>BufTabLine.Go(10)
+    end
+" }}}
+" {{{ NeoVim
+if has('nvim')
+	let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+	set mouse=r
+    nmap <BS> <C-w>h
+    map <C-h> <C-w>h
+    map <C-j> <C-w>j
+    map <C-k> <C-w>k
+    map <C-l> <C-w>l
+    tnoremap <F12> <C-\><C-n> 
+    set switchbuf+=useopen
+    function! TermEnter()
+      let bufcount = bufnr("$")
+      let currbufnr = 1
+      let nummatches = 0
+      let firstmatchingbufnr = 0
+      while currbufnr <= bufcount
+        if(bufexists(currbufnr))
+          let currbufname = bufname(currbufnr)
+          if(match(currbufname, "term://") > -1)
+            echo currbufnr . ": ". bufname(currbufnr)
+            let nummatches += 1
+            let firstmatchingbufnr = currbufnr
+            break
+          endif
+        endif
+        let currbufnr = currbufnr + 1
+      endwhile
+      if(nummatches >= 1)
+        execute ":sbuffer ". firstmatchingbufnr
+        startinsert
+      else
+        execute ":terminal"
+      endif
+    endfunction
+    map <F12> :call TermEnter()<CR>
+endif
+"}}}

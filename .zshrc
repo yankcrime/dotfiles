@@ -52,6 +52,8 @@ alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias mutt='cd ~/Desktop && mutt'
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
+alias vim='nvim'
+alias papply='sudo puppet apply --modulepath /etc/dischord/modules --hiera_config /etc/dischord/hiera.yaml --manifestdir /etc/dischord/ /etc/dischord/default.pp'
 
 # <3 vagrant
 #
