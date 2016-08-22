@@ -8,7 +8,6 @@ export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:
 export EDITOR="vim"
 export HOMEBREW_GITHUB_API_TOKEN=""
 export GOPATH=~/src/golang
-export NVIM_TUI_ENABLE_TRUE_COLOR=1
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
 export PURE_PROMPT_SYMBOL="$"
 

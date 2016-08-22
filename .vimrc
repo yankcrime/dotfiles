@@ -27,6 +27,7 @@ Plug 'majutsushi/tagbar'
 Plug 'ap/vim-buftabline'
 Plug 'junegunn/goyo.vim'
 Plug 'cocopon/shadeline.vim'
+Plug 'kassio/neoterm'
 " Themes and colorschemes
 Plug 'godlygeek/csapprox'
 Plug 'nanotech/jellybeans.vim'
@@ -143,21 +144,26 @@ augroup ft_muttrc
     au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
 augroup END
 
+noremap <leader>gadd :Gwrite<CR>
+noremap <leader>gcommit :Gcommit<CR>
+noremap <leader>gpush :Gpush<CR>
+noremap <leader>gstat :Gstatus<CR>
+
 " }}} End basic settings
 " {{{ BufTabLine
 let g:buftabline_show=1
 let g:buftabline_indicators=1
 let g:buftabline_numbers=2
-nmap <A-1> <Plug>BufTabLine.Go(1)
-nmap <A-2> <Plug>BufTabLine.Go(2)
-nmap <A-3> <Plug>BufTabLine.Go(3)
-nmap <A-4> <Plug>BufTabLine.Go(4)
-nmap <A-5> <Plug>BufTabLine.Go(5)
-nmap <A-6> <Plug>BufTabLine.Go(6)
-nmap <A-7> <Plug>BufTabLine.Go(7)
-nmap <A-8> <Plug>BufTabLine.Go(8)
-nmap <A-9> <Plug>BufTabLine.Go(9)
-nmap <A-0> <Plug>BufTabLine.Go(10)
+nmap <leader>1 <Plug>BufTabLine.Go(1)
+nmap <leader>2 <Plug>BufTabLine.Go(2)
+nmap <leader>3 <Plug>BufTabLine.Go(3)
+nmap <leader>4 <Plug>BufTabLine.Go(4)
+nmap <leader>5 <Plug>BufTabLine.Go(5)
+nmap <leader>6 <Plug>BufTabLine.Go(6)
+nmap <leader>7 <Plug>BufTabLine.Go(7)
+nmap <leader>8 <Plug>BufTabLine.Go(8)
+nmap <leader>9 <Plug>BufTabLine.Go(9)
+nmap <leader>0 <Plug>BufTabLine.Go(10)
 " }}}
 " {{{ NERDTree
 map <C-n> :NERDTreeToggle<CR>
@@ -227,7 +233,7 @@ let g:GeeknoteFormat="markdown"
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_toc_autofit = 1
 " }}}
-" {{{ Go
+" {{{ Go 
 au FileType go nmap <leader>r <Plug>(go-run)
 au FileType go nmap <leader>b <Plug>(go-build)
 au FileType go nmap <leader>t <Plug>(go-test)
@@ -237,7 +243,7 @@ au FileType go nmap <Leader>gd <Plug>(go-doc)
 au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
 let g:go_term_enabled = 1
 " }}}
-" {{{ ctags / Tagbar
+" {{{ ctags / Tagbar 
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
 " prefixed with '::' which don't match to a file directly when used in
 " conjunction with ctags
@@ -287,7 +293,7 @@ if has('gui_running')
 " }}}
 " {{{ NeoVim
 if has('nvim')
-	let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+"	set termguicolors
 	set mouse=r
     nmap <BS> <C-w>h
     map <C-h> <C-w>h
@@ -321,5 +327,8 @@ if has('nvim')
       endif
     endfunction
     map <F12> :call TermEnter()<CR>
+	let g:neoterm_automap_keys = '<leader>tt'
+	nnoremap <silent> <leader>th :call neoterm#close()<cr>
+	nnoremap <silent> <leader>tcls :call neoterm#clear()<cr>
 endif
 "}}}
