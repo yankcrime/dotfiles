@@ -8,19 +8,15 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
-Plug 'kien/ctrlp.vim'
 Plug 'rking/ag.vim'
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/syntastic'
 Plug 'godlygeek/tabular'
 Plug 'airblade/vim-gitgutter'
-Plug 'fatih/vim-go'
-Plug 'rodjek/vim-puppet'
 Plug 'cespare/vim-sbd'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'stephpy/vim-yaml'
 Plug 'lambdalisue/vim-pyenv'
 Plug 'plasticboy/vim-markdown'
 Plug 'majutsushi/tagbar'
@@ -28,6 +24,10 @@ Plug 'ap/vim-buftabline'
 Plug 'junegunn/goyo.vim'
 Plug 'cocopon/shadeline.vim'
 Plug 'kassio/neoterm'
+Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
+Plug 'fatih/vim-go', { 'for': ['go'] }
+Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
+Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
 " Themes and colorschemes
 Plug 'godlygeek/csapprox'
 Plug 'nanotech/jellybeans.vim'
@@ -35,6 +35,7 @@ Plug 'sjl/badwolf'
 Plug 'fxn/vim-monochrome'
 Plug 'cocopon/iceberg.vim'
 Plug 'pbrisbin/vim-colors-off'
+Plug 'yankcrime/direwolf'
 
 call plug#end()
 
@@ -113,10 +114,6 @@ set background=light
 colorscheme direwolf
 set laststatus=2
 
-" Space to toggle folds.
-nnoremap <Space> za
-vnoremap <Space> za
-
 augroup ft_vim
     au!
     au FileType vim setlocal foldmethod=marker keywordprg=:help
@@ -171,11 +168,38 @@ let NERDTreeShowBookmarks=1
 let NERDTreeShowHidden=1
 let NERDTreeBookmarksSort = 1
 " }}}
-" {{{ CtrlP 
-let g:ctrlp_match_window = 'bottom,order:ttb'
-let g:ctrlp_switch_buffer = 0
-let g:ctrlp_working_path_mode = 0
-let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
+" {{{ fzf 
+nnoremap <silent> <expr> <C-f> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
+nnoremap <silent> <C-b> :Buffers <CR>
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+" Default fzf layout
+" - down / up / left / right
+let g:fzf_layout = { 'down': '~40%' }
+
+" In Neovim, you can set up fzf window using a Vim command
+let g:fzf_layout = { 'window': 'enew' }
+let g:fzf_layout = { 'window': '-tabnew' }
+
+" Customize fzf colors to match your color scheme
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+let g:fzf_buffers_jump = 1
+let g:fzf_tags_command = 'ctags -R'
 " }}}
 " {{{ Statusline
 let g:shadeline = {}
@@ -229,9 +253,11 @@ let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
 " }}}
 " {{{ Markdown 
 nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
-let g:GeeknoteFormat="markdown"
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_toc_autofit = 1
+au FileType markdown setlocal nonumber
+au FileType markdown setlocal linebreak
+au FileType markdown setlocal wrap
 " }}}
 " {{{ Go 
 au FileType go nmap <leader>r <Plug>(go-run)
@@ -264,12 +290,12 @@ let g:tagbar_type_puppet = {
 " }}}
 " {{{ MacVim GUI overrides
 if has('gui_running')
-    set linespace=2
+    set linespace=1
 	set transparency=5
     set fuoptions=maxvert,maxhorz
 	set background=light
 	colorscheme direwolf
-    set guifont=Triplicate\ T4s:h14
+    set guifont=Triplicate\ T4c:h14
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
     set guioptions-=r " don't show scrollbars
