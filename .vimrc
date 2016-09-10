@@ -9,6 +9,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
 Plug 'rking/ag.vim'
+Plug 'kien/ctrlp.vim'
 Plug 'scrooloose/nerdtree'
 Plug 'scrooloose/syntastic'
 Plug 'godlygeek/tabular'
@@ -30,9 +31,9 @@ Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
 " Themes and colorschemes
 Plug 'godlygeek/csapprox'
+Plug 'edkolev/tmuxline.vim'
 Plug 'nanotech/jellybeans.vim'
 Plug 'sjl/badwolf'
-Plug 'fxn/vim-monochrome'
 Plug 'cocopon/iceberg.vim'
 Plug 'pbrisbin/vim-colors-off'
 Plug 'yankcrime/direwolf'
@@ -230,6 +231,15 @@ function! ShadelineItemGitBranch()
 	return empty(name) ? '' : printf('(%s)', name)
 endfunction
 " }}}
+" {{{ Tmuxline
+let g:tmuxline_powerline_separators = 0
+let g:tmuxline_separators = {
+    \ 'left' : '',
+    \ 'left_alt': '',
+    \ 'right' : '',
+    \ 'right_alt' : '',
+    \ 'space' : ' '}
+" }}}
 " {{{ SBD (Smart Buffer Delete)
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
@@ -315,6 +325,10 @@ if has('gui_running')
     nmap <D-8> <Plug>BufTabLine.Go(8)
     nmap <D-9> <Plug>BufTabLine.Go(9)
     nmap <D-0> <Plug>BufTabLine.Go(10)
+    let g:ctrlp_match_window = 'bottom,order:ttb'
+    let g:ctrlp_switch_buffer = 0
+    let g:ctrlp_working_path_mode = 0
+    let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
     end
 " }}}
 " {{{ NeoVim
