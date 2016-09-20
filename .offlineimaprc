@@ -3,7 +3,7 @@
 #
 [general]
 ui = TTY.TTYUI
-accounts = datacentred, dischord
+accounts = datacentred,dischord
 pythonfile=~/.mutt/offlineimap.py
 fsync = False
 socktimeout = 30
@@ -14,6 +14,7 @@ filename = ~/.mutt/mailboxes
 header = "mailboxes "
 peritem = =%(foldername)s
 sep = " "
+footer = " "
 
 [Account datacentred]
 localrepository = datacentred-local

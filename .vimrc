@@ -37,6 +37,7 @@ Plug 'sjl/badwolf'
 Plug 'cocopon/iceberg.vim'
 Plug 'pbrisbin/vim-colors-off'
 Plug 'yankcrime/direwolf'
+Plug 'jacoborus/tender.vim'
 
 call plug#end()
 
@@ -111,7 +112,6 @@ map <F3> :source .vim_session<CR>
 " Appearance
 syntax on
 set t_Co=256
-set background=light
 colorscheme direwolf
 set laststatus=2
 
@@ -303,8 +303,8 @@ if has('gui_running')
     set linespace=1
 	set transparency=5
     set fuoptions=maxvert,maxhorz
-	set background=light
-	colorscheme direwolf
+	let macvim_skip_colorscheme=1
+	" colorscheme goodwolf
     set guifont=Triplicate\ T4c:h14
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
@@ -333,7 +333,7 @@ if has('gui_running')
 " }}}
 " {{{ NeoVim
 if has('nvim')
-"	set termguicolors
+	set termguicolors
 	set mouse=r
     nmap <BS> <C-w>h
     map <C-h> <C-w>h

@@ -11,14 +11,14 @@ unset copy
 set sendmail="/usr/local/bin/msmtp -a datacentred"
 
 mailboxes +datacentred.co.uk/INBOX \
-          +datacentred.co.uk/Helpdesk \
-          +datacentred.co.uk/Sent \
-          +datacentred.co.uk/Alerts \
-          +datacentred.co.uk/GitHub \
-          +datacentred.co.uk/Lists.OpenStack-Ops \
-          +datacentred.co.uk/Lists.OpenStack-Dev \
-          +datacentred.co.uk/Lists.RHSA \
-          +datacentred.co.uk/Lists.USN
+           +datacentred.co.uk/Helpdesk \
+           +datacentred.co.uk/Sent \
+           +datacentred.co.uk/Alerts \
+           +datacentred.co.uk/GitHub \
+           +datacentred.co.uk/Lists.OpenStack-Ops \
+           +datacentred.co.uk/Lists.OpenStack-Dev \
+           +datacentred.co.uk/Lists.RHSA \
+           +datacentred.co.uk/Lists.USN
 
 virtual-mailboxes \
     "INBOX"         "notmuch://?query=tag:inbox and tag:work and NOT tag:archive" \

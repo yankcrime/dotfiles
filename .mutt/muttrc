@@ -133,7 +133,6 @@ bind index,pager R           group-reply
 bind pager       :           enter-command
 bind pager       p           previous-undeleted
 bind pager       n           next-undeleted
-bind pager       \n          next-unread
 bind compose     <return>    send-message
 bind compose     s           send-message
 bind pager       ,p          print-message
@@ -166,7 +165,7 @@ bind index <space> sidebar-open
 bind index \Cs sidebar-toggle-virtual
 
 set sidebar_width	 = 35
-set sidebar_visible	 = yes
+set sidebar_visible	 = no
 set sidebar_sort_method  = unsorted
 set sidebar_divider_char = │
 
@@ -193,6 +192,8 @@ set nm_default_uri="notmuch:///Users/nick/Mail/"
 # set virtual_spoolfile=yes
 # set vfolder_format = "%6n (%6N) %f "
 set vfolder_format=" %<N?%-4N&    > %f"
+
+macro index N "<modify-labels-then-hide>-unread\n<sync-mailbox><toggle-new>"
 
 tag-transforms             \
     "inbox"          "∙"   \
