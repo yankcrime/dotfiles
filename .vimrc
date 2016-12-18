@@ -9,22 +9,19 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
 Plug 'rking/ag.vim'
-Plug 'kien/ctrlp.vim'
-Plug 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'scrooloose/syntastic'
-Plug 'godlygeek/tabular'
+ Plug 'godlygeek/tabular'
 Plug 'airblade/vim-gitgutter'
 Plug 'cespare/vim-sbd'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'lambdalisue/vim-pyenv'
 Plug 'plasticboy/vim-markdown'
-Plug 'majutsushi/tagbar'
-Plug 'ap/vim-buftabline'
+" Plug 'ap/vim-buftabline'
 Plug 'junegunn/goyo.vim'
+Plug 'junegunn/vim-emoji'
 Plug 'cocopon/shadeline.vim'
-Plug 'kassio/neoterm'
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
 Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
@@ -32,12 +29,11 @@ Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
 " Themes and colorschemes
 Plug 'godlygeek/csapprox'
 Plug 'edkolev/tmuxline.vim'
-Plug 'nanotech/jellybeans.vim'
 Plug 'sjl/badwolf'
-Plug 'cocopon/iceberg.vim'
-Plug 'pbrisbin/vim-colors-off'
+Plug 'yankcrime/vim-colors-off'
 Plug 'yankcrime/direwolf'
-Plug 'jacoborus/tender.vim'
+Plug 'cocopon/iceberg.vim'
+Plug 'chriskempson/base16-vim'
 
 call plug#end()
 
@@ -66,7 +62,8 @@ set ttyfast
 
 nmap <leader>l :set list!<CR>
 set listchars=tab:▸\ ,eol:¬,trail:-,
-set fillchars+=vert:\│
+" set fillchars+=vert:\│
+set emoji
 
 set backupdir=/tmp//,.
 set directory=/tmp//,.
@@ -165,9 +162,22 @@ nmap <leader>0 <Plug>BufTabLine.Go(10)
 " }}}
 " {{{ NERDTree
 map <C-n> :NERDTreeToggle<CR>
-let NERDTreeShowBookmarks=1
-let NERDTreeShowHidden=1
-let NERDTreeBookmarksSort = 1
+let g:NERDTreeShowBookmarks=1
+let g:NERDTreeShowHidden=1
+let g:NERDTreeBookmarksSort = 1
+let g:NERDTreeDirArrowExpandable = '▸'
+let g:NERDTreeDirArrowCollapsible = '▾'
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "✹",
+    \ "Staged"    : "✚",
+    \ "Untracked" : "✭",
+    \ "Renamed"   : "➜",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ "Unknown"   : "?"
+    \ }
 " }}}
 " {{{ fzf 
 nnoremap <silent> <expr> <C-f> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
@@ -185,20 +195,6 @@ let g:fzf_layout = { 'down': '~40%' }
 let g:fzf_layout = { 'window': 'enew' }
 let g:fzf_layout = { 'window': '-tabnew' }
 
-" Customize fzf colors to match your color scheme
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
 let g:fzf_buffers_jump = 1
 let g:fzf_tags_command = 'ctags -R'
 " }}}
@@ -206,7 +202,6 @@ let g:fzf_tags_command = 'ctags -R'
 let g:shadeline = {}
 let g:shadeline.active = {
 			\ 	'left': [
-			\ 		'▸',
 			\ 		'fname',
 			\ 		'flags',
 			\ 		'ShadelineItemGitBranch',
@@ -230,6 +225,27 @@ function! ShadelineItemGitBranch()
 				\ : ''
 	return empty(name) ? '' : printf('(%s)', name)
 endfunction
+
+" Emoji statusline
+function! SL(function)
+  if exists('*'.a:function)
+    return call(a:function,[])
+  else
+    return ''
+  endif
+endfunction
+
+function! StatusGit()
+    let git = '⎇ ' . fugitive#head()
+    return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
+endfunction
+
+set statusline=[%n]
+set statusline+=\ %<%.99f\ %h%w%m%r
+set statusline+=%{SL('StatusGit')}
+set statusline+=%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}
+set statusline+=%*%=%-14.(%r%y\ ⭡\ %l,%c%)\ %P
+
 " }}}
 " {{{ Tmuxline
 let g:tmuxline_powerline_separators = 0
@@ -300,12 +316,56 @@ let g:tagbar_type_puppet = {
 " }}}
 " {{{ MacVim GUI overrides
 if has('gui_running')
-    set linespace=1
+    silent! if emoji#available()
+      function! S_modified()
+        if &modified
+          return emoji#for('kiss').' '
+        elseif !&modifiable
+          return emoji#for('construction').' '
+        else
+          return ''
+        endif
+      endfunction
+    
+      function! S_fugitive()
+        if !exists('g:loaded_fugitive')
+          return ''
+        endif
+        let head = fugitive#head()
+        if empty(head)
+          return ''
+        else
+          return head == 'master' ? emoji#for('crown') : emoji#for('seedling').' '.head
+        endif
+      endfunction
+    
+      function! S_filetype()
+        if empty(&filetype)
+          return emoji#for('grey_question')
+        else
+          return get(s:ft_emoji, &filetype, '['.&filetype.']')
+        endif
+      endfunction
+    
+      function! MyStatusLine()
+        let mod = '%{S_modified()}'
+        let ro  = "%{&readonly ? emoji#for('lock') . ' ' : ''}"
+        let ft  = '%y'
+        let fug = ' %{S_fugitive()}'
+        let sep = ' %= '
+        let pos = ' ⭡ %l,%c%V '
+        let pct = ' %P '
+        return '[%n] %f %<'.mod.ro.ft.fug.sep.pos.pct
+      endfunction
+    
+      set statusline=%!MyStatusLine()
+    endif
+    set linespace=2
 	set transparency=5
     set fuoptions=maxvert,maxhorz
 	let macvim_skip_colorscheme=1
-	" colorscheme goodwolf
-    set guifont=Triplicate\ T4c:h14
+	colorscheme off
+    set guifont=Triplicate\ T4s:h14
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
     set guioptions-=r " don't show scrollbars
@@ -331,44 +391,3 @@ if has('gui_running')
     let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
     end
 " }}}
-" {{{ NeoVim
-if has('nvim')
-	set termguicolors
-	set mouse=r
-    nmap <BS> <C-w>h
-    map <C-h> <C-w>h
-    map <C-j> <C-w>j
-    map <C-k> <C-w>k
-    map <C-l> <C-w>l
-    tnoremap <F12> <C-\><C-n> 
-    set switchbuf+=useopen
-    function! TermEnter()
-      let bufcount = bufnr("$")
-      let currbufnr = 1
-      let nummatches = 0
-      let firstmatchingbufnr = 0
-      while currbufnr <= bufcount
-        if(bufexists(currbufnr))
-          let currbufname = bufname(currbufnr)
-          if(match(currbufname, "term://") > -1)
-            echo currbufnr . ": ". bufname(currbufnr)
-            let nummatches += 1
-            let firstmatchingbufnr = currbufnr
-            break
-          endif
-        endif
-        let currbufnr = currbufnr + 1
-      endwhile
-      if(nummatches >= 1)
-        execute ":sbuffer ". firstmatchingbufnr
-        startinsert
-      else
-        execute ":terminal"
-      endif
-    endfunction
-    map <F12> :call TermEnter()<CR>
-	let g:neoterm_automap_keys = '<leader>tt'
-	nnoremap <silent> <leader>th :call neoterm#close()<cr>
-	nnoremap <silent> <leader>tcls :call neoterm#clear()<cr>
-endif
-"}}}
