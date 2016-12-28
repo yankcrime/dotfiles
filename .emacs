@@ -46,12 +46,13 @@ Return a list of installed packages or nil for every skipped package."
 (ensure-package-installed 'evil 'magit 'helm 'evil-magit 'projectile
 			  'evil-leader 'evil-visual-mark-mode 'helm-ag 'helm-projectile
 			  'puppet-mode 'flycheck 'go-mode 'dim 'yaml-mode
-			  'markdown-mode 'whitespace)
+			  'markdown-mode 'whitespace 'multi-term 'project-explorer)
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
 ; evil mode and related
+(setq evil-mode-line-format '(before . mode-line-front-space))
 (setq evil-want-C-u-scroll t)
 
 (require 'evil-leader)
@@ -63,6 +64,7 @@ Return a list of installed packages or nil for every skipped package."
 (evil-leader/set-key "q" 'evil-quit)
 (evil-leader/set-key "w" 'evil-write)
 (evil-leader/set-key "x" 'evil-save-and-close)
+(evil-leader/set-key "f" 'fzf)
 
 (require 'evil)
 (require 'evil-magit)
@@ -81,6 +83,10 @@ Return a list of installed packages or nil for every skipped package."
 
 ;; Show column numbers
 (column-number-mode)
+
+;; MultiTerm
+(require 'multi-term)
+(setq multi-term-program "/usr/local/bin/zsh")
 
 ;; Highlight matching parens
 (show-paren-mode)
@@ -103,7 +109,7 @@ Return a list of installed packages or nil for every skipped package."
     ("78c1c89192e172436dbf892bd90562bc89e2cc3811b5f9506226e735a953a9c6" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
  '(package-selected-packages
    (quote
-    (ag spacemacs-theme markdown-mode dim diminish helm-ag yaml-mode helm-projectile ## projectile puppet-mode helm flycheck evil-visual-mark-mode evil-magit)))
+    (project-explorer multi-term fzf dockerfile-mode ag spacemacs-theme markdown-mode dim diminish helm-ag yaml-mode helm-projectile ## projectile puppet-mode helm flycheck evil-visual-mark-mode evil-magit)))
  '(projectile-enable-caching t)
  '(projectile-mode t nil (projectile))
  '(projectile-mode-line
@@ -162,8 +168,13 @@ Return a list of installed packages or nil for every skipped package."
 (global-set-key (kbd "C--") 'split-window-vertically)
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
 (global-set-key (kbd "C-x f") 'helm-find-files)
+(global-set-key (kbd "C-x s") 'helm-projectile-ag)
+
 ; Quickly flip between buffers
 (global-set-key (kbd "M-o")  'mode-line-other-buffer)
+
+; Kill current buffer
+(global-set-key [(control x) (k)] 'kill-this-buffer)
 
 ; Shorten major and minor mode names
 (dim-major-name 'emacs-lisp-mode "EL")
