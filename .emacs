@@ -7,7 +7,7 @@
 (scroll-bar-mode 0)
 (tool-bar-mode -1)
 (set-face-attribute 'default nil
-                    :family "Triplicate T4c"
+                    :family "Triplicate T4s"
                     :height 140
                     :weight 'normal)
 
@@ -60,9 +60,9 @@ Return a list of installed packages or nil for every skipped package."
                           'puppet-mode 'go-mode 'dim 'yaml-mode 'markdown-mode
                           'whitespace 'multi-term 'project-explorer
                           'flycheck 'highlight-indentation 'indent-guide 'shackle
-                          'exec-path-from-shell)
+                          'exec-path-from-shell 'deft)
 
-(load-theme 'base16-oceanic-next)
+(load-theme 'whiteboard)
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
@@ -140,7 +140,7 @@ Return a list of installed packages or nil for every skipped package."
     ("5a7830712d709a4fc128a7998b7fa963f37e960fd2e8aa75c76f692b36e6cf3c" "1263771faf6967879c3ab8b577c6c31020222ac6d3bac31f331a74275385a452" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "3d47d88c86c30150c9a993cc14c808c769dad2d4e9d0388a24fee1fbf61f0971" "3380a2766cf0590d50d6366c5a91e976bdc3c413df963a0ab9952314b4577299" "0c3b1358ea01895e56d1c0193f72559449462e5952bded28c81a8e09b53f103f" "78c1c89192e172436dbf892bd90562bc89e2cc3811b5f9506226e735a953a9c6" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
  '(package-selected-packages
    (quote
-    (smart-mode-line zenburn-theme exec-path-from-shell shackle indent-guide highlight-indentation project-explorer multi-term fzf dockerfile-mode ag spacemacs-theme markdown-mode dim diminish helm-ag yaml-mode helm-projectile ## projectile puppet-mode helm flycheck evil-visual-mark-mode evil-magit)))
+    (deft magit-gh-pulls web-mode smart-mode-line zenburn-theme exec-path-from-shell shackle indent-guide highlight-indentation project-explorer multi-term fzf dockerfile-mode ag spacemacs-theme markdown-mode dim diminish helm-ag yaml-mode helm-projectile ## projectile puppet-mode helm flycheck evil-visual-mark-mode evil-magit)))
  '(projectile-enable-caching t)
  '(projectile-mode t nil (projectile))
  '(projectile-mode-line
@@ -204,20 +204,22 @@ Return a list of installed packages or nil for every skipped package."
                         :slant 'italic
                         :height 160)))
 
-;; Keybindings
+;; Keybindings, some mirroring macOS behaviour
 (global-set-key (kbd "<f1>") 'projectile-switch-project)
 (global-set-key (kbd "<f2>") 'projectile-find-file)
 (global-set-key (kbd "<f10>") 'magit-status)
 (global-set-key (kbd "C--") 'split-window-vertically)
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
-(global-set-key (kbd "C-x f") 'helm-find-files)
+(global-set-key (kbd "M-o") 'helm-find-files)
 (global-set-key (kbd "C-x s") 'helm-projectile-ag)
+(global-set-key (kbd "M-s") 'evil-write)
+(global-set-key (kbd "M-f") 'evil-search-forward)
 
 ; Quickly flip between buffers
-(global-set-key (kbd "M-o")  'mode-line-other-buffer)
+; (global-set-key (kbd "M-o")  'mode-line-other-buffer)
 
 ; Kill current buffer
-(global-set-key [(control x) (k)] 'kill-this-buffer)
+(global-set-key  (kbd "M-w") 'kill-this-buffer)
 
 ; Shorten major and minor mode names
 (dim-major-name 'emacs-lisp-mode "EL")
@@ -272,6 +274,25 @@ Return a list of installed packages or nil for every skipped package."
                            (error nil) ))
           minor-mode-list)
     (message "Active modes are %s" active-modes)))
+
+;; Open files in dired mode using 'open'
+(eval-after-load "dired"
+  '(progn
+     (define-key dired-mode-map (kbd "z")
+       (lambda () (interactive)
+         (let ((fn (dired-get-file-for-visit)))
+           (start-process "default-app" nil "open" fn))))))
+
+;; Deft
+(require 'deft)
+(setq deft-extensions '("txt" "tex" "org"))
+(setq deft-directory "~/Dropbox/org")
+(global-set-key [f3] 'deft)
+(defun deft-enter-insert-mode ()
+    ;; delay seems necessary
+    (run-at-time "0.1 sec" nil 'evil-insert-state))
+(add-hook 'deft-mode-hook 'deft-enter-insert-mode)
+(setq deft-use-filename-as-title t)
 
 ;; Generic hooks
 (add-hook 'puppet-mode-hook 'flycheck-mode)
