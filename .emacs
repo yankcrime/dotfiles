@@ -56,11 +56,11 @@ Return a list of installed packages or nil for every skipped package."
 (package-initialize)
 
 (ensure-package-installed 'evil 'magit 'evil-magit 'evil-leader
-                          'evil-visual-mark-mode 'helm' helm-ag 'projectile 'helm-projectile
+                          'evil-visual-mark-mode 'evil-org 'helm' helm-ag 'projectile 'helm-projectile
                           'puppet-mode 'go-mode 'dim 'yaml-mode 'markdown-mode
                           'whitespace 'multi-term 'project-explorer
                           'flycheck 'highlight-indentation 'indent-guide 'shackle
-                          'exec-path-from-shell 'deft)
+                          'exec-path-from-shell 'deft 'org-bullets)
 
 (load-theme 'whiteboard)
 
@@ -93,6 +93,7 @@ Return a list of installed packages or nil for every skipped package."
 
 ;; org-mode
 (require 'org)
+(setq org-directory "~/Dropbox/org")
 (setq org-agenda-files '("~/Dropbox/org/"))
 (defun pop-to-org-agenda (split)
   "Visit the org agenda, in the current window or a SPLIT."
@@ -101,10 +102,18 @@ Return a list of installed packages or nil for every skipped package."
   (when (not split)
     (delete-other-windows)))
 
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+(define-key global-map (kbd "C-c c") 'org-capture)
 (define-key global-map (kbd "C-c t a") 'pop-to-org-agenda)
-(define-key global-map (kbd "C-c t t") 'org-todo-list)
+(define-key global-map (kbd "C-c t l") 'org-todo-list)
 
 (setq org-log-done 'time)
+
+(setq org-adapt-indentation nil)
+(setq org-ellipsis "•••")
+
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 ;; Disable startup screen
 (setq inhibit-splash-screen t)
@@ -140,7 +149,7 @@ Return a list of installed packages or nil for every skipped package."
     ("5a7830712d709a4fc128a7998b7fa963f37e960fd2e8aa75c76f692b36e6cf3c" "1263771faf6967879c3ab8b577c6c31020222ac6d3bac31f331a74275385a452" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "3d47d88c86c30150c9a993cc14c808c769dad2d4e9d0388a24fee1fbf61f0971" "3380a2766cf0590d50d6366c5a91e976bdc3c413df963a0ab9952314b4577299" "0c3b1358ea01895e56d1c0193f72559449462e5952bded28c81a8e09b53f103f" "78c1c89192e172436dbf892bd90562bc89e2cc3811b5f9506226e735a953a9c6" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
  '(package-selected-packages
    (quote
-    (deft magit-gh-pulls web-mode smart-mode-line zenburn-theme exec-path-from-shell shackle indent-guide highlight-indentation project-explorer multi-term fzf dockerfile-mode ag spacemacs-theme markdown-mode dim diminish helm-ag yaml-mode helm-projectile ## projectile puppet-mode helm flycheck evil-visual-mark-mode evil-magit)))
+    (org-bullets evil-org deft magit-gh-pulls web-mode smart-mode-line zenburn-theme exec-path-from-shell shackle indent-guide highlight-indentation project-explorer multi-term fzf dockerfile-mode ag spacemacs-theme markdown-mode dim diminish helm-ag yaml-mode helm-projectile ## projectile puppet-mode helm flycheck evil-visual-mark-mode evil-magit)))
  '(projectile-enable-caching t)
  '(projectile-mode t nil (projectile))
  '(projectile-mode-line
@@ -294,7 +303,52 @@ Return a list of installed packages or nil for every skipped package."
 (add-hook 'deft-mode-hook 'deft-enter-insert-mode)
 (setq deft-use-filename-as-title t)
 
-;; Generic hooks
+;; Fantastical
+(defun applescript-quote-string (argument)
+  "Quote a string for passing as a string to AppleScript."
+  (if (or (not argument) (string-equal argument ""))
+      "\"\""
+    ;; Quote using double quotes, but escape any existing quotes or
+    ;; backslashes in the argument with backslashes.
+    (let ((result "")
+          (start 0)
+          end)
+      (save-match-data
+        (if (or (null (string-match "[^\"\\]" argument))
+                (< (match-end 0) (length argument)))
+            (while (string-match "[\"\\]" argument start)
+              (setq end (match-beginning 0)
+                    result (concat result (substring argument start end)
+                                   "\\" (substring argument end (1+ end)))
+                    start (1+ end))))
+        (concat "\"" result (substring argument start) "\"")))))
+
+(defun send-region-to-fantastical (beg end)
+  "Send the selected region to Fantastical.
+Parse the first line to create the event and use the second
+and subsequent lines as the event note."
+  (interactive "r")
+  (let* ((region (buffer-substring-no-properties beg end))
+         (match (string-match "^\\(.*\\)$" region))
+         (event (substring region (match-beginning 1) (match-end 1)))
+         (notes (if (< (match-end 0) (length region))
+                   (concat (substring region (+ (match-end 0) 1) nil) "\n\n")
+                 "")))
+    (do-applescript
+     (format "set theDate to current date
+              set eventText to %s
+              set eventNotes to %s
+              set eventNotes to (eventNotes) & \"Added from Emacs on \" & (theDate as string)
+              tell application \"Fantastical\"
+                parse sentence (eventText) notes (eventNotes)
+              end tell"
+             (applescript-quote-string event)
+             (applescript-quote-string notes)))))
+
+(autoload 'send-region-to-fantastical "fantastical-capture" "Send region to Fantastical" t)
+(global-set-key (kbd "C-c C-f") 'send-region-to-fantastical)
+
+;; And finally, some generic hooks
 (add-hook 'puppet-mode-hook 'flycheck-mode)
 (add-hook 'python-mode-hook 'flycheck-mode)
 (add-hook 'go-mode-hook 'flycheck-mode)
