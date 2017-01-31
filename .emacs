@@ -33,49 +33,32 @@
 ;; Window title
 (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 
-;; Packages
+;; Disable auto-save and auto-backup
+(setq auto-save-default nil)
+(setq make-backup-files nil)
+
+;; Use y / n instead of yes / no
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; Package management
 (require 'package)
+(setq package-enable-at-startup nil)
 
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 
-(setq package-enable-at-startup nil)
-
-;; disable auto-save and auto-backup
-(setq auto-save-default nil)
-(setq make-backup-files nil)
-
-(defun ensure-package-installed (&rest packages)
-  "Assure every package is installed, ask for installation if it’s not.
-
-Return a list of installed packages or nil for every skipped package."
-  (mapcar
-   (lambda (package)
-     (if (package-installed-p package)
-         nil
-       (if (y-or-n-p (format "Package %s is missing. Install it? " package))
-           (package-install package)
-         package)))
-   packages))
-
-;; Make sure to have downloaded archive description.
-(or (file-exists-p package-user-dir)
-    (package-refresh-contents))
-
-;; Activate installed packages
 (package-initialize)
 
-(ensure-package-installed 'use-package 'evil 'magit 'evil-magit 'evil-leader
-                          'evil-visual-mark-mode 'evil-org 'helm' helm-ag 'projectile 'helm-projectile
-                          'puppet-mode 'go-mode 'dim 'yaml-mode 'markdown-mode
-                          'whitespace 'multi-term 'project-explorer
-                          'flycheck 'highlight-indentation 'indent-guide 'shackle
-                          'exec-path-from-shell 'deft 'org-bullets 'leuven-theme 'material-theme
-                          'nyan-mode)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
-(load-theme 'leuven t)
+(use-package leuven-theme
+  :ensure t
+  :config
+  (load-theme 'leuven t))
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
@@ -93,6 +76,9 @@ Return a list of installed packages or nil for every skipped package."
   (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
   (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
 
+  (global-set-key (kbd "M-s") 'evil-write)
+  (global-set-key (kbd "M-f") 'evil-search-forward)
+
   (use-package evil-leader
     :ensure t
     :config
@@ -107,6 +93,12 @@ Return a list of installed packages or nil for every skipped package."
     (evil-leader/set-key "f" 'fzf))
 
   (use-package evil-magit
+    :ensure t)
+
+  (use-package evil-visual-mark-mode
+    :ensure t)
+
+  (use-package evil-org
     :ensure t))
 
 ;; org-mode
@@ -151,36 +143,11 @@ Return a list of installed packages or nil for every skipped package."
   (setq-default nyan-wavy-trail t)
   (nyan-mode))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "4156d0da4d9b715c6f7244be34f2622716fb563d185b6facedca2c0985751334" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "5a7830712d709a4fc128a7998b7fa963f37e960fd2e8aa75c76f692b36e6cf3c" "1263771faf6967879c3ab8b577c6c31020222ac6d3bac31f331a74275385a452" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "3d47d88c86c30150c9a993cc14c808c769dad2d4e9d0388a24fee1fbf61f0971" "3380a2766cf0590d50d6366c5a91e976bdc3c413df963a0ab9952314b4577299" "0c3b1358ea01895e56d1c0193f72559449462e5952bded28c81a8e09b53f103f" "78c1c89192e172436dbf892bd90562bc89e2cc3811b5f9506226e735a953a9c6" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" default)))
- '(package-selected-packages
-   (quote
-    (helm-config material-theme nyan-mode org-bullets evil-org deft magit-gh-pulls web-mode smart-mode-line zenburn-theme exec-path-from-shell shackle indent-guide highlight-indentation project-explorer multi-term fzf dockerfile-mode ag spacemacs-theme markdown-mode dim diminish helm-ag yaml-mode helm-projectile ## projectile puppet-mode helm flycheck evil-visual-mark-mode evil-magit)))
- '(projectile-enable-caching t)
- '(projectile-mode t nil (projectile))
- '(projectile-mode-line
-   (quote
-    (:eval
-     (if
-         (file-remote-p default-directory)
-         " "
-       (format " [%s]"
-               (projectile-project-name))))))
- '(projectile-switch-project-action (quote helm-projectile-find-file)))
-
-;; Projectile
-(use-package projectile
+;; Magit
+(use-package magit
   :ensure t
   :config
-  (projectile-global-mode)
-  (setq projectile-enable-caching t)
-  (setq projectile-switch-project-action 'helm-projectile-find-file))
+  (global-set-key (kbd "<f10>") 'magit-status))
 
 ;; Helm
 (use-package helm
@@ -193,6 +160,7 @@ Return a list of installed packages or nil for every skipped package."
   (add-hook 'helm-after-initialize-hook
             'spacemacs//hide-cursor-in-helm-buffer)
 
+  (global-set-key (kbd "M-o") 'helm-find-files)
   ;; vim-like keybindings
   (define-key helm-map (kbd "C-j") 'helm-next-line)
   (define-key helm-map (kbd "C-k") 'helm-previous-line)
@@ -211,28 +179,33 @@ Return a list of installed packages or nil for every skipped package."
                         :height 120))
   :init
   (helm-mode 1)
-  (helm-projectile-on))
 
-;; use Marked.app to preview Markdown
-(setq markdown-open-command "~/bin/mark")
+  (use-package helm-ag
+    :ensure t))
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; Projectile
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-global-mode)
+  (setq projectile-enable-caching t)
+  (setq projectile-switch-project-action 'helm-projectile-find-file)
+  (global-set-key (kbd "<f1>") 'projectile-switch-project)
+  (global-set-key (kbd "<f2>") 'projectile-find-file)
 
-;; Keybindings, some mirroring macOS behaviour
-(global-set-key (kbd "<f1>") 'projectile-switch-project)
-(global-set-key (kbd "<f2>") 'projectile-find-file)
-(global-set-key (kbd "<f10>") 'magit-status)
+  (use-package helm-projectile
+    :ensure t
+    :init
+    (helm-projectile-on)
+    :config
+    (global-set-key (kbd "C-x s") 'helm-projectile-ag)
+    (progn
+      (setq projectile-switch-project-action 'projectile-dired)
+      (setq projectile-completion-system 'helm))))
+
+;; Additional keybindings, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
-(global-set-key (kbd "M-o") 'helm-find-files)
-(global-set-key (kbd "C-x s") 'helm-projectile-ag)
-(global-set-key (kbd "M-s") 'evil-write)
-(global-set-key (kbd "M-f") 'evil-search-forward)
 
 ; Kill current buffer
 (global-set-key  (kbd "M-w") 'kill-this-buffer)
@@ -254,12 +227,11 @@ Return a list of installed packages or nil for every skipped package."
   (dim-minor-name 'helm-mode "")
   (dim-minor-name 'auto-revert-mode ""))
 
-;; Flycheck
-;; (add-hook 'after-init-hook #'global-flycheck-mode)
-
-;; use y / n instead of yes / no
-(fset 'yes-or-no-p 'y-or-n-p)
-
+(use-package flycheck
+  :ensure t
+  :config
+  ;; (add-hook 'after-init-hook #'global-flycheck-mode)
+  )
 ;; Tame window arrangement for consistency's sake
 (use-package shackle
   :ensure t
@@ -318,6 +290,25 @@ Return a list of installed packages or nil for every skipped package."
   (add-hook 'deft-mode-hook 'deft-enter-insert-mode)
   (setq deft-use-filename-as-title t))
 
+(use-package exec-path-from-shell
+  :ensure t)
+
+;; Modes
+(use-package go-mode
+  :ensure t
+  :config
+  (add-hook 'go-mode-hook 'flycheck-mode))
+
+(use-package puppet-mode
+  :ensure t
+  :config
+  (add-hook 'puppet-mode-hook 'flycheck-mode))
+
+(use-package python-mode
+  :ensure t
+  :config
+  (add-hook 'python-mode-hook 'flycheck-mode))
+
 ;; Fantastical
 (defun applescript-quote-string (argument)
   "Quote a string for passing as a string to AppleScript."
@@ -363,7 +354,19 @@ and subsequent lines as the event note."
 (autoload 'send-region-to-fantastical "fantastical-capture" "Send region to Fantastical" t)
 (global-set-key (kbd "C-c C-f") 'send-region-to-fantastical)
 
-;; And finally, some generic hooks
-(add-hook 'puppet-mode-hook 'flycheck-mode)
-(add-hook 'python-mode-hook 'flycheck-mode)
-(add-hook 'go-mode-hook 'flycheck-mode)
+;; use Marked.app to preview Markdown
+(setq markdown-open-command "~/bin/mark")
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
