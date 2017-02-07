@@ -7,8 +7,8 @@
 (scroll-bar-mode 0)
 (tool-bar-mode -1)
 (set-face-attribute 'default nil
-                    :family "SF Mono"
-                    :height 120
+                    :family "Triplicate T4s"
+                    :height 140
                     :weight 'normal)
 
 ;; Tooltips etc.
@@ -40,6 +40,14 @@
 ;; Use y / n instead of yes / no
 (fset 'yes-or-no-p 'y-or-n-p)
 
+;; Global keybindings, some mirroring macOS behaviour
+(global-set-key (kbd "C--") 'split-window-vertically)
+(global-set-key (kbd "C-\\") 'split-window-horizontally)
+(global-set-key (kbd "M-w") 'kill-this-buffer)
+(global-set-key (kbd "M-s") 'evil-write)
+(global-set-key (kbd "M-f") 'evil-search-forward)
+(global-set-key (kbd "M-o") 'helm-find-files)
+
 ;; Package management
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -60,6 +68,10 @@
   :config
   (load-theme 'leuven t))
 
+;; I prefer whiteboard, but Leuven comes with a load of extra for org-mode.
+;; Solution - load leuven first, then whiteboard! \o/
+(load-theme 'whiteboard)
+
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
@@ -68,16 +80,15 @@
   :ensure t
   :config
   (evil-mode 1)
-  (setq evil-mode-line-format '(before . mode-line-front-space))
-  (setq evil-want-C-u-scroll t)
   (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
   (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
   (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
   (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
   (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-
   (global-set-key (kbd "M-s") 'evil-write)
   (global-set-key (kbd "M-f") 'evil-search-forward)
+  (setq evil-mode-line-format '(before . mode-line-front-space))
+  (setq evil-want-C-u-scroll t)
 
   (use-package evil-leader
     :ensure t
@@ -96,9 +107,6 @@
     :ensure t)
 
   (use-package evil-visual-mark-mode
-    :ensure t)
-
-  (use-package evil-org
     :ensure t))
 
 ;; org-mode
@@ -124,7 +132,7 @@
   (use-package org-bullets
     :ensure t
     :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 
 ;; MultiTerm
@@ -140,8 +148,7 @@
 (use-package nyan-mode
   :ensure t
   :config
-  (setq-default nyan-wavy-trail t)
-  (nyan-mode))
+(setq-default nyan-wavy-trail t))
 
 ;; Magit
 (use-package magit
@@ -151,8 +158,19 @@
 
 ;; Helm
 (use-package helm
+  :bind (:map helm-map
+              ("C-j" . helm-next-line)
+              ("C-k" . helm-previous-line)
+              ("C-h" . helm-next-source)
+              ("C-S-h" . describe-key)
+              ("C-l" . "RET")
+              ([escape] . helm-keyboard-quit))
   :ensure t
+  :init
+  (helm-mode 1)
   :config
+  (global-set-key (kbd "M-o") 'helm-find-files)
+  (global-set-key (kbd "M-x") 'helm-M-x)
   (defun spacemacs//hide-cursor-in-helm-buffer ()
     "Hide the cursor in helm buffers."
     (with-helm-buffer
@@ -160,26 +178,15 @@
   (add-hook 'helm-after-initialize-hook
             'spacemacs//hide-cursor-in-helm-buffer)
 
-  (global-set-key (kbd "M-o") 'helm-find-files)
-  ;; vim-like keybindings
-  (define-key helm-map (kbd "C-j") 'helm-next-line)
-  (define-key helm-map (kbd "C-k") 'helm-previous-line)
-  (define-key helm-map (kbd "C-h") 'helm-next-source)
-  (define-key helm-map (kbd "C-S-h") 'describe-key)
-  (define-key helm-map (kbd "C-l") (kbd "RET"))
-  (define-key helm-map [escape] 'helm-keyboard-quit)
   (dolist (keymap (list helm-find-files-map helm-read-file-map))
     (define-key keymap (kbd "C-l") 'helm-execute-persistent-action)
     (define-key keymap (kbd "C-h") 'helm-find-files-up-one-level)
     (define-key keymap (kbd "C-S-h") 'describe-key))
   (lambda ()
     (set-face-attribute 'helm-source-header nil
-                        :family "SF Mono"
+                        :family "Triplicate T4s"
                         :slant 'italic
-                        :height 120))
-  :init
-  (helm-mode 1)
-
+                        :height 12))
   (use-package helm-ag
     :ensure t))
 
@@ -203,12 +210,6 @@
       (setq projectile-switch-project-action 'projectile-dired)
       (setq projectile-completion-system 'helm))))
 
-;; Additional keybindings, some mirroring macOS behaviour
-(global-set-key (kbd "C--") 'split-window-vertically)
-(global-set-key (kbd "C-\\") 'split-window-horizontally)
-
-; Kill current buffer
-(global-set-key  (kbd "M-w") 'kill-this-buffer)
 
 ; Shorten major and minor mode names
 (use-package dim
@@ -227,11 +228,13 @@
   (dim-minor-name 'helm-mode "")
   (dim-minor-name 'auto-revert-mode ""))
 
+;; Flycheck
 (use-package flycheck
   :ensure t
   :config
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
   )
+
 ;; Tame window arrangement for consistency's sake
 (use-package shackle
   :ensure t
@@ -281,10 +284,9 @@
 (use-package deft
   :ensure t
   :config
+  (global-set-key [f3] 'deft)
   (setq deft-extensions '("txt" "tex" "org"))
   (setq deft-directory "~/Dropbox/org")
-  (global-set-key [f3] 'deft)
-  (defun deft-enter-insert-mode ()
     ;; delay seems necessary
     (run-at-time "0.1 sec" nil 'evil-insert-state))
   (add-hook 'deft-mode-hook 'deft-enter-insert-mode)
@@ -308,6 +310,19 @@
   :ensure t
   :config
   (add-hook 'python-mode-hook 'flycheck-mode))
+
+(use-package yaml-mode
+  :ensure t
+  :config
+  (add-hook 'yaml-mode-hook 'flycheck-mode))
+
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
 
 ;; Fantastical
 (defun applescript-quote-string (argument)
@@ -354,8 +369,29 @@ and subsequent lines as the event note."
 (autoload 'send-region-to-fantastical "fantastical-capture" "Send region to Fantastical" t)
 (global-set-key (kbd "C-c C-f") 'send-region-to-fantastical)
 
+;; Rename current buffer and file
+(defun rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " filename)))
+        (if (get-buffer new-name)
+            (error "A buffer named '%s' already exists!" new-name)
+          (rename-file filename new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil)
+          (message "File '%s' successfully renamed to '%s'"
+                   name (file-name-nondirectory new-name)))))))
+
+(global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+
 ;; use Marked.app to preview Markdown
 (setq markdown-open-command "~/bin/mark")
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -363,7 +399,7 @@ and subsequent lines as the event note."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
+    (flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
