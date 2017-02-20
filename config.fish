@@ -1,7 +1,7 @@
 # User customisation for the Fish shell
 
 # vi related
-fish_vi_mode
+set fish_key_bindings fish_vi_key_bindings
 function fish_mode_prompt; end
 
 # better compatibility for fzf with tmux
