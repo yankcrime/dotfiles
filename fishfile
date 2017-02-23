@@ -7,5 +7,6 @@ fisherman/getopts
 fisherman/git_util
 fisherman/last_job_id
 tader/touchbar
+tader/touchbar_dirstack
 tader/touchbar_git
 fisherman/z
