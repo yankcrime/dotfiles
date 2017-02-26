@@ -7,9 +7,11 @@
 (scroll-bar-mode 0)
 (tool-bar-mode -1)
 (set-face-attribute 'default nil
-                    :family "Triplicate T4s"
-                    :height 140
-                    :weight 'normal)
+                    :family "Triplicate T4c"
+                    :height 140)
+
+;; Ligatures
+;; (mac-auto-operator-composition-mode)
 
 ;; Tooltips etc.
 (set-face-attribute 'variable-pitch nil
@@ -70,7 +72,7 @@
 
 ;; I prefer whiteboard, but Leuven comes with a load of extra for org-mode.
 ;; Solution - load leuven first, then whiteboard! \o/
-(load-theme 'whiteboard)
+;; (load-theme 'whiteboard)
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
@@ -95,13 +97,20 @@
     :config
     (global-evil-leader-mode)
     (evil-leader/set-leader "<SPC>")
-    (evil-leader/set-key "<SPC>" 'evil-buffer)
-    (evil-leader/set-key "b" 'helm-buffers-list)
-    (evil-leader/set-key "o" 'delete-other-windows)
-    (evil-leader/set-key "q" 'evil-quit)
-    (evil-leader/set-key "w" 'evil-write)
-    (evil-leader/set-key "x" 'evil-save-and-close)
-    (evil-leader/set-key "f" 'fzf))
+    (evil-leader/set-key
+      "<SPC>" 'evil-buffer
+      "b" 'helm-buffers-list
+      "pp" 'projectile-switch-project
+      "pf" 'projectile-find-file
+      "d" 'deft
+      "gg" 'magit-status
+      "ga" 'magit-stage-file
+      "gc" 'magit-commit
+      "o" 'delete-other-windows
+      "q" 'evil-quit
+      "w" 'evil-write
+      "x" 'evil-save-and-close
+      "f" 'fzf))
 
   (use-package evil-magit
     :ensure t)
@@ -184,9 +193,9 @@
     (define-key keymap (kbd "C-S-h") 'describe-key))
   (lambda ()
     (set-face-attribute 'helm-source-header nil
-                        :family "Triplicate T4s"
+                        :family "Triplicate T4c"
                         :slant 'italic
-                        :height 12))
+                        :height 140))
   (use-package helm-ag
     :ensure t))
 
@@ -324,6 +333,15 @@
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 
+(use-package dockerfile-mode
+  :ensure t)
+
+(use-package ruby-mode
+  :ensure t)
+
+(use-package toml-mode
+  :ensure t)
+
 ;; Fantastical
 (defun applescript-quote-string (argument)
   "Quote a string for passing as a string to AppleScript."
@@ -399,10 +417,10 @@ and subsequent lines as the event note."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
+    (toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(org-document-title ((t (:foreground "black" :weight bold :height 1.2 :family "Triplicate T4c")))))
