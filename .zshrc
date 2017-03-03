@@ -3,13 +3,12 @@
 
 # usual suspects
 #
-export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:
+export GOPATH=~/src/golang
 # export LSCOLORS="exfxcxdxbxegedabagacad"
 export EDITOR="vim"
-export HOMEBREW_GITHUB_API_TOKEN=""
-export GOPATH=~/src/golang
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
 export PURE_PROMPT_SYMBOL="$"
+export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:$GOPATH/bin
 
 # history and general options
 #
@@ -44,14 +43,14 @@ alias rip='dvdbackup -i /dev/sr0 -o . -M'
 alias trillian='mosh trillian.dischord.org'
 alias zarquon='mosh zarquon.dischord.org'
 alias sshx='ssh -c arcfour,blowfish-cbc -XC'
-alias pwplz='apg -n 1 -m 12 -x 12 -M NC'
+alias pwplz='pwgen -n -y -s 12 1'
 alias keyplz='openssl rand -hex 10'
 alias md='open -a Marked.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias mutt='cd ~/Desktop && mutt'
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
-# alias vim='nvim'
+alias vim='/usr/local/bin/vim'
 alias papply='sudo puppet apply --modulepath /etc/dischord/modules --hiera_config /etc/dischord/hiera.yaml --manifestdir /etc/dischord/ /etc/dischord/default.pp'
 
 # <3 vagrant
@@ -72,6 +71,9 @@ alias gitrs="git reset --soft 'HEAD^'"
 alias gitrsh='git reset --hard HEAD'
 alias gitsup='git submodule sync ; git submodule update --init'
 
+# emacs
+#
+alias emacs='open -a /Applications/Emacs.app $1'
 
 # stuff that makes zsh worthwhile
 #
@@ -100,7 +102,11 @@ export KEYTIMEOUT=1
 # pyenv and rbenv junk
 #
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
-if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+if which pyenv > /dev/null; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+fi
 
 # added by travis gem
 #
@@ -120,8 +126,16 @@ if ! zgen saved; then
   zgen load junegunn/fzf shell/key-bindings.zsh
   zgen load rupa/z
   zgen load felixr/docker-zsh-completion
+  zgen load supercrabtree/k
 
   zgen save
 fi
 
+# Allow use of Ctrl-S in vim
+stty -ixon
+
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
 # vim:ts=4:sw=4:ft=zsh:et
+
