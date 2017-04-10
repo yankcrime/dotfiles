@@ -45,7 +45,7 @@ alias zarquon='mosh zarquon.dischord.org'
 alias sshx='ssh -c arcfour,blowfish-cbc -XC'
 alias pwplz='pwgen -n -y -s 12 1'
 alias keyplz='openssl rand -hex 10'
-alias md='open -a Marked.app'
+alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias mutt='cd ~/Desktop && mutt'
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
@@ -135,6 +135,7 @@ fi
 stty -ixon
 
 # fzf
+#
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # vim:ts=4:sw=4:ft=zsh:et

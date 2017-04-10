@@ -3,22 +3,27 @@
 (server-start)
 
 ;; User-interface stuff
+
 (add-to-list 'default-frame-alist '(width . 110))
 (scroll-bar-mode 0)
 (tool-bar-mode -1)
+(column-number-mode 1)
 (set-face-attribute 'default nil
                     :family "Triplicate T4c"
-                    :height 140)
+                    :height 140
+                    :width 'normal)
 
 ;; Ligatures
 ;; (mac-auto-operator-composition-mode)
+
+;; Custom themes outside of ELPA etc.
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 
 ;; Tooltips etc.
 (set-face-attribute 'variable-pitch nil
                     :family "Helvetica Neue"
                     :height 120
                     :weight 'regular)
-
 
 ;; Kill the welcome buffer
 (setq inhibit-startup-message t)
@@ -49,6 +54,8 @@
 (global-set-key (kbd "M-s") 'evil-write)
 (global-set-key (kbd "M-f") 'evil-search-forward)
 (global-set-key (kbd "M-o") 'helm-find-files)
+(global-set-key (kbd "M-\=") 'text-scale-increase)
+(global-set-key (kbd "M--") 'text-scale-decrease)
 
 ;; Package management
 (require 'package)
@@ -70,12 +77,25 @@
   :config
   (load-theme 'leuven t))
 
-;; I prefer whiteboard, but Leuven comes with a load of extra for org-mode.
-;; Solution - load leuven first, then whiteboard! \o/
 ;; (load-theme 'whiteboard)
+
+;;(use-package material-theme
+;;  :ensure t
+;;  :config
+;;  (load-theme 'material-light t))
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
+
+(use-package git-gutter-fringe
+  :ensure t
+  :config
+  (set-face-foreground 'git-gutter-fr:added "darkgreen")
+  (set-face-background 'git-gutter-fr:added "#e2e2e2")
+  (set-face-foreground 'git-gutter-fr:modified "blue")
+  (set-face-background 'git-gutter-fr:modified "#e2e2e2")
+  (require 'git-gutter)
+  (require 'git-gutter-fringe))
 
 ; Evil mode and related
 (use-package evil
@@ -102,21 +122,25 @@
       "b" 'helm-buffers-list
       "pp" 'projectile-switch-project
       "pf" 'projectile-find-file
+      "ps" 'helm-projectile-ag
       "d" 'deft
       "gg" 'magit-status
       "ga" 'magit-stage-file
       "gc" 'magit-commit
+      "tl" 'org-todo-list
+      "ta" 'org-agenda
+      "tc" 'org-task-capture
       "o" 'delete-other-windows
       "q" 'evil-quit
-      "w" 'evil-write
       "x" 'evil-save-and-close
-      "f" 'fzf))
+      "ws" 'evil-window-split
+      "f" 'fzf)
 
   (use-package evil-magit
     :ensure t)
 
   (use-package evil-visual-mark-mode
-    :ensure t))
+    :ensure t)))
 
 ;; org-mode
 (use-package org
@@ -136,13 +160,22 @@
   (setq org-log-done 'time)
   (setq org-adapt-indentation nil)
 
+  (setq org-capture-templates
+        '(("a" "My TODO task format." entry
+           (file "todo.org")
+           "* TODO %?
+SCHEDULED: %t")))
+
+  (defun org-task-capture ()
+    (interactive)
+    (org-capture nil "a"))
+
   (setq org-ellipsis "•••")
 
   (use-package org-bullets
     :ensure t
     :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
 ;; MultiTerm
 (use-package multi-term
@@ -195,7 +228,7 @@
     (set-face-attribute 'helm-source-header nil
                         :family "Triplicate T4c"
                         :slant 'italic
-                        :height 140))
+                        :height 120))
   (use-package helm-ag
     :ensure t))
 
@@ -203,7 +236,7 @@
 (use-package projectile
   :ensure t
   :config
-  (projectile-global-mode)
+  (projectile-global-mode +1)
   (setq projectile-enable-caching t)
   (setq projectile-switch-project-action 'helm-projectile-find-file)
   (global-set-key (kbd "<f1>") 'projectile-switch-project)
@@ -296,6 +329,7 @@
   (global-set-key [f3] 'deft)
   (setq deft-extensions '("txt" "tex" "org"))
   (setq deft-directory "~/Dropbox/org")
+  (defun deft-enter-insert-mode ()
     ;; delay seems necessary
     (run-at-time "0.1 sec" nil 'evil-insert-state))
   (add-hook 'deft-mode-hook 'deft-enter-insert-mode)
@@ -303,6 +337,12 @@
 
 (use-package exec-path-from-shell
   :ensure t)
+
+;; Which-key
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
 
 ;; Modes
 (use-package go-mode
@@ -410,14 +450,22 @@ and subsequent lines as the event note."
 ;; use Marked.app to preview Markdown
 (setq markdown-open-command "~/bin/mark")
 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(column-number-mode t)
+ '(custom-safe-themes
+   (quote
+    ("98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
+ '(hl-sexp-background-color "#efebe9")
  '(package-selected-packages
    (quote
-    (toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
+    (material-theme git-gutter-fringe git-gutter powerline-evil smart-mode-line-powerline-theme smart-mode-line telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

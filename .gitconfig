@@ -1,3 +1,16 @@
+[alias]
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
+	up = "!git remote update -p; git merge --ff-only @{u}"
+	prune = fetch --prune
+	undo = reset --soft HEAD^
+	stash-all = stash save --include-untracked
+[push]
+	default = simple
+[commit]
+    gpgSign = true
+
+[status]
+    showUntrackedFiles = all
 [user]
-	email = nick@dischord.org
 	name = Nick Jones
+	email = nick@dischord.org

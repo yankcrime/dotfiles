@@ -10,30 +10,32 @@ Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
 Plug 'rking/ag.vim'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-Plug 'scrooloose/syntastic'
- Plug 'godlygeek/tabular'
+" Plug 'scrooloose/syntastic'
+Plug 'w0rp/ale'
+Plug 'godlygeek/tabular'
 Plug 'airblade/vim-gitgutter'
 Plug 'cespare/vim-sbd'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'plasticboy/vim-markdown'
-" Plug 'ap/vim-buftabline'
 Plug 'junegunn/goyo.vim'
-Plug 'junegunn/vim-emoji'
 Plug 'cocopon/shadeline.vim'
+Plug 'ap/vim-buftabline'
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
 Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
-Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
-" Themes and colorschemes
-Plug 'godlygeek/csapprox'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'skywind3000/asyncrun.vim'
+" Appearance
 Plug 'edkolev/tmuxline.vim'
 Plug 'sjl/badwolf'
 Plug 'yankcrime/vim-colors-off'
 Plug 'yankcrime/direwolf'
 Plug 'cocopon/iceberg.vim'
 Plug 'chriskempson/base16-vim'
+Plug 'jonathanfilip/vim-lucius'
 
 call plug#end()
 
@@ -51,6 +53,8 @@ set hidden " Don't moan about changes when switching buffers
 set matchpairs=(:),{:},[:],<:> " Add <> to % matching
 
 set modelines=5 " Enable modelines
+
+set cursorline
 
 set cpo=aABceFs$
 
@@ -109,7 +113,8 @@ map <F3> :source .vim_session<CR>
 " Appearance
 syntax on
 set t_Co=256
-colorscheme direwolf
+set background=light
+colorscheme off
 set laststatus=2
 
 augroup ft_vim
@@ -122,7 +127,7 @@ augroup END
 augroup ft_ruby
     au!
     au Filetype ruby setlocal foldmethod=syntax
-	au Filetype ruby set expandtab ts=4 sw=4 ai
+au Filetype ruby set expandtab ts=4 sw=4 ai
     au BufRead,BufNewFile Capfile setlocal filetype=ruby
 augroup END
 
@@ -135,7 +140,7 @@ augroup END
 augroup ft_muttrc
     au!
     au BufRead,BufNewFile *.muttrc set ft=muttrc
-	au Filetype muttrc set expandtab ts=4 sw=4 ai
+    au Filetype muttrc set expandtab ts=4 sw=4 ai
     au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
 augroup END
 
@@ -144,21 +149,33 @@ noremap <leader>gcommit :Gcommit<CR>
 noremap <leader>gpush :Gpush<CR>
 noremap <leader>gstat :Gstatus<CR>
 
+nnoremap ; :
+
 " }}} End basic settings
 " {{{ BufTabLine
 let g:buftabline_show=1
 let g:buftabline_indicators=1
 let g:buftabline_numbers=2
-nmap <leader>1 <Plug>BufTabLine.Go(1)
-nmap <leader>2 <Plug>BufTabLine.Go(2)
-nmap <leader>3 <Plug>BufTabLine.Go(3)
-nmap <leader>4 <Plug>BufTabLine.Go(4)
-nmap <leader>5 <Plug>BufTabLine.Go(5)
-nmap <leader>6 <Plug>BufTabLine.Go(6)
-nmap <leader>7 <Plug>BufTabLine.Go(7)
-nmap <leader>8 <Plug>BufTabLine.Go(8)
-nmap <leader>9 <Plug>BufTabLine.Go(9)
-nmap <leader>0 <Plug>BufTabLine.Go(10)
+nmap 1 <Plug>BufTabLine.Go(1)
+nmap 2 <Plug>BufTabLine.Go(2)
+nmap 3 <Plug>BufTabLine.Go(3)
+nmap 4 <Plug>BufTabLine.Go(4)
+nmap 5 <Plug>BufTabLine.Go(5)
+nmap 6 <Plug>BufTabLine.Go(6)
+nmap 7 <Plug>BufTabLine.Go(7)
+nmap 8 <Plug>BufTabLine.Go(8)
+nmap 9 <Plug>BufTabLine.Go(9)
+" }}}
+" {{{ Tab management
+noremap <leader>1 :tabnext 1<CR>
+noremap <leader>2 :tabnext 2<CR>
+noremap <leader>3 :tabnext 3<CR>
+noremap <leader>4 :tabnext 4<CR>
+noremap <leader>5 :tabnext 5<CR>
+noremap <leader>6 :tabnext 6<CR>
+noremap <leader>7 :tabnext 7<CR>
+noremap <leader>8 :tabnext 8<CR>
+noremap <leader>9 :tablast<CR>
 " }}}
 " {{{ NERDTree
 map <C-n> :NERDTreeToggle<CR>
@@ -179,7 +196,7 @@ let g:NERDTreeIndicatorMapCustom = {
     \ "Unknown"   : "?"
     \ }
 " }}}
-" {{{ fzf 
+" {{{ fzf
 nnoremap <silent> <expr> <C-f> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
 nnoremap <silent> <C-b> :Buffers <CR>
 let g:fzf_action = {
@@ -197,6 +214,31 @@ let g:fzf_layout = { 'window': '-tabnew' }
 
 let g:fzf_buffers_jump = 1
 let g:fzf_tags_command = 'ctags -R'
+
+" Customize fzf colors to match your color scheme
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
+" }}}
+" {{{ Tmuxline
+let g:tmuxline_powerline_separators = 0
+let g:tmuxline_separators = {
+    \ 'left' : '',
+    \ 'left_alt': '',
+    \ 'right' : '',
+    \ 'right_alt' : '',
+    \ 'space' : ' '}
 " }}}
 " {{{ Statusline
 let g:shadeline = {}
@@ -247,15 +289,6 @@ set statusline+=%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}
 set statusline+=%*%=%-14.(%r%y\ ⭡\ %l,%c%)\ %P
 
 " }}}
-" {{{ Tmuxline
-let g:tmuxline_powerline_separators = 0
-let g:tmuxline_separators = {
-    \ 'left' : '',
-    \ 'left_alt': '',
-    \ 'right' : '',
-    \ 'right_alt' : '',
-    \ 'space' : ' '}
-" }}}
 " {{{ SBD (Smart Buffer Delete)
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
@@ -277,7 +310,7 @@ let g:syntastic_auto_loc_list=1
 let g:syntastic_loc_list_height=3
 let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
 " }}}
-" {{{ Markdown 
+" {{{ Markdown
 nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_toc_autofit = 1
@@ -285,7 +318,7 @@ au FileType markdown setlocal nonumber
 au FileType markdown setlocal linebreak
 au FileType markdown setlocal wrap
 " }}}
-" {{{ Go 
+" {{{ Go
 au FileType go nmap <leader>r <Plug>(go-run)
 au FileType go nmap <leader>b <Plug>(go-build)
 au FileType go nmap <leader>t <Plug>(go-test)
@@ -295,12 +328,12 @@ au FileType go nmap <Leader>gd <Plug>(go-doc)
 au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
 let g:go_term_enabled = 1
 " }}}
-" {{{ ctags / Tagbar 
+" {{{ ctags / Tagbar
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
 " prefixed with '::' which don't match to a file directly when used in
 " conjunction with ctags
 nnoremap <C-t> :TagbarToggle<CR>
-au FileType puppet nnoremap <c-]> :exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>  
+au FileType puppet nnoremap <c-]> :exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>
 au FileType puppet nnoremap <c-w><c-]> :tab split<CR>:exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>
 let g:tagbar_type_puppet = {
   \ 'ctagstype': 'puppet',
@@ -314,65 +347,45 @@ let g:tagbar_type_puppet = {
   \]
 \}
 " }}}
+" {{{ vim-airline
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ''
+let g:airline#extensions#tabline#left_alt_sep = ''
+let g:airline_powerline_fonts = 1
+let g:airline_mode_map = {'n': 'N', 'i' : 'I', 'R': 'R', 'v': 'V', 'V': 'V'}
+if !exists('g:airline_symbols') | let g:airline_symbols = {} | endif
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
+let g:airline_left_alt_sep = '|'
+let g:airline_right_alt_sep = '|'
+let g:airline_symbols.linenr = ''
+let g:airline_symbols.maxlinenr = ''
+let g:airline_symbols.linenr = ''
+let g:airline_symbols.spell = 'Ꞩ'
+let g:airline_symbols.notexists = '∄'
+let g:airline_symbols.whitespace = ''
+let g:airline_theme='papercolor'
+" }}}
+" {{{ Asyncrun
+nnoremap <C-r> :AsyncRun 
+nnoremap <leader>ar :AsyncRun 
+noremap <leader>arqf :call asyncrun#quickfix_toggle(8)<cr>
+" }}}
 " {{{ MacVim GUI overrides
 if has('gui_running')
-    silent! if emoji#available()
-      function! S_modified()
-        if &modified
-          return emoji#for('kiss').' '
-        elseif !&modifiable
-          return emoji#for('construction').' '
-        else
-          return ''
-        endif
-      endfunction
-    
-      function! S_fugitive()
-        if !exists('g:loaded_fugitive')
-          return ''
-        endif
-        let head = fugitive#head()
-        if empty(head)
-          return ''
-        else
-          return head == 'master' ? emoji#for('crown') : emoji#for('seedling').' '.head
-        endif
-      endfunction
-    
-      function! S_filetype()
-        if empty(&filetype)
-          return emoji#for('grey_question')
-        else
-          return get(s:ft_emoji, &filetype, '['.&filetype.']')
-        endif
-      endfunction
-    
-      function! MyStatusLine()
-        let mod = '%{S_modified()}'
-        let ro  = "%{&readonly ? emoji#for('lock') . ' ' : ''}"
-        let ft  = '%y'
-        let fug = ' %{S_fugitive()}'
-        let sep = ' %= '
-        let pos = ' ⭡ %l,%c%V '
-        let pct = ' %P '
-        return '[%n] %f %<'.mod.ro.ft.fug.sep.pos.pct
-      endfunction
-    
-      set statusline=%!MyStatusLine()
-    endif
     set linespace=2
-	set transparency=5
+"   set transparency=5
     set fuoptions=maxvert,maxhorz
-	let macvim_skip_colorscheme=1
-	colorscheme off
-    set guifont=Triplicate\ T4s:h14
+    let macvim_skip_colorscheme=1
+    colorscheme iceberg
+    set guifont=SF Mono:h14
     set guioptions-=e " don't use gui tab apperance
     set guioptions-=T " hide toolbar
     set guioptions-=r " don't show scrollbars
     set guioptions-=l " don't show scrollbars
     set guioptions-=R " don't show scrollbars
     set guioptions-=L " don't show scrollbars
-    set stal=2 " turn on tabs by default
+"    set stal=2 " turn on tabs by default
     set gtl=%t gtt=%F " tab headings
     " set macligatures
     nmap <D-1> <Plug>BufTabLine.Go(1)
@@ -391,3 +404,6 @@ if has('gui_running')
     let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
     end
 " }}}
+
+" vim:ts=4:sw=4:ft=vimrc:et
+
