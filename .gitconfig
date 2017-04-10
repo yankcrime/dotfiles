@@ -8,9 +8,9 @@
 	default = simple
 [commit]
     gpgSign = true
-
 [status]
     showUntrackedFiles = all
 [user]
 	name = Nick Jones
 	email = nick@dischord.org
+	signingKey = 309D20E4
