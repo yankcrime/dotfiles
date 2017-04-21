@@ -16,13 +16,16 @@
 ;; Ligatures
 ;; (mac-auto-operator-composition-mode)
 
+(setq initial-scratch-message "")
+(fset 'yes-or-no-p 'y-or-n-p)
+
 ;; Custom themes outside of ELPA etc.
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 
 ;; Tooltips etc.
 (set-face-attribute 'variable-pitch nil
                     :family "Helvetica Neue"
-                    :height 120
+                    :height 140
                     :weight 'regular)
 
 ;; Kill the welcome buffer
@@ -77,7 +80,7 @@
   :config
   (load-theme 'leuven t))
 
-;; (load-theme 'whiteboard)
+(load-theme 'whiteboard)
 
 ;;(use-package material-theme
 ;;  :ensure t
@@ -107,6 +110,8 @@
   (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
   (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
   (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+  (define-key evil-motion-state-map ";" 'evil-ex)
+  (define-key evil-motion-state-map ":" 'evil-repeat-find-char)
   (global-set-key (kbd "M-s") 'evil-write)
   (global-set-key (kbd "M-f") 'evil-search-forward)
   (setq evil-mode-line-format '(before . mode-line-front-space))
@@ -177,6 +182,97 @@ SCHEDULED: %t")))
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
+(eval-after-load 'org-agenda
+ '(progn
+    (evil-set-initial-state 'org-agenda-mode 'normal)
+    (evil-define-key 'normal org-agenda-mode-map
+      (kbd "<DEL>") 'org-agenda-show-scroll-down
+      (kbd "<RET>") 'org-agenda-switch-to
+      (kbd "\t") 'org-agenda-goto
+      "\C-n" 'org-agenda-next-line
+      "\C-p" 'org-agenda-previous-line
+      "\C-r" 'org-agenda-redo
+      "a" 'org-agenda-archive-default-with-confirmation
+      ;b
+      "c" 'org-agenda-goto-calendar
+      "d" 'org-agenda-day-view
+      "e" 'org-agenda-set-effort
+      ;f
+      "g " 'org-agenda-show-and-scroll-up
+      "gG" 'org-agenda-toggle-time-grid
+      "gh" 'org-agenda-holidays
+      "gj" 'org-agenda-goto-date
+      "gJ" 'org-agenda-clock-goto
+      "gk" 'org-agenda-action
+      "gm" 'org-agenda-bulk-mark
+      "go" 'org-agenda-open-link
+      "gO" 'delete-other-windows
+      "gr" 'org-agenda-redo
+      "gv" 'org-agenda-view-mode-dispatch
+      "gw" 'org-agenda-week-view
+      "g/" 'org-agenda-filter-by-tag
+      "h"  'org-agenda-earlier
+      "i"  'org-agenda-diary-entry
+      "j"  'org-agenda-next-line
+      "k"  'org-agenda-previous-line
+      "l"  'org-agenda-later
+      "m" 'org-agenda-bulk-mark
+      "n" nil                           ; evil-search-next
+      "o" 'delete-other-windows
+      ;p
+      "q" 'org-agenda-quit
+      "r" 'org-agenda-redo
+      "s" 'org-save-all-org-buffers
+      "t" 'org-agenda-todo
+      "u" 'org-agenda-bulk-unmark
+      ;v
+      "x" 'org-agenda-exit
+      "y" 'org-agenda-year-view
+      "z" 'org-agenda-add-note
+      "{" 'org-agenda-manipulate-query-add-re
+      "}" 'org-agenda-manipulate-query-subtract-re
+      "$" 'org-agenda-archive
+      "%" 'org-agenda-bulk-mark-regexp
+      "+" 'org-agenda-priority-up
+      "," 'org-agenda-priority
+      "-" 'org-agenda-priority-down
+      "." 'org-agenda-goto-today
+      "0" 'evil-digit-argument-or-evil-beginning-of-line
+      ":" 'org-agenda-set-tags
+      ";" 'org-timer-set-timer
+      "<" 'org-agenda-filter-by-category
+      ">" 'org-agenda-date-prompt
+      "?" 'org-agenda-show-the-flagging-note
+      "A" 'org-agenda-append-agenda
+      "B" 'org-agenda-bulk-action
+      "C" 'org-agenda-convert-date
+      "D" 'org-agenda-toggle-diary
+      "E" 'org-agenda-entry-text-mode
+      "F" 'org-agenda-follow-mode
+      ;G
+      "H" 'org-agenda-holidays
+      "I" 'org-agenda-clock-in
+      "J" 'org-agenda-next-date-line
+      "K" 'org-agenda-previous-date-line
+      "L" 'org-agenda-recenter
+      "M" 'org-agenda-phases-of-moon
+      ;N
+      "O" 'org-agenda-clock-out
+      "P" 'org-agenda-show-priority
+      ;Q
+      "R" 'org-agenda-clockreport-mode
+      "S" 'org-agenda-sunrise-sunset
+      "T" 'org-agenda-show-tags
+      ;U
+      ;V
+      ;W
+      "X" 'org-agenda-clock-cancel
+      ;Y
+      ;Z
+      "[" 'org-agenda-manipulate-query-add
+      "g\\" 'org-agenda-filter-by-tag-refine
+      "]" 'org-agenda-manipulate-query-subtract)))
+
 ;; MultiTerm
 (use-package multi-term
   :ensure t
@@ -228,7 +324,7 @@ SCHEDULED: %t")))
     (set-face-attribute 'helm-source-header nil
                         :family "Triplicate T4c"
                         :slant 'italic
-                        :height 120))
+                        :height 140))
   (use-package helm-ag
     :ensure t))
 
@@ -450,6 +546,11 @@ and subsequent lines as the event note."
 ;; use Marked.app to preview Markdown
 (setq markdown-open-command "~/bin/mark")
 
+;; Hide some menu junk
+(define-key global-map [menu-bar tools gnus] nil)
+(define-key global-map [menu-bar tools rmail] nil)
+(define-key global-map [menu-bar tools compose-mail] nil)
+(define-key global-map [menu-bar tools games] nil)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -465,7 +566,7 @@ and subsequent lines as the event note."
  '(hl-sexp-background-color "#efebe9")
  '(package-selected-packages
    (quote
-    (material-theme git-gutter-fringe git-gutter powerline-evil smart-mode-line-powerline-theme smart-mode-line telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
+    (worf material-theme git-gutter-fringe git-gutter powerline-evil smart-mode-line-powerline-theme smart-mode-line telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
