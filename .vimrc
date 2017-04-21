@@ -10,8 +10,7 @@ Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
 Plug 'rking/ag.vim'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-" Plug 'scrooloose/syntastic'
-Plug 'w0rp/ale'
+Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby'] }
 Plug 'godlygeek/tabular'
 Plug 'airblade/vim-gitgutter'
 Plug 'cespare/vim-sbd'
@@ -19,8 +18,7 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'plasticboy/vim-markdown'
-Plug 'junegunn/goyo.vim'
-Plug 'cocopon/shadeline.vim'
+Plug 'junegunn/vim-emoji'
 Plug 'ap/vim-buftabline'
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
@@ -35,7 +33,6 @@ Plug 'yankcrime/vim-colors-off'
 Plug 'yankcrime/direwolf'
 Plug 'cocopon/iceberg.vim'
 Plug 'chriskempson/base16-vim'
-Plug 'jonathanfilip/vim-lucius'
 
 call plug#end()
 
@@ -52,6 +49,9 @@ set pastetoggle=<F2> " Quickly enable paste mode
 set hidden " Don't moan about changes when switching buffers
 set matchpairs=(:),{:},[:],<:> " Add <> to % matching
 
+" Emoji completion with CTRL-X CTRL-U
+set completefunc=emoji#complete
+
 set modelines=5 " Enable modelines
 
 set cursorline
@@ -67,7 +67,6 @@ set ttyfast
 nmap <leader>l :set list!<CR>
 set listchars=tab:▸\ ,eol:¬,trail:-,
 " set fillchars+=vert:\│
-set emoji
 
 set backupdir=/tmp//,.
 set directory=/tmp//,.
@@ -112,11 +111,20 @@ map <F3> :source .vim_session<CR>
 
 " Appearance
 syntax on
-set t_Co=256
 set background=light
 colorscheme off
 set laststatus=2
 
+" Fugitive shortcuts
+noremap <leader>gadd :Gwrite<CR>
+noremap <leader>gcommit :Gcommit<CR>
+noremap <leader>gpush :Gpush<CR>
+noremap <leader>gstat :Gstatus<CR>
+
+nnoremap ; :
+
+" }}} End basic settings
+" {{{ Folding
 augroup ft_vim
     au!
     au FileType vim setlocal foldmethod=marker keywordprg=:help
@@ -143,15 +151,7 @@ augroup ft_muttrc
     au Filetype muttrc set expandtab ts=4 sw=4 ai
     au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
 augroup END
-
-noremap <leader>gadd :Gwrite<CR>
-noremap <leader>gcommit :Gcommit<CR>
-noremap <leader>gpush :Gpush<CR>
-noremap <leader>gstat :Gstatus<CR>
-
-nnoremap ; :
-
-" }}} End basic settings
+" }}}
 " {{{ BufTabLine
 let g:buftabline_show=1
 let g:buftabline_indicators=1
@@ -184,17 +184,6 @@ let g:NERDTreeShowHidden=1
 let g:NERDTreeBookmarksSort = 1
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
-let g:NERDTreeIndicatorMapCustom = {
-    \ "Modified"  : "✹",
-    \ "Staged"    : "✚",
-    \ "Untracked" : "✭",
-    \ "Renamed"   : "➜",
-    \ "Unmerged"  : "═",
-    \ "Deleted"   : "✖",
-    \ "Dirty"     : "✗",
-    \ "Clean"     : "✔︎",
-    \ "Unknown"   : "?"
-    \ }
 " }}}
 " {{{ fzf
 nnoremap <silent> <expr> <C-f> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
@@ -218,7 +207,7 @@ let g:fzf_tags_command = 'ctags -R'
 " Customize fzf colors to match your color scheme
 let g:fzf_colors =
 \ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
+  \ 'bg':      ['bg', 'NONE'],
   \ 'hl':      ['fg', 'Comment'],
   \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
   \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
@@ -241,34 +230,7 @@ let g:tmuxline_separators = {
     \ 'space' : ' '}
 " }}}
 " {{{ Statusline
-let g:shadeline = {}
-let g:shadeline.active = {
-			\ 	'left': [
-			\ 		'fname',
-			\ 		'flags',
-			\ 		'ShadelineItemGitBranch',
-			\ 	],
-			\ 	'right': [
-			\ 		'<',
-			\ 		['ff', 'fenc', 'ft'],
-			\ 		'ruler',
-			\ 	],
-			\ }
-let g:shadeline.inactive = {
-			\ 	'left': [
-			\ 		'fname',
-			\ 		'flags',
-			\ 	],
-			\ }
 
-function! ShadelineItemGitBranch()
-	let name = exists('*fugitive#head')
-				\ ? fugitive#head()
-				\ : ''
-	return empty(name) ? '' : printf('(%s)', name)
-endfunction
-
-" Emoji statusline
 function! SL(function)
   if exists('*'.a:function)
     return call(a:function,[])
@@ -278,7 +240,7 @@ function! SL(function)
 endfunction
 
 function! StatusGit()
-    let git = '⎇ ' . fugitive#head()
+    let git = '⎇  ' . fugitive#head()
     return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
 endfunction
 
@@ -287,7 +249,6 @@ set statusline+=\ %<%.99f\ %h%w%m%r
 set statusline+=%{SL('StatusGit')}
 set statusline+=%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}
 set statusline+=%*%=%-14.(%r%y\ ⭡\ %l,%c%)\ %P
-
 " }}}
 " {{{ SBD (Smart Buffer Delete)
 nnoremap <silent> <C-x> :Sbd<CR>
@@ -371,6 +332,16 @@ nnoremap <C-r> :AsyncRun
 nnoremap <leader>ar :AsyncRun 
 noremap <leader>arqf :call asyncrun#quickfix_toggle(8)<cr>
 " }}}
+" {{{ neovim
+if has('nvim')
+    nmap <BS> <C-w>h
+    map <C-h> <C-w>h
+    map <C-j> <C-w>j
+    map <C-k> <C-w>k
+    map <C-l> <C-w>l
+    tnoremap <F12> <C-\><C-n> 
+end
+" }}}
 " {{{ MacVim GUI overrides
 if has('gui_running')
     set linespace=2
@@ -402,8 +373,7 @@ if has('gui_running')
     let g:ctrlp_switch_buffer = 0
     let g:ctrlp_working_path_mode = 0
     let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
-    end
+end
 " }}}
 
 " vim:ts=4:sw=4:ft=vimrc:et
-
