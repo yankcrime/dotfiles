@@ -26,6 +26,7 @@ Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'skywind3000/asyncrun.vim'
+Plug 'kien/ctrlp.vim', { 'on': [] }
 " Appearance
 Plug 'edkolev/tmuxline.vim'
 Plug 'sjl/badwolf'
@@ -33,6 +34,7 @@ Plug 'yankcrime/vim-colors-off'
 Plug 'yankcrime/direwolf'
 Plug 'cocopon/iceberg.vim'
 Plug 'chriskempson/base16-vim'
+Plug 'sonjapeterson/1989.vim'
 
 call plug#end()
 
@@ -78,7 +80,6 @@ au BufRead,BufNewFile *.go setlocal noet ts=4 sw=4 sts=4
 set hlsearch
 set incsearch
 set ignorecase
-" set cursorline
 
 set wildmenu
 
@@ -229,27 +230,6 @@ let g:tmuxline_separators = {
     \ 'right_alt' : '',
     \ 'space' : ' '}
 " }}}
-" {{{ Statusline
-
-function! SL(function)
-  if exists('*'.a:function)
-    return call(a:function,[])
-  else
-    return ''
-  endif
-endfunction
-
-function! StatusGit()
-    let git = '⎇  ' . fugitive#head()
-    return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
-endfunction
-
-set statusline=[%n]
-set statusline+=\ %<%.99f\ %h%w%m%r
-set statusline+=%{SL('StatusGit')}
-set statusline+=%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}
-set statusline+=%*%=%-14.(%r%y\ ⭡\ %l,%c%)\ %P
-" }}}
 " {{{ SBD (Smart Buffer Delete)
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
@@ -278,6 +258,7 @@ let g:vim_markdown_toc_autofit = 1
 au FileType markdown setlocal nonumber
 au FileType markdown setlocal linebreak
 au FileType markdown setlocal wrap
+au FileType markdown setlocal ts=4 sw=4 sts=0 expandtab
 " }}}
 " {{{ Go
 au FileType go nmap <leader>r <Plug>(go-run)
@@ -288,6 +269,27 @@ au FileType go nmap <Leader>rv <Plug>(go-run-vertical)
 au FileType go nmap <Leader>gd <Plug>(go-doc)
 au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
 let g:go_term_enabled = 1
+" }}}
+" {{{ Statusline
+
+function! SL(function)
+  if exists('*'.a:function)
+    return call(a:function,[])
+  else
+    return ''
+  endif
+endfunction
+
+function! StatusGit()
+    let git = '  ' . fugitive#head()
+    return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
+endfunction
+
+set statusline=[%n]
+set statusline+=\ %<%.99f\ %h%w%m%r
+set statusline+=%{SL('StatusGit')}
+set statusline+=%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}
+set statusline+=%*%=%-14.(%r%y\ ≡\ %l,%c%)\ %P
 " }}}
 " {{{ ctags / Tagbar
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
@@ -308,27 +310,7 @@ let g:tagbar_type_puppet = {
   \]
 \}
 " }}}
-" {{{ vim-airline
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#left_sep = ''
-let g:airline#extensions#tabline#left_alt_sep = ''
-let g:airline_powerline_fonts = 1
-let g:airline_mode_map = {'n': 'N', 'i' : 'I', 'R': 'R', 'v': 'V', 'V': 'V'}
-if !exists('g:airline_symbols') | let g:airline_symbols = {} | endif
-let g:airline_left_sep = ''
-let g:airline_right_sep = ''
-let g:airline_left_alt_sep = '|'
-let g:airline_right_alt_sep = '|'
-let g:airline_symbols.linenr = ''
-let g:airline_symbols.maxlinenr = ''
-let g:airline_symbols.linenr = ''
-let g:airline_symbols.spell = 'Ꞩ'
-let g:airline_symbols.notexists = '∄'
-let g:airline_symbols.whitespace = ''
-let g:airline_theme='papercolor'
-" }}}
 " {{{ Asyncrun
-nnoremap <C-r> :AsyncRun 
 nnoremap <leader>ar :AsyncRun 
 noremap <leader>arqf :call asyncrun#quickfix_toggle(8)<cr>
 " }}}
@@ -339,22 +321,32 @@ if has('nvim')
     map <C-j> <C-w>j
     map <C-k> <C-w>k
     map <C-l> <C-w>l
-    tnoremap <F12> <C-\><C-n> 
+    tnoremap <leader><esc> <C-\><C-n>
+    " nnoremap <bs> <c-w>h
+    let g:terminal_scrollback_buffer_size = 10000
+    let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+    set inccommand=nosplit
 end
 " }}}
 " {{{ MacVim GUI overrides
 if has('gui_running')
+    let g:ctrlp_map = '<C-p>'
+    let g:ctrlp_match_window = 'bottom,order:ttb'
+    let g:ctrlp_switch_buffer = 0
+    let g:ctrlp_working_path_mode = 0
+    let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
+    call plug#load('ctrlp.vim')
     set linespace=2
-"   set transparency=5
+    set transparency=5
     set fuoptions=maxvert,maxhorz
     let macvim_skip_colorscheme=1
-    colorscheme iceberg
-    set guifont=SF Mono:h14
-    set guioptions-=e " don't use gui tab apperance
-    set guioptions-=T " hide toolbar
-    set guioptions-=r " don't show scrollbars
-    set guioptions-=l " don't show scrollbars
-    set guioptions-=R " don't show scrollbars
+    colorscheme off
+    set guifont=Triplicate\ T4s:h14
+    set guioptions=e " don't use gui tab apperance
+    set guioptions=T " hide toolbar
+    set guioptions=r " don't show scrollbars
+    set guioptions=l " don't show scrollbars
+    set guioptions=R " don't show scrollbars
     set guioptions-=L " don't show scrollbars
 "    set stal=2 " turn on tabs by default
     set gtl=%t gtt=%F " tab headings
@@ -369,10 +361,6 @@ if has('gui_running')
     nmap <D-8> <Plug>BufTabLine.Go(8)
     nmap <D-9> <Plug>BufTabLine.Go(9)
     nmap <D-0> <Plug>BufTabLine.Go(10)
-    let g:ctrlp_match_window = 'bottom,order:ttb'
-    let g:ctrlp_switch_buffer = 0
-    let g:ctrlp_working_path_mode = 0
-    let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
 end
 " }}}
 
