@@ -269,6 +269,7 @@ au FileType go nmap <Leader>rv <Plug>(go-run-vertical)
 au FileType go nmap <Leader>gd <Plug>(go-doc)
 au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
 let g:go_term_enabled = 1
+let g:go_term_mode = "split"
 " }}}
 " {{{ Statusline
 
@@ -281,7 +282,7 @@ function! SL(function)
 endfunction
 
 function! StatusGit()
-    let git = '  ' . fugitive#head()
+    let git = '⭠  ' . fugitive#head()
     return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
 endfunction
 
@@ -289,7 +290,7 @@ set statusline=[%n]
 set statusline+=\ %<%.99f\ %h%w%m%r
 set statusline+=%{SL('StatusGit')}
 set statusline+=%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}
-set statusline+=%*%=%-14.(%r%y\ ≡\ %l,%c%)\ %P
+set statusline+=%*%=%-14.(%r%y\ ⭡\ %l,%c%)\ %P
 " }}}
 " {{{ ctags / Tagbar
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
@@ -313,6 +314,10 @@ let g:tagbar_type_puppet = {
 " {{{ Asyncrun
 nnoremap <leader>ar :AsyncRun 
 noremap <leader>arqf :call asyncrun#quickfix_toggle(8)<cr>
+" }}}
+" {{{ ALE
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_enter = 0
 " }}}
 " {{{ neovim
 if has('nvim')
