@@ -8,33 +8,24 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
-Plug 'rking/ag.vim'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby'] }
 Plug 'godlygeek/tabular'
-Plug 'airblade/vim-gitgutter'
 Plug 'cespare/vim-sbd'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'plasticboy/vim-markdown'
 Plug 'junegunn/vim-emoji'
-Plug 'ap/vim-buftabline'
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
 Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
+Plug 'rking/ag.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'kien/ctrlp.vim', { 'on': [] }
-" Appearance
-Plug 'edkolev/tmuxline.vim'
-Plug 'sjl/badwolf'
 Plug 'yankcrime/vim-colors-off'
-Plug 'yankcrime/direwolf'
-Plug 'cocopon/iceberg.vim'
-Plug 'chriskempson/base16-vim'
-Plug 'sonjapeterson/1989.vim'
 
 call plug#end()
 
@@ -44,7 +35,7 @@ call plug#end()
 filetype indent off
 
 set nobackup " Irrelevant these days
-set number " Show linenumbers
+set nonumber " Don't show linenumbers
 let mapleader = "\<Space>" " Define leader key
 
 set pastetoggle=<F2> " Quickly enable paste mode
@@ -56,7 +47,7 @@ set completefunc=emoji#complete
 
 set modelines=5 " Enable modelines
 
-set cursorline
+" set cursorline
 
 set cpo=aABceFs$
 
@@ -112,7 +103,6 @@ map <F3> :source .vim_session<CR>
 
 " Appearance
 syntax on
-set background=light
 colorscheme off
 set laststatus=2
 
@@ -205,20 +195,15 @@ let g:fzf_layout = { 'window': '-tabnew' }
 let g:fzf_buffers_jump = 1
 let g:fzf_tags_command = 'ctags -R'
 
-" Customize fzf colors to match your color scheme
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'NONE'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
+function! s:fzf_statusline()
+  " Override statusline as you like
+  highlight fzf1 ctermfg=161 ctermbg=251
+  highlight fzf2 ctermfg=23 ctermbg=251
+  highlight fzf3 ctermfg=237 ctermbg=251
+  setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
+endfunction
+
+autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
 " }}}
 " {{{ Tmuxline
@@ -282,7 +267,7 @@ function! SL(function)
 endfunction
 
 function! StatusGit()
-    let git = '⭠  ' . fugitive#head()
+    let git = '⎇  ' . fugitive#head()
     return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
 endfunction
 
