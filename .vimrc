@@ -97,7 +97,7 @@ cmap w!! w !sudo tee % >/dev/null
 " Appearance
 set t_Co=256
 let g:jellybeans_use_term_italics=1
-colorscheme off 
+colorscheme off
 hi Normal ctermfg=none ctermbg=none
 hi Statusline cterm=bold ctermfg=231 ctermbg=232
 set laststatus=2
@@ -147,6 +147,7 @@ let g:NERDTreeDirArrowCollapsible = '▾'
 " {{{ fzf
 nnoremap <silent> <expr> <C-f> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
 nnoremap <silent> <C-b> :Buffers <CR>
+nnoremap <silent> <C-t> :call fzf#vim#tags(expand('<cword>'))<cr>
 let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-x': 'split',
@@ -256,10 +257,10 @@ if has('gui_running')
     set linespace=2
     set fuoptions=maxvert,maxhorz
     let macvim_skip_colorscheme=1
-    set background=dark
+    set background=light
     colorscheme off
-    " hi Statusline guifg=#000000 guibg=#dddddd gui=bold
-    set guifont=Operator\ Mono:h14
+    hi Statusline guifg=#000000 guibg=#dddddd gui=bold
+    set guifont=Menlo:h13
     set guioptions=e " don't use gui tab apperance
     set guioptions=T " hide toolbar
     set guioptions=r " don't show scrollbars
