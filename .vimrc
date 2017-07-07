@@ -27,6 +27,8 @@ Plug 'chriskempson/base16-vim'
 Plug 'yankcrime/vim-colors-off'
 Plug 'sonjapeterson/1989.vim'
 Plug 'nanotech/jellybeans.vim'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 
 call plug#end()
 
@@ -260,7 +262,7 @@ if has('gui_running')
     set background=light
     colorscheme off
     hi Statusline guifg=#000000 guibg=#dddddd gui=bold
-    set guifont=Menlo:h13
+    set guifont=Triplicate\ T4c:h14
     set guioptions=e " don't use gui tab apperance
     set guioptions=T " hide toolbar
     set guioptions=r " don't show scrollbars
@@ -269,6 +271,24 @@ if has('gui_running')
     set guioptions-=L " don't show scrollbars
     set gtl=%t gtt=%F " tab headings
 end
+" }}}
+" {{{ Airline
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+
+let g:airline_theme='powerlineish'
+
+let g:airline#extensions#syntastic#enabled = 0
+
+let g:airline_left_sep = '⮀'
+let g:airline_left_alt_sep = '⮁'
+let g:airline_right_sep = '⮂'
+let g:airline_right_alt_sep = '⮃'
+let g:airline_symbols.branch = '⭠'
+let g:airline_symbols.readonly = '⭤'
+let g:airline_symbols.linenr = '⭡'
+
 " }}}
 
 " vim:ts=4:sw=4:ft=vimrc:et
