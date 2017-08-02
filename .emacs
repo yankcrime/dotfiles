@@ -55,7 +55,9 @@
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
 (global-set-key (kbd "M-w") 'kill-this-buffer)
 (global-set-key (kbd "M-s") 'evil-write)
+(global-set-key (kbd "M-v") 'evil-visual-paste)
 (global-set-key (kbd "M-f") 'evil-search-forward)
+(global-set-key (kbd "M-F") 'query-replace)
 (global-set-key (kbd "M-o") 'helm-find-files)
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
@@ -76,16 +78,14 @@
   (package-install 'use-package))
 
 (use-package leuven-theme
-  :ensure t
-  :config
-  (load-theme 'leuven t))
+   :ensure t
+   :init
+   (setq leuven-scale-outline-headlines nil)
+   (setq leuven-scale-org-agenda-structure nil))
+   :config
+   (load-theme 'leuven t)
 
 (load-theme 'whiteboard)
-
-;;(use-package material-theme
-;;  :ensure t
-;;  :config
-;;  (load-theme 'material-light t))
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
@@ -100,27 +100,25 @@
   (require 'git-gutter)
   (require 'git-gutter-fringe))
 
+(use-package smart-mode-line
+  :init
+  (progn
+    (setq sml/theme 'light
+          sml/mode-width 'right
+          sml/name-width 20
+          sml/shorten-modes t
+          sml/shorten-directory t
+          sml/no-confirm-load-theme t)
+    (sml/setup)))
+
 ; Evil mode and related
 (use-package evil
-  :ensure t
-  :config
-  (evil-mode 1)
-  (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
-  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-  (define-key evil-motion-state-map ";" 'evil-ex)
-  (define-key evil-motion-state-map ":" 'evil-repeat-find-char)
-  (global-set-key (kbd "M-s") 'evil-write)
-  (global-set-key (kbd "M-f") 'evil-search-forward)
-  (setq evil-mode-line-format '(before . mode-line-front-space))
-  (setq evil-want-C-u-scroll t)
-
+  :init
   (use-package evil-leader
+    :init (global-evil-leader-mode)
     :ensure t
     :config
-    (global-evil-leader-mode)
+    (setq evil-leader/in-all-states t)
     (evil-leader/set-leader "<SPC>")
     (evil-leader/set-key
       "<SPC>" 'evil-buffer
@@ -141,8 +139,28 @@
       "ws" 'evil-window-split
       "f" 'fzf)
 
+  :ensure t
+  :config
+  (evil-mode 1)
+  (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+  (define-key evil-motion-state-map ";" 'evil-ex)
+  (global-set-key (kbd "M-s") 'evil-write)
+  (global-set-key (kbd "M-f") 'evil-search-forward)
+  (setq evil-mode-line-format '(before . mode-line-front-space))
+  (setq evil-want-C-u-scroll t)
+
   (use-package evil-magit
     :ensure t)
+
+  (use-package evil-escape
+    :ensure t
+    :diminish evil-escape-mode
+    :init
+    (evil-escape-mode))
 
   (use-package evil-visual-mark-mode
     :ensure t)))
@@ -181,6 +199,19 @@ SCHEDULED: %t")))
     :ensure t
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+
+(use-package ob-http
+  :ensure t)
+
+(use-package ob-ipython
+  :ensure t)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((sh . t)
+   (http . t)
+   (ipython . t)
+   (ruby . t)))
 
 (eval-after-load 'org-agenda
  '(progn
@@ -278,14 +309,21 @@ SCHEDULED: %t")))
   :ensure t
   :config
   (setq multi-term-program "/usr/local/bin/zsh")
+  (set-face-attribute 'term nil :background 'unspecified)
   (add-hook 'term-mode-hook
             (lambda ()
               (setq show-trailing-whitespace nil))))
+
+;; Handy function to rename MultiTerm buffers
+(defun rename-term (name)
+  (interactive "s")
+  (rename-buffer (concat "*term* " name)))
 
 ;; Nyan
 (use-package nyan-mode
   :ensure t
   :config
+  (setq nyan-bar-length 20)
 (setq-default nyan-wavy-trail t))
 
 ;; Magit
@@ -349,23 +387,6 @@ SCHEDULED: %t")))
       (setq projectile-completion-system 'helm))))
 
 
-; Shorten major and minor mode names
-(use-package dim
-  :ensure t
-  :config
-  (dim-major-name 'emacs-lisp-mode "EL")
-  (dim-major-name 'lisp-mode "L")
-  (dim-major-name 'buffer "b")
-  (dim-major-name 'inferior "i")
-  (dim-major-name 'interaction "i")
-  (dim-major-name 'interactive "i")
-  (dim-major-name 'mode "mode")
-  (dim-major-name 'diff "diff")
-  (dim-major-name 'fundamental "fund")
-  (dim-minor-name 'undo-tree-mode "")
-  (dim-minor-name 'helm-mode "")
-  (dim-minor-name 'auto-revert-mode ""))
-
 ;; Flycheck
 (use-package flycheck
   :ensure t
@@ -390,6 +411,7 @@ SCHEDULED: %t")))
           ("*Help*"            :align below :size 16  :select t)
           ("*Messages*"        :align below :size 15  :select t)
           ("*Warnings*"        :align below :size 10  :noselect t)
+          ("*compilation*"     :align below :size 15  :noselect t)
           (compilation-mode    :align below :size 15  :noselect t)
           (eww-mode            :align below :size 30  :select t)
           ("*command-log*"     :align right :size 28  :noselect t)
@@ -434,17 +456,30 @@ SCHEDULED: %t")))
 (use-package exec-path-from-shell
   :ensure t)
 
-;; Which-key
+;; Which-key - command previews
 (use-package which-key
   :ensure t
   :config
   (which-key-mode))
 
-;; Modes
-(use-package go-mode
+(use-package pyenv-mode
   :ensure t
   :config
-  (add-hook 'go-mode-hook 'flycheck-mode))
+  (pyenv-mode))
+
+;; Modes
+
+;; Golang
+(use-package go-mode
+  :ensure t
+  :init
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  :config
+  (set (make-local-variable 'compile-command)
+       "go build -v && go test -v && go vet"))
+
+(use-package go-projectile
+  :ensure t)
 
 (use-package puppet-mode
   :ensure t
@@ -552,6 +587,34 @@ and subsequent lines as the event note."
 (define-key global-map [menu-bar tools compose-mail] nil)
 (define-key global-map [menu-bar tools games] nil)
 
+; Shorten major and minor mode names
+(use-package dim
+  :ensure t
+  :config
+  (dim-major-name 'emacs-lisp-mode "EL")
+  (dim-major-name 'lisp-mode "L")
+  (dim-major-name 'buffer "b")
+  (dim-major-name 'inferior "i")
+  (dim-major-name 'interaction "i")
+  (dim-major-name 'interactive "i")
+  (dim-major-name 'mode "mode")
+  (dim-major-name 'diff "diff")
+  (dim-major-name 'fundamental "fund")
+  (dim-minor-name 'undo-tree-mode "")
+  (dim-minor-name 'helm-mode "")
+  (dim-minor-name 'which-key-mode "")
+  (dim-minor-name 'projectile-mode "")
+  (dim-minor-name 'git-gutter-mode "")
+  (dim-minor-name 'org-indent-mode "")
+  (dim-minor-name 'auto-revert-mode ""))
+
+; Always wrap text in compilation windows
+(add-hook 'compilation-mode-hook
+          (lambda () (visual-line-mode 1)))
+
+(add-hook 'compilation-minor-mode-hook
+          (lambda () (visual-line-mode 1)))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -559,14 +622,20 @@ and subsequent lines as the event note."
  ;; If there is more than one, they won't work right.
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
-    ("98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
+    ("bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
  '(hl-sexp-background-color "#efebe9")
+ '(nyan-mode nil)
  '(package-selected-packages
    (quote
-    (worf material-theme git-gutter-fringe git-gutter powerline-evil smart-mode-line-powerline-theme smart-mode-line telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package))))
+    (helm-ag-r ag ob-http smart-mode-line github-modern-theme smart-mode-line-powerline-theme go-projectile json-mode evil-surround powerline yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter powerline-evil telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+ '(powerline-buffer-size-suffix nil)
+ '(powerline-display-buffer-size nil)
+ '(powerline-gui-use-vcs-glyph nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
