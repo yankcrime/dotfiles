@@ -58,9 +58,9 @@
 (global-set-key (kbd "M-v") 'evil-visual-paste)
 (global-set-key (kbd "M-f") 'evil-search-forward)
 (global-set-key (kbd "M-F") 'query-replace)
-(global-set-key (kbd "M-o") 'helm-find-files)
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
+(global-set-key (kbd "M-o") 'counsel-find-file)
 
 ;; Package management
 (require 'package)
@@ -77,18 +77,32 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(use-package leuven-theme
-   :ensure t
-   :init
-   (setq leuven-scale-outline-headlines nil)
-   (setq leuven-scale-org-agenda-structure nil))
-   :config
-   (load-theme 'leuven t)
-
-(load-theme 'whiteboard)
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
+
+(use-package ivy
+  :ensure t
+  :config
+  (ivy-mode 1)
+  (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
+  (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
+  (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t))
+
+(use-package counsel
+  :ensure t
+  :config
+  (counsel-projectile-on))
+
+(use-package ivy-rich
+  :ensure t
+  :config
+  (setq ivy-virtual-abbreviate 'full
+        ivy-rich-switch-buffer-align-virtual-buffer t)
+  (setq ivy-rich-abbreviate-paths t)
+  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package git-gutter-fringe
   :ensure t
@@ -122,10 +136,9 @@
     (evil-leader/set-leader "<SPC>")
     (evil-leader/set-key
       "<SPC>" 'evil-buffer
-      "b" 'helm-buffers-list
+      "b" 'ivy-switch-buffer
       "pp" 'projectile-switch-project
       "pf" 'projectile-find-file
-      "ps" 'helm-projectile-ag
       "d" 'deft
       "gg" 'magit-status
       "ga" 'magit-stage-file
@@ -164,6 +177,17 @@
 
   (use-package evil-visual-mark-mode
     :ensure t)))
+
+;; Neotree
+(use-package neotree
+  :ensure t
+  :config
+  (define-key evil-normal-state-map "\C-n" 'neotree-toggle)
+  (define-key evil-normal-state-map "\C-n" 'neotree-toggle)
+  (define-key evil-normal-state-map "\C-n" 'neotree-toggle)
+  (define-key neotree-mode-map [return] 'neotree-enter)
+  (define-key neotree-mode-map (kbd "\C-g") 'neotree-refresh)
+  (define-key neotree-mode-map (kbd "C-<return>") 'neo-node-do-change-root))
 
 ;; org-mode
 (use-package org
@@ -330,62 +354,18 @@ SCHEDULED: %t")))
 (use-package magit
   :ensure t
   :config
+  (setq magit-completing-read-function 'ivy-completing-read)
   (global-set-key (kbd "<f10>") 'magit-status))
-
-;; Helm
-(use-package helm
-  :bind (:map helm-map
-              ("C-j" . helm-next-line)
-              ("C-k" . helm-previous-line)
-              ("C-h" . helm-next-source)
-              ("C-S-h" . describe-key)
-              ("C-l" . "RET")
-              ([escape] . helm-keyboard-quit))
-  :ensure t
-  :init
-  (helm-mode 1)
-  :config
-  (global-set-key (kbd "M-o") 'helm-find-files)
-  (global-set-key (kbd "M-x") 'helm-M-x)
-  (defun spacemacs//hide-cursor-in-helm-buffer ()
-    "Hide the cursor in helm buffers."
-    (with-helm-buffer
-      (setq cursor-in-non-selected-windows nil)))
-  (add-hook 'helm-after-initialize-hook
-            'spacemacs//hide-cursor-in-helm-buffer)
-
-  (dolist (keymap (list helm-find-files-map helm-read-file-map))
-    (define-key keymap (kbd "C-l") 'helm-execute-persistent-action)
-    (define-key keymap (kbd "C-h") 'helm-find-files-up-one-level)
-    (define-key keymap (kbd "C-S-h") 'describe-key))
-  (lambda ()
-    (set-face-attribute 'helm-source-header nil
-                        :family "Triplicate T4c"
-                        :slant 'italic
-                        :height 140))
-  (use-package helm-ag
-    :ensure t))
 
 ;; Projectile
 (use-package projectile
   :ensure t
   :config
   (projectile-global-mode +1)
+  (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
-  (setq projectile-switch-project-action 'helm-projectile-find-file)
   (global-set-key (kbd "<f1>") 'projectile-switch-project)
-  (global-set-key (kbd "<f2>") 'projectile-find-file)
-
-  (use-package helm-projectile
-    :ensure t
-    :init
-    (helm-projectile-on)
-    :config
-    (global-set-key (kbd "C-x s") 'helm-projectile-ag)
-    (progn
-      (setq projectile-switch-project-action 'projectile-dired)
-      (setq projectile-completion-system 'helm))))
-
+  (global-set-key (kbd "<f2>") 'projectile-find-file))
 
 ;; Flycheck
 (use-package flycheck
@@ -412,10 +392,12 @@ SCHEDULED: %t")))
           ("*Messages*"        :align below :size 15  :select t)
           ("*Warnings*"        :align below :size 10  :noselect t)
           ("*compilation*"     :align below :size 15  :noselect t)
+          ("*Flycheck errors*" :align below :size 15  :noselect t)
           (compilation-mode    :align below :size 15  :noselect t)
           (eww-mode            :align below :size 30  :select t)
           ("*command-log*"     :align right :size 28  :noselect t)
           ;; vcs
+          ("*magit" :align below :size 50 :select t)
           ("*vc-diff*"         :align below :size 15  :noselect t)
           ("*vc-change-log*"   :align below :size 15  :select t)
           (vc-annotate-mode    :same t))))
@@ -474,7 +456,6 @@ SCHEDULED: %t")))
   :ensure t
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
-  :config
   (set (make-local-variable 'compile-command)
        "go build -v && go test -v && go vet"))
 
@@ -601,10 +582,10 @@ and subsequent lines as the event note."
   (dim-major-name 'diff "diff")
   (dim-major-name 'fundamental "fund")
   (dim-minor-name 'undo-tree-mode "")
-  (dim-minor-name 'helm-mode "")
   (dim-minor-name 'which-key-mode "")
   (dim-minor-name 'projectile-mode "")
   (dim-minor-name 'git-gutter-mode "")
+  (dim-minor-name 'ivy-mode "")
   (dim-minor-name 'org-indent-mode "")
   (dim-minor-name 'auto-revert-mode ""))
 
@@ -627,12 +608,14 @@ and subsequent lines as the event note."
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
-    ("bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
+    ("41c926d688a69c7d3c7d2eeb54b2ea3c32c49c058004483f646c1d7d1f7bf6ac" "bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
+ '(evil-escape-mode t)
  '(hl-sexp-background-color "#efebe9")
+ '(ivy-mode t)
  '(nyan-mode nil)
  '(package-selected-packages
    (quote
-    (helm-ag-r ag ob-http smart-mode-line github-modern-theme smart-mode-line-powerline-theme go-projectile json-mode evil-surround powerline yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter powerline-evil telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim helm-projectile projectile helm-ag helm nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (counsel-projectile neotree ivy-rich counsel ivy zerodark-theme all-the-icons-dired all-the-icons ag ob-http smart-mode-line github-modern-theme smart-mode-line-powerline-theme go-projectile json-mode evil-surround powerline yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter powerline-evil telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(powerline-buffer-size-suffix nil)
  '(powerline-display-buffer-size nil)
  '(powerline-gui-use-vcs-glyph nil))
@@ -642,3 +625,13 @@ and subsequent lines as the event note."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(org-document-title ((t (:foreground "black" :weight bold :height 1.2 :family "Triplicate T4c")))))
+
+(use-package leuven-theme
+   :ensure t
+   :init
+   (setq leuven-scale-outline-headlines nil)
+   (setq leuven-scale-org-agenda-structure nil))
+   :config
+   (load-theme 'leuven t)
+
+(load-theme 'whiteboard)
