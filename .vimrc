@@ -22,13 +22,9 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'kien/ctrlp.vim', { 'on': [] }
-Plug 'NLKNguyen/papercolor-theme'
 Plug 'chriskempson/base16-vim'
 Plug 'yankcrime/vim-colors-off'
 Plug 'sonjapeterson/1989.vim'
-Plug 'nanotech/jellybeans.vim'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
 
 call plug#end()
 
@@ -36,7 +32,7 @@ call plug#end()
 " {{{ General
 
 set nobackup " Irrelevant these days
-set nonumber " Don't show linenumbers
+set nonumber " (Don't) show linenumbers
 let mapleader = "\<Space>" " Define leader key
 
 set breakindent " indent wrapped lines, by...
@@ -52,7 +48,7 @@ set completefunc=emoji#complete
 
 set modelines=5 " Enable modelines
 
-set cursorline
+" set cursorline
 
 set cpo=aABceFs$
 
@@ -96,12 +92,16 @@ au FileType puppet setlocal isk+=:
 
 cmap w!! w !sudo tee % >/dev/null
 
+" Insert a datestamp at the top of a file
+nmap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
+
 " Appearance
 set t_Co=256
 let g:jellybeans_use_term_italics=1
 colorscheme off
 hi Normal ctermfg=none ctermbg=none
-hi Statusline cterm=bold ctermfg=231 ctermbg=232
+" hi Statusline cterm=bold ctermfg=231 ctermbg=232
+hi Statusline cterm=bold
 set laststatus=2
 
 " Fugitive shortcuts
@@ -195,30 +195,20 @@ au FileType go nmap <leader>c <Plug>(go-coverage)
 au FileType go nmap <Leader>rv <Plug>(go-run-vertical)
 au FileType go nmap <Leader>gd <Plug>(go-doc)
 au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
+au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
 let g:go_term_enabled = 1
 let g:go_term_mode = "split"
 " }}}
 " {{{ Statusline
-
-function! SL(function)
-  if exists('*'.a:function)
-    return call(a:function,[])
-  else
-    return ''
-  endif
-endfunction
-
 function! StatusGit()
     let git = '⎇  ' . fugitive#head()
     return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
 endfunction
 
 set statusline=\ %<%.20F\ %h%w%m%r
-set statusline+=%{SL('StatusGit')}
-set statusline+=%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}
+set statusline+=%{StatusGit()}
 set statusline+=%*%=%-14.(%r%y\ ⭡\ %l,%c%)\ %P\ 
-
-" }}}
+"" }}}
 " {{{ ctags
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
 " prefixed with '::' which don't match to a file directly when used in
@@ -233,6 +223,10 @@ noremap <leader>arqf :call asyncrun#quickfix_toggle(8)<cr>
 " {{{ ALE
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_enter = 0
+let g:ale_sign_warning='●'
+hi ALEErrorSign ctermfg=red ctermbg=none
+let g:ale_sign_error='●'
+hi ALEWarningSign ctermfg=yellow ctermbg=none
 " }}}
 " {{{ neovim
 if has('nvim')
@@ -271,24 +265,6 @@ if has('gui_running')
     set guioptions-=L " don't show scrollbars
     set gtl=%t gtt=%F " tab headings
 end
-" }}}
-" {{{ Airline
-if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-endif
-
-let g:airline_theme='powerlineish'
-
-let g:airline#extensions#syntastic#enabled = 0
-
-let g:airline_left_sep = '⮀'
-let g:airline_left_alt_sep = '⮁'
-let g:airline_right_sep = '⮂'
-let g:airline_right_alt_sep = '⮃'
-let g:airline_symbols.branch = '⭠'
-let g:airline_symbols.readonly = '⭤'
-let g:airline_symbols.linenr = '⭡'
-
 " }}}
 
 " vim:ts=4:sw=4:ft=vimrc:et
