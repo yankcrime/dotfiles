@@ -34,6 +34,7 @@ call plug#end()
 set nobackup " Irrelevant these days
 set nonumber " (Don't) show linenumbers
 let mapleader = "\<Space>" " Define leader key
+set noswapfile
 
 set breakindent " indent wrapped lines, by...
 set breakindentopt=shift:4,sbr " indenting them another level and showing 'showbreak' char
@@ -92,25 +93,56 @@ au FileType puppet setlocal isk+=:
 
 cmap w!! w !sudo tee % >/dev/null
 
-" Insert a datestamp at the top of a file
-nmap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
-
-" Appearance
+" appearance
 set t_Co=256
-let g:jellybeans_use_term_italics=1
 colorscheme off
 hi Normal ctermfg=none ctermbg=none
-" hi Statusline cterm=bold ctermfg=231 ctermbg=232
 hi Statusline cterm=bold
 set laststatus=2
 
-" Fugitive shortcuts
+" insert a datestamp at the top of a file
+nmap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
+
+" fugitive shortcuts
 noremap <leader>gadd :Gwrite<CR>
 noremap <leader>gcommit :Gcommit<CR>
 noremap <leader>gpush :Gpush<CR>
 noremap <leader>gstat :Gstatus<CR>
 
+" convenience remap - one less key to press
 nnoremap ; :
+
+" juggling with quickfix entries
+nnoremap <End>  :cnext<CR>
+nnoremap <Home> :cprevious<CR>
+
+" juggling with buffers
+nnoremap <PageUp>   :bprevious<CR>
+nnoremap <PageDown> :bnext<CR>
+nnoremap <BS>       :buffer#<CR>
+
+" super quick search and replace
+nnoremap <Space><Space> :'{,'}s/\<<C-r>=expand("<cword>")<CR>\>/
+nnoremap <Space>%       :%s/\<<C-r>=expand("<cword>")<CR>\>/
+
+" do some sensible things with listings
+cnoremap <expr> <CR> <SID>CCR()
+function! s:CCR()
+	command! -bar Z silent set more|delcommand Z
+	if getcmdtype() == ":"
+		let cmdline = getcmdline()
+		    if cmdline =~ '\v\C^(dli|il)' | return "\<CR>:" . cmdline[0] . "jump   " . split(cmdline, " ")[1] . "\<S-Left>\<Left>\<Left>"
+		elseif cmdline =~ '\v\C^(cli|lli)' | return "\<CR>:silent " . repeat(cmdline[0], 2) . "\<Space>"
+		elseif cmdline =~ '\C^changes' | set nomore | return "\<CR>:Z|norm! g;\<S-Left>"
+		elseif cmdline =~ '\C^ju' | set nomore | return "\<CR>:Z|norm! \<C-o>\<S-Left>"
+		elseif cmdline =~ '\v\C(#|nu|num|numb|numbe|number)$' | return "\<CR>:"
+		elseif cmdline =~ '\C^ol' | set nomore | return "\<CR>:Z|e #<"
+		elseif cmdline =~ '\v\C^(ls|files|buffers)' | return "\<CR>:b"
+		elseif cmdline =~ '\C^marks' | return "\<CR>:norm! `"
+		elseif cmdline =~ '\C^undol' | return "\<CR>:u "
+		else | return "\<CR>" | endif
+	else | return "\<CR>" | endif
+endfunction
 
 " }}} End basic settings
 " {{{ Folding
@@ -205,9 +237,9 @@ function! StatusGit()
     return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
 endfunction
 
-set statusline=\ %<%.20F\ %h%w%m%r
+set statusline=\ %<%.40F\ %h%w%r
 set statusline+=%{StatusGit()}
-set statusline+=%*%=%-14.(%r%y\ ⭡\ %l,%c%)\ %P\ 
+set statusline+=%*%=%-14.(%m%y\ ⭡\ %l,%c%)\ %P\ 
 "" }}}
 " {{{ ctags
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
@@ -250,7 +282,7 @@ if has('gui_running')
     let g:ctrlp_working_path_mode = 0
     let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
     call plug#load('ctrlp.vim')
-    set linespace=2
+    set linespace=1
     set fuoptions=maxvert,maxhorz
     let macvim_skip_colorscheme=1
     set background=light
