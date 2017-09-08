@@ -9,7 +9,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-sleuth'
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'tpope/vim-vinegar'
 Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby'] }
 Plug 'godlygeek/tabular'
 Plug 'cespare/vim-sbd'
@@ -21,10 +21,10 @@ Plug 'rking/ag.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'skywind3000/asyncrun.vim'
-Plug 'kien/ctrlp.vim', { 'on': [] }
 Plug 'chriskempson/base16-vim'
 Plug 'yankcrime/vim-colors-off'
 Plug 'sonjapeterson/1989.vim'
+Plug 'nightire/grb256'
 
 call plug#end()
 
@@ -97,7 +97,7 @@ cmap w!! w !sudo tee % >/dev/null
 set t_Co=256
 colorscheme off
 hi Normal ctermfg=none ctermbg=none
-hi Statusline cterm=bold
+hi Statusline cterm=bold ctermfg=234
 set laststatus=2
 
 " insert a datestamp at the top of a file
@@ -145,6 +145,30 @@ function! s:CCR()
 endfunction
 
 " }}} End basic settings
+" {{{ netrw
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+" Toggle Vexplore with Ctrl-n
+function! ToggleVExplorer()
+  if exists("t:expl_buf_num")
+      let expl_win_num = bufwinnr(t:expl_buf_num)
+      if expl_win_num != -1
+          let cur_win_nr = winnr()
+          exec expl_win_num . 'wincmd w'
+          close
+          exec cur_win_nr . 'wincmd w'
+          unlet t:expl_buf_num
+      else
+          unlet t:expl_buf_num
+      endif
+  else
+      exec '1wincmd w'
+      Vexplore
+      let t:expl_buf_num = bufnr("%")
+  endif
+endfunction
+map <silent> <C-n> :call ToggleVExplorer()<CR>
+"}}}
 " {{{ Folding
 augroup ft_vim
     au!
@@ -169,14 +193,6 @@ augroup ft_muttrc
     au BufRead,BufNewFile *.muttrc set ft=muttrc
     au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
 augroup END
-" }}}
-" {{{ NERDTree
-map <C-n> :NERDTreeToggle<CR>
-let g:NERDTreeShowBookmarks=1
-let g:NERDTreeShowHidden=1
-let g:NERDTreeBookmarksSort = 1
-let g:NERDTreeDirArrowExpandable = '▸'
-let g:NERDTreeDirArrowCollapsible = '▾'
 " }}}
 " {{{ fzf
 nnoremap <silent> <expr> <C-f> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
@@ -239,7 +255,7 @@ endfunction
 
 set statusline=\ %<%.40F\ %h%w%r
 set statusline+=%{StatusGit()}
-set statusline+=%*%=%-14.(%m%y\ ⭡\ %l,%c%)\ %P\ 
+set statusline+=%*%=%-14.(%m%y\ %l,%c%)\ %P\ 
 "" }}}
 " {{{ ctags
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
@@ -276,18 +292,11 @@ end
 " }}}
 " {{{ GUI overrides
 if has('gui_running')
-    let g:ctrlp_map = '<C-p>'
-    let g:ctrlp_match_window = 'bottom,order:ttb'
-    let g:ctrlp_switch_buffer = 0
-    let g:ctrlp_working_path_mode = 0
-    let g:ctrlp_user_command = '/usr/local/bin/ag %s -l --nocolor --hidden -g ""'
-    call plug#load('ctrlp.vim')
     set linespace=1
     set fuoptions=maxvert,maxhorz
     let macvim_skip_colorscheme=1
     set background=light
     colorscheme off
-    hi Statusline guifg=#000000 guibg=#dddddd gui=bold
     set guifont=Triplicate\ T4c:h14
     set guioptions=e " don't use gui tab apperance
     set guioptions=T " hide toolbar
