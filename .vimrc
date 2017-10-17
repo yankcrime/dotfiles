@@ -1,7 +1,7 @@
 " .vimrc
 " nick@dischord.org
 
-" {{{ vim-plug
+" {{{ Plugins via vim-plug
 call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-fugitive'
@@ -18,13 +18,14 @@ Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
 Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
 Plug 'rking/ag.vim'
+Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'chriskempson/base16-vim'
 Plug 'yankcrime/vim-colors-off'
 Plug 'sonjapeterson/1989.vim'
-Plug 'nightire/grb256'
+Plug 'sjl/badwolf'
 
 call plug#end()
 
@@ -95,6 +96,7 @@ cmap w!! w !sudo tee % >/dev/null
 
 " appearance
 set t_Co=256
+set background=light
 colorscheme off
 hi Normal ctermfg=none ctermbg=none
 hi Statusline cterm=bold ctermfg=234
@@ -145,30 +147,6 @@ function! s:CCR()
 endfunction
 
 " }}} End basic settings
-" {{{ netrw
-let g:netrw_banner = 0
-let g:netrw_liststyle = 3
-" Toggle Vexplore with Ctrl-n
-function! ToggleVExplorer()
-  if exists("t:expl_buf_num")
-      let expl_win_num = bufwinnr(t:expl_buf_num)
-      if expl_win_num != -1
-          let cur_win_nr = winnr()
-          exec expl_win_num . 'wincmd w'
-          close
-          exec cur_win_nr . 'wincmd w'
-          unlet t:expl_buf_num
-      else
-          unlet t:expl_buf_num
-      endif
-  else
-      exec '1wincmd w'
-      Vexplore
-      let t:expl_buf_num = bufnr("%")
-  endif
-endfunction
-map <silent> <C-n> :call ToggleVExplorer()<CR>
-"}}}
 " {{{ Folding
 augroup ft_vim
     au!
@@ -229,9 +207,6 @@ autocmd! User FzfStatusLine call <SID>fzf_statusline()
 nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
 " }}}
-" {{{ Silver Searcher (Ag)
-nnoremap <C-s> :Ag 
-" }}}
 " {{{ Markdown
 nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
 " }}}
@@ -253,9 +228,9 @@ function! StatusGit()
     return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
 endfunction
 
-set statusline=\ %<%.40F\ %h%w%r
+set statusline=%<%.40F%m\ %h%w%r
 set statusline+=%{StatusGit()}
-set statusline+=%*%=%-14.(%m%y\ %l,%c%)\ %P\ 
+set statusline+=%*%=%-14.(%y\ %l,%c%)\ %P
 "" }}}
 " {{{ ctags
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
@@ -295,7 +270,6 @@ if has('gui_running')
     set linespace=1
     set fuoptions=maxvert,maxhorz
     let macvim_skip_colorscheme=1
-    set background=light
     colorscheme off
     set guifont=Triplicate\ T4c:h14
     set guioptions=e " don't use gui tab apperance
