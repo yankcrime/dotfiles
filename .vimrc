@@ -5,11 +5,11 @@
 call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-vinegar'
+Plug 'machakann/vim-sandwich'
 Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby'] }
 Plug 'godlygeek/tabular'
 Plug 'cespare/vim-sbd'
@@ -106,10 +106,10 @@ set laststatus=2
 nmap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
 
 " fugitive shortcuts
-noremap <leader>gadd :Gwrite<CR>
-noremap <leader>gcommit :Gcommit<CR>
-noremap <leader>gpush :Gpush<CR>
-noremap <leader>gstat :Gstatus<CR>
+noremap <leader>ga :Gwrite<CR>
+noremap <leader>gc :Gcommit<CR>
+noremap <leader>gp :Gpush<CR>
+noremap <leader>gs :Gstatus<CR>
 
 " convenience remap - one less key to press
 nnoremap ; :
@@ -209,6 +209,9 @@ nnoremap <silent> <leader>bdm :Sbdm<CR>
 " }}}
 " {{{ Markdown
 nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
+" }}}
+" {{{ Silver Searcher (Ag)
+nnoremap <C-s> :Ag
 " }}}
 " {{{ Go
 au FileType go nmap <leader>r <Plug>(go-run)
