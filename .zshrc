@@ -50,7 +50,7 @@ alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias mutt='cd ~/Desktop && mutt'
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
-alias vim='/usr/local/bin/vim'
+alias vim='/usr/local/bin/nvim'
 alias papply='sudo puppet apply --modulepath /etc/dischord/modules --hiera_config /etc/dischord/hiera.yaml --manifestdir /etc/dischord/ /etc/dischord/default.pp'
 
 # <3 vagrant
@@ -98,6 +98,28 @@ bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-pattern-search-backward
 export KEYTIMEOUT=1
+
+# change cursor shape based on which vi mode we're in
+# via https://emily.st/2013/05/03/zsh-vi-cursor/
+function zle-keymap-select zle-line-init
+{
+    case $KEYMAP in
+        vicmd)      print -n -- "\E]50;CursorShape=0\C-G";;  # block cursor
+        viins|main) print -n -- "\E]50;CursorShape=1\C-G";;  # line cursor
+    esac
+
+    zle reset-prompt
+    zle -R
+}
+
+function zle-line-finish
+{
+    print -n -- "\E]50;CursorShape=0\C-G"  # block cursor
+}
+
+zle -N zle-line-init
+zle -N zle-line-finish
+zle -N zle-keymap-select
 
 # pyenv and rbenv junk
 #
