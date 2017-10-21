@@ -1,7 +1,7 @@
 " .vimrc
 " nick@dischord.org
 
-" {{{ Plugins via vim-plug
+" {{{ Plugins
 call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-fugitive'
@@ -21,6 +21,7 @@ Plug 'rking/ag.vim'
 Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'itchyny/lightline.vim'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'chriskempson/base16-vim'
 Plug 'yankcrime/vim-colors-off'
@@ -33,13 +34,14 @@ call plug#end()
 " {{{ General
 
 set nobackup " Irrelevant these days
-set nonumber " (Don't) show linenumbers
 let mapleader = "\<Space>" " Define leader key
 set noswapfile
 
 set breakindent " indent wrapped lines, by...
 set breakindentopt=shift:4,sbr " indenting them another level and showing 'showbreak' char
 set showbreak=↪
+set number
+set noshowmode
 
 set pastetoggle=<F2> " Quickly enable paste mode
 set hidden " Don't moan about changes when switching buffers
@@ -97,7 +99,7 @@ cmap w!! w !sudo tee % >/dev/null
 " appearance
 set t_Co=256
 set background=light
-colorscheme off
+colorscheme goodwolf
 hi Normal ctermfg=none ctermbg=none
 hi Statusline cterm=bold ctermfg=234
 set laststatus=2
@@ -147,6 +149,67 @@ function! s:CCR()
 endfunction
 
 " }}} End basic settings
+" {{{ Statusline
+function! StatusGit()
+    let git = '⎇  ' . fugitive#head()
+    return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
+endfunction
+
+set statusline=%<%.40F%m\ %h%w%r
+set statusline+=%{StatusGit()}
+set statusline+=%*%=%-14.(%y\ %l,%c%)\ %P
+"" }}}
+" {{{ Lightline
+" Lightline
+let g:lightline = {
+\ 'colorscheme': 'wombat',
+\ 'active': {
+\   'left': [['mode', 'paste'], ['filename', 'modified']],
+\   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok']]
+\ },
+\ 'component_expand': {
+\   'linter_warnings': 'LightlineLinterWarnings',
+\   'linter_errors': 'LightlineLinterErrors',
+\   'linter_ok': 'LightlineLinterOK'
+\ },
+\ 'component_type': {
+\   'readonly': 'error',
+\   'linter_warnings': 'warning',
+\   'linter_errors': 'error'
+\ },
+\ }
+
+function! LightlineLinterWarnings() abort
+  let l:counts = ale#statusline#Count(bufnr(''))
+  let l:all_errors = l:counts.error + l:counts.style_error
+  let l:all_non_errors = l:counts.total - l:all_errors
+  return l:counts.total == 0 ? '' : printf('%d ◆', all_non_errors)
+endfunction
+
+function! LightlineLinterErrors() abort
+  let l:counts = ale#statusline#Count(bufnr(''))
+  let l:all_errors = l:counts.error + l:counts.style_error
+  let l:all_non_errors = l:counts.total - l:all_errors
+  return l:counts.total == 0 ? '' : printf('%d ✗', all_errors)
+endfunction
+
+function! LightlineLinterOK() abort
+  let l:counts = ale#statusline#Count(bufnr(''))
+  let l:all_errors = l:counts.error + l:counts.style_error
+  let l:all_non_errors = l:counts.total - l:all_errors
+  return l:counts.total == 0 ? '✓ ' : ''
+endfunction
+
+autocmd User ALELint call s:MaybeUpdateLightline()
+
+" Update and show lightline but only if it's visible (e.g., not in Goyo)
+function! s:MaybeUpdateLightline()
+  if exists('#lightline')
+    call lightline#update()
+  end
+endfunction
+let g:lightline.subseparator = { 'left': '', 'right': '' }
+" }}}
 " {{{ Folding
 augroup ft_vim
     au!
@@ -172,7 +235,21 @@ augroup ft_muttrc
     au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
 augroup END
 " }}}
-" {{{ fzf
+" {{{ Neovim
+if has('nvim')
+    nmap <BS> <C-w>h
+    map <C-h> <C-w>h
+    map <C-j> <C-w>j
+    map <C-k> <C-w>k
+    map <C-l> <C-w>l
+    tnoremap <leader><esc> <C-\><C-n>
+    " nnoremap <bs> <c-w>h
+    let g:terminal_scrollback_buffer_size = 10000
+    let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+    set inccommand=nosplit
+end
+" }}}
+" {{{ FZF
 nnoremap <silent> <expr> <C-f> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
 nnoremap <silent> <C-b> :Buffers <CR>
 nnoremap <silent> <C-t> :call fzf#vim#tags(expand('<cword>'))<cr>
@@ -203,17 +280,7 @@ let g:fzf_layout = { 'down': '~40%' }
 autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
 " }}}
-" {{{ SBD (Smart Buffer Delete)
-nnoremap <silent> <C-x> :Sbd<CR>
-nnoremap <silent> <leader>bdm :Sbdm<CR>
-" }}}
-" {{{ Markdown
-nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
-" }}}
-" {{{ Silver Searcher (Ag)
-nnoremap <C-s> :Ag
-" }}}
-" {{{ Go
+" {{{ Golang
 au FileType go nmap <leader>r <Plug>(go-run)
 au FileType go nmap <leader>b <Plug>(go-build)
 au FileType go nmap <leader>t <Plug>(go-test)
@@ -225,17 +292,17 @@ au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
 let g:go_term_enabled = 1
 let g:go_term_mode = "split"
 " }}}
-" {{{ Statusline
-function! StatusGit()
-    let git = '⎇  ' . fugitive#head()
-    return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
-endfunction
-
-set statusline=%<%.40F%m\ %h%w%r
-set statusline+=%{StatusGit()}
-set statusline+=%*%=%-14.(%y\ %l,%c%)\ %P
-"" }}}
-" {{{ ctags
+" {{{ SBD (Smart Buffer Delete)
+nnoremap <silent> <C-x> :Sbd<CR>
+nnoremap <silent> <leader>bdm :Sbdm<CR>
+" }}}
+" {{{ Markdown
+nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
+" }}}
+" {{{ Silver Searcher (Ag)
+nnoremap <C-s> :Ag
+" }}}
+" {{{ Ctags
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
 " prefixed with '::' which don't match to a file directly when used in
 " conjunction with ctags
@@ -250,23 +317,9 @@ noremap <leader>arqf :call asyncrun#quickfix_toggle(8)<cr>
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_enter = 0
 let g:ale_sign_warning='●'
-hi ALEErrorSign ctermfg=red ctermbg=none
+hi ALEErrorSign ctermfg=red ctermbg=233
 let g:ale_sign_error='●'
-hi ALEWarningSign ctermfg=yellow ctermbg=none
-" }}}
-" {{{ neovim
-if has('nvim')
-    nmap <BS> <C-w>h
-    map <C-h> <C-w>h
-    map <C-j> <C-w>j
-    map <C-k> <C-w>k
-    map <C-l> <C-w>l
-    tnoremap <leader><esc> <C-\><C-n>
-    " nnoremap <bs> <c-w>h
-    let g:terminal_scrollback_buffer_size = 10000
-    let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
-    set inccommand=nosplit
-end
+hi ALEWarningSign ctermfg=yellow ctermbg=233
 " }}}
 " {{{ GUI overrides
 if has('gui_running')
