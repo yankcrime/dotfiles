@@ -165,7 +165,7 @@ let g:lightline = {
 \ 'colorscheme': 'wombat',
 \ 'active': {
 \   'left': [['mode', 'paste'], ['filename', 'modified']],
-\   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok']]
+\   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok'], ['filetype']]
 \ },
 \ 'component_expand': {
 \   'linter_warnings': 'LightlineLinterWarnings',
@@ -300,7 +300,13 @@ nnoremap <silent> <leader>bdm :Sbdm<CR>
 nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
 " }}}
 " {{{ Silver Searcher (Ag)
-nnoremap <C-s> :Ag
+function! AGSearch()
+    call inputsave()
+    let searchterm = input('Search string: ')
+    call inputrestore()
+    execute 'Ag' searchterm
+endfunction
+nnoremap <C-s> :call AGSearch()<cr>
 " }}}
 " {{{ Ctags
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
