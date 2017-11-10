@@ -3,12 +3,9 @@
 
 # usual suspects
 #
-export GOPATH=~/src/golang
-# export LSCOLORS="exfxcxdxbxegedabagacad"
 export EDITOR="vim"
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
 export PURE_PROMPT_SYMBOL="$"
-export PATH=~/.rbenv/bin:$PATH:~/bin:/usr/local/bin:/usr/local/sbin:$GOPATH/bin
 
 # history and general options
 #
