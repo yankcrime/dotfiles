@@ -25,7 +25,6 @@ Plug 'itchyny/lightline.vim'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'chriskempson/base16-vim'
 Plug 'yankcrime/vim-colors-off'
-Plug 'sonjapeterson/1989.vim'
 Plug 'sjl/badwolf'
 
 call plug#end()
@@ -59,7 +58,7 @@ set cpo=aABceFs$
 set smarttab
 set ttyfast
 
-nmap <leader>l :set list!<CR>
+nnoremap <leader>l :set list!<CR>
 set listchars=tab:▸\ ,eol:¬,trail:-,
 set fillchars+=vert:\│
 
@@ -76,10 +75,10 @@ filetype plugin on
 set ai
 
 vmap Q gq
-nmap Q gqap
+nnoremap Q gqap
 
 " Clear search
-nmap <silent> ,/ :noh<cr>
+nnoremap <silent> ,/ :noh<cr>
 
 au BufEnter *.sh if getline(1) == "" | :call setline(1, "#!/usr/bin/env bash") | endif
 au BufEnter *.py if getline(1) == "" | :call setline(1, "#!/usr/bin/env python") | endif
@@ -98,14 +97,14 @@ cmap w!! w !sudo tee % >/dev/null
 
 " appearance
 set t_Co=256
-set background=light
-colorscheme goodwolf
+colorscheme off
 hi Normal ctermfg=none ctermbg=none
 hi Statusline cterm=bold ctermfg=234
+hi clear SignColumn
 set laststatus=2
 
 " insert a datestamp at the top of a file
-nmap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
+nnoremap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
 
 " fugitive shortcuts
 noremap <leader>ga :Gwrite<CR>
@@ -149,23 +148,15 @@ function! s:CCR()
 endfunction
 
 " }}} End basic settings
-" {{{ Statusline
-function! StatusGit()
-    let git = '⎇  ' . fugitive#head()
-    return fugitive#head() != '' && winwidth('.') > 70 ? git : ''
-endfunction
-
-set statusline=%<%.40F%m\ %h%w%r
-set statusline+=%{StatusGit()}
-set statusline+=%*%=%-14.(%y\ %l,%c%)\ %P
-"" }}}
 " {{{ Lightline
 " Lightline
 let g:lightline = {
-\ 'colorscheme': 'wombat',
 \ 'active': {
 \   'left': [['mode', 'paste'], ['filename', 'modified']],
-\   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok'], ['filetype']]
+\   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok'], ['gitbranch']]
+\ },
+\ 'component_function': {
+\   'gitbranch': 'fugitive#head'
 \ },
 \ 'component_expand': {
 \   'linter_warnings': 'LightlineLinterWarnings',
@@ -237,16 +228,18 @@ augroup END
 " }}}
 " {{{ Neovim
 if has('nvim')
-    nmap <BS> <C-w>h
-    map <C-h> <C-w>h
-    map <C-j> <C-w>j
-    map <C-k> <C-w>k
-    map <C-l> <C-w>l
+    nnoremap <BS> <C-w>h
+    tnoremap <C-h> <C-\><C-N><C-w>h
+    tnoremap <C-j> <C-\><C-N><C-w>j
+    tnoremap <C-k> <C-\><C-N><C-w>k
+    tnoremap <C-l> <C-\><C-N><C-w>l
     tnoremap <leader><esc> <C-\><C-n>
-    " nnoremap <bs> <c-w>h
     let g:terminal_scrollback_buffer_size = 10000
     let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
     set inccommand=nosplit
+    command! -nargs=* T split | terminal <args>
+    command! -nargs=* VT vsplit | terminal <args>
+    nnoremap <leader>t :T<cr>
 end
 " }}}
 " {{{ FZF
@@ -265,6 +258,9 @@ let g:fzf_layout = { 'window': '-tabnew' }
 let g:fzf_buffers_jump = 1
 let g:fzf_tags_command = 'ctags -R'
 
+" Workaround for https://github.com/junegunn/fzf/issues/809
+let $FZF_DEFAULT_OPTS .= ' --no-height'
+
 function! s:fzf_statusline()
   " Override statusline as you like
   highlight fzf1 ctermfg=161 ctermbg=251
@@ -281,13 +277,13 @@ autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
 " }}}
 " {{{ Golang
-au FileType go nmap <leader>r <Plug>(go-run)
-au FileType go nmap <leader>b <Plug>(go-build)
-au FileType go nmap <leader>t <Plug>(go-test)
-au FileType go nmap <leader>c <Plug>(go-coverage)
-au FileType go nmap <Leader>rv <Plug>(go-run-vertical)
-au FileType go nmap <Leader>gd <Plug>(go-doc)
-au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
+au FileType go nnoremap <leader>r <Plug>(go-run)
+au FileType go nnoremap <leader>b <Plug>(go-build)
+au FileType go nnoremap <leader>t <Plug>(go-test)
+au FileType go nnoremap <leader>c <Plug>(go-coverage)
+au FileType go nnoremap <Leader>rv <Plug>(go-run-vertical)
+au FileType go nnoremap <Leader>gd <Plug>(go-doc)
+au FileType go nnoremap <Leader>gv <Plug>(go-doc-vertical)
 au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
 let g:go_term_enabled = 1
 let g:go_term_mode = "split"
@@ -322,18 +318,21 @@ noremap <leader>arqf :call asyncrun#quickfix_toggle(8)<cr>
 " {{{ ALE
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_enter = 0
+let g:ale_set_loclist = 0
+let g:ale_set_quickfix = 1
 let g:ale_sign_warning='●'
-hi ALEErrorSign ctermfg=red ctermbg=233
+hi ALEErrorSign ctermfg=red ctermbg=none
 let g:ale_sign_error='●'
-hi ALEWarningSign ctermfg=yellow ctermbg=233
+hi ALEWarningSign ctermfg=yellow ctermbg=none
 " }}}
 " {{{ GUI overrides
 if has('gui_running')
     set linespace=1
     set fuoptions=maxvert,maxhorz
     let macvim_skip_colorscheme=1
+    set background=light
+    set guifont=Triplicate T4c:h14
     colorscheme off
-    set guifont=Triplicate\ T4c:h14
     set guioptions=e " don't use gui tab apperance
     set guioptions=T " hide toolbar
     set guioptions=r " don't show scrollbars
