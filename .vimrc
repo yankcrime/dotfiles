@@ -151,8 +151,9 @@ endfunction
 " {{{ Lightline
 " Lightline
 let g:lightline = {
+\ 'colorscheme': 'default',
 \ 'active': {
-\   'left': [['mode', 'paste'], ['filename', 'modified']],
+\   'left': [['mode', 'paste'], ['filename', 'modified'], ['filetype']],
 \   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok'], ['gitbranch']]
 \ },
 \ 'component_function': {
@@ -168,6 +169,19 @@ let g:lightline = {
 \   'linter_warnings': 'warning',
 \   'linter_errors': 'error'
 \ },
+\ 'mode_map': {
+\ 'n': 'N',
+\ 'i': 'I',
+\ 'r': 'R',
+\ 'V': 'V',
+\ 'v': 'V-L',
+\ "\<C-v>": 'V-B',
+\ "c": 'C',
+\ "s": 'S',
+\ "S": 'S-L',
+\ "\<C-s>": 'S-B',
+\ "t": 'T',
+\ }
 \ }
 
 function! LightlineLinterWarnings() abort
@@ -229,11 +243,12 @@ augroup END
 " {{{ Neovim
 if has('nvim')
     nnoremap <BS> <C-w>h
-    tnoremap <C-h> <C-\><C-N><C-w>h
-    tnoremap <C-j> <C-\><C-N><C-w>j
-    tnoremap <C-k> <C-\><C-N><C-w>k
-    tnoremap <C-l> <C-\><C-N><C-w>l
+"    tnoremap <C-h> <C-\><C-N><C-w>h
+"    tnoremap <C-j> <C-\><C-N><C-w>j
+"    tnoremap <C-k> <C-\><C-N><C-w>k
+"    tnoremap <C-l> <C-\><C-N><C-w>l
     tnoremap <leader><esc> <C-\><C-n>
+    au TermOpen * setlocal nonumber norelativenumber
     let g:terminal_scrollback_buffer_size = 10000
     let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
     set inccommand=nosplit
@@ -296,7 +311,7 @@ nnoremap <silent> <leader>bdm :Sbdm<CR>
 nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
 " }}}
 " {{{ Silver Searcher (Ag)
-function! AGSearch()
+function! AGSearch() abort
     call inputsave()
     let searchterm = input('Search string: ')
     call inputrestore()
@@ -331,7 +346,7 @@ if has('gui_running')
     set fuoptions=maxvert,maxhorz
     let macvim_skip_colorscheme=1
     set background=light
-    set guifont=Triplicate T4c:h14
+    set guifont=Triplicate\ T4c:h14
     colorscheme off
     set guioptions=e " don't use gui tab apperance
     set guioptions=T " hide toolbar
