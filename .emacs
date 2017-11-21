@@ -61,6 +61,8 @@
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
 (global-set-key (kbd "M-o") 'counsel-find-file)
+(global-set-key (kbd "C-s") 'counsel-projectile-ag)
+(global-set-key (kbd "C-b") 'ivy-switch-buffer)
 
 ;; Package management
 (require 'package)
@@ -88,8 +90,14 @@
   (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
+  (add-hook 'minibuffer-setup-hook
+            (lambda ()
+              (setq show-trailing-whitespace nil)))
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t))
+
+(use-package counsel-projectile
+  :ensure t)
 
 (use-package counsel
   :ensure t
@@ -115,6 +123,7 @@
   (require 'git-gutter-fringe))
 
 (use-package smart-mode-line
+  :ensure t
   :init
   (progn
     (setq sml/theme 'light
@@ -211,7 +220,10 @@
         '(("a" "My TODO task format." entry
            (file "todo.org")
            "* TODO %?
-SCHEDULED: %t")))
+SCHEDULED: %t
+:PROPERTIES:
+:CREATED: %U\n
+:END:")))
 
   (defun org-task-capture ()
     (interactive)
@@ -444,10 +456,10 @@ SCHEDULED: %t")))
   :config
   (which-key-mode))
 
-(use-package pyenv-mode
-  :ensure t
-  :config
-  (pyenv-mode))
+;(use-package pyenv-mode
+;  :ensure t
+;  :config
+;  (pyenv-mode))
 
 ;; Modes
 
@@ -615,7 +627,7 @@ and subsequent lines as the event note."
  '(nyan-mode nil)
  '(package-selected-packages
    (quote
-    (counsel-projectile neotree ivy-rich counsel ivy zerodark-theme all-the-icons-dired all-the-icons ag ob-http smart-mode-line github-modern-theme smart-mode-line-powerline-theme go-projectile json-mode evil-surround powerline yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter powerline-evil telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (mmm-jinja2 counsel-projectile neotree ivy-rich counsel ivy zerodark-theme all-the-icons-dired all-the-icons ag ob-http smart-mode-line github-modern-theme smart-mode-line-powerline-theme go-projectile json-mode evil-surround powerline yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter powerline-evil telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(powerline-buffer-size-suffix nil)
  '(powerline-display-buffer-size nil)
  '(powerline-gui-use-vcs-glyph nil))
