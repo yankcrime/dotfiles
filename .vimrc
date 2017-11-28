@@ -9,6 +9,7 @@ Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-vinegar'
+Plug 'tpope/vim-dispatch'
 Plug 'machakann/vim-sandwich'
 Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby'] }
 Plug 'godlygeek/tabular'
@@ -151,7 +152,7 @@ endfunction
 " {{{ Lightline
 " Lightline
 let g:lightline = {
-\ 'colorscheme': 'default',
+\ 'colorscheme': 'wombat',
 \ 'active': {
 \   'left': [['mode', 'paste'], ['filename', 'modified'], ['filetype']],
 \   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok'], ['gitbranch']]
