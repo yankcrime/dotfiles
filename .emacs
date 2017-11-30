@@ -60,6 +60,7 @@
 (global-set-key (kbd "M-F") 'query-replace)
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
+(define-key evil-normal-state-map "Q" 'fill-paragraph)
 (global-set-key (kbd "M-o") 'counsel-find-file)
 (global-set-key (kbd "C-s") 'counsel-projectile-ag)
 (global-set-key (kbd "C-b") 'ivy-switch-buffer)
