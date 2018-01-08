@@ -11,20 +11,22 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-dispatch'
 Plug 'machakann/vim-sandwich'
-Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby'] }
+Plug 'pearofducks/ansible-vim'
 Plug 'godlygeek/tabular'
 Plug 'cespare/vim-sbd'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
 Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
+Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby', 'ansible'] }
 Plug 'rking/ag.vim'
 Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'itchyny/lightline.vim'
+Plug 'wvffle/vimterm'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'chriskempson/base16-vim'
+Plug 'romainl/vim-sweet16'
 Plug 'yankcrime/vim-colors-off'
 Plug 'sjl/badwolf'
 
@@ -98,9 +100,11 @@ cmap w!! w !sudo tee % >/dev/null
 
 " appearance
 set t_Co=256
+set termguicolors
+set background=light
 colorscheme off
-hi Normal ctermfg=none ctermbg=none
-hi Statusline cterm=bold ctermfg=234
+hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
+" hi Statusline term=reverse cterm=reverse gui=reverse
 hi clear SignColumn
 set laststatus=2
 
@@ -149,73 +153,6 @@ function! s:CCR()
 endfunction
 
 " }}} End basic settings
-" {{{ Lightline
-" Lightline
-let g:lightline = {
-\ 'colorscheme': 'wombat',
-\ 'active': {
-\   'left': [['mode', 'paste'], ['filename', 'modified'], ['filetype']],
-\   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok'], ['gitbranch']]
-\ },
-\ 'component_function': {
-\   'gitbranch': 'fugitive#head'
-\ },
-\ 'component_expand': {
-\   'linter_warnings': 'LightlineLinterWarnings',
-\   'linter_errors': 'LightlineLinterErrors',
-\   'linter_ok': 'LightlineLinterOK'
-\ },
-\ 'component_type': {
-\   'readonly': 'error',
-\   'linter_warnings': 'warning',
-\   'linter_errors': 'error'
-\ },
-\ 'mode_map': {
-\ 'n': 'N',
-\ 'i': 'I',
-\ 'r': 'R',
-\ 'V': 'V',
-\ 'v': 'V-L',
-\ "\<C-v>": 'V-B',
-\ "c": 'C',
-\ "s": 'S',
-\ "S": 'S-L',
-\ "\<C-s>": 'S-B',
-\ "t": 'T',
-\ }
-\ }
-
-function! LightlineLinterWarnings() abort
-  let l:counts = ale#statusline#Count(bufnr(''))
-  let l:all_errors = l:counts.error + l:counts.style_error
-  let l:all_non_errors = l:counts.total - l:all_errors
-  return l:counts.total == 0 ? '' : printf('%d ◆', all_non_errors)
-endfunction
-
-function! LightlineLinterErrors() abort
-  let l:counts = ale#statusline#Count(bufnr(''))
-  let l:all_errors = l:counts.error + l:counts.style_error
-  let l:all_non_errors = l:counts.total - l:all_errors
-  return l:counts.total == 0 ? '' : printf('%d ✗', all_errors)
-endfunction
-
-function! LightlineLinterOK() abort
-  let l:counts = ale#statusline#Count(bufnr(''))
-  let l:all_errors = l:counts.error + l:counts.style_error
-  let l:all_non_errors = l:counts.total - l:all_errors
-  return l:counts.total == 0 ? '✓ ' : ''
-endfunction
-
-autocmd User ALELint call s:MaybeUpdateLightline()
-
-" Update and show lightline but only if it's visible (e.g., not in Goyo)
-function! s:MaybeUpdateLightline()
-  if exists('#lightline')
-    call lightline#update()
-  end
-endfunction
-let g:lightline.subseparator = { 'left': '', 'right': '' }
-" }}}
 " {{{ Folding
 augroup ft_vim
     au!
@@ -341,6 +278,10 @@ hi ALEErrorSign ctermfg=red ctermbg=none
 let g:ale_sign_error='●'
 hi ALEWarningSign ctermfg=yellow ctermbg=none
 " }}}
+" {{{ vimterm
+nnoremap <F7> :call vimterm#toggle() <CR>
+tnoremap <F7> <C-\><C-n>:call vimterm#toggle() <CR>
+" }}}
 " {{{ GUI overrides
 if has('gui_running')
     set linespace=1
@@ -357,6 +298,26 @@ if has('gui_running')
     set guioptions-=L " don't show scrollbars
     set gtl=%t gtt=%F " tab headings
 end
+" }}}
+" {{{ Statusline
+let g:look_up = {
+    \ '__' : '-', 'n'  : 'N',
+    \ 'i'  : 'I', 'R'  : 'R',
+    \ 'v'  : 'V', 'V'  : 'V',
+    \ 'c'  : 'C', '' : 'V',
+    \ 's'  : 'S', '' : 'S',
+    \ '^S' : 'S', 't'  : 'T',
+\}
+
+set statusline=
+set statusline+=%(\ %{g:look_up[mode()]}%)
+set statusline+=%(%{&paste?'\ p\ ':''}%)
+set statusline+=%(\ ⎇\ \ %{fugitive#head()}%)
+set statusline+=%(\ %<%F%)
+set statusline+=\ %h%m%r%w
+set statusline+=%=
+set statusline+=%(%<\ %p%%\ ☰\ \ %l/%L:%c\ %)
+
 " }}}
 
 " vim:ts=4:sw=4:ft=vimrc:et
