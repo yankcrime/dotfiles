@@ -30,7 +30,7 @@ alias pg='ps auwwx | grep -i -e ^USER -e '
 alias publicip='curl http://ifconfig.me'
 alias webserver="ifconfig | grep 'inet ' | grep -v 127.0.0.1; python -m SimpleHTTPServer"
 alias cls='clear'
-alias ls='ls -FG'
+alias ls='ls -F'
 alias tma='tmux attach-session -t'
 alias view='vim -R'
 alias se='sudoedit'
@@ -44,10 +44,9 @@ alias pwplz='pwgen -n -y -s 12 1'
 alias keyplz='openssl rand -hex 10'
 alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
-alias mutt='cd ~/Desktop && mutt'
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
-alias vim='/usr/local/bin/nvim'
+alias vim='/usr/local/bin/vim'
 alias papply='sudo puppet apply --modulepath /etc/dischord/modules --hiera_config /etc/dischord/hiera.yaml --manifestdir /etc/dischord/ /etc/dischord/default.pp'
 
 # <3 vagrant
@@ -83,6 +82,9 @@ zle -N down-line-or-beginning-search
 local knownhosts
 knownhosts=( ${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[0-9]*}%%\ *}%%,*} )
 zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
+
+setopt print_exit_value
+PS1='%n@%m:%25<..<%~%(!.#.>) '
 
 # make it work like vim
 # thanks dougblack - http://dougblack.io/words/zsh-vi-mode.html
@@ -127,10 +129,6 @@ if which pyenv > /dev/null; then
     eval "$(pyenv init -)"
 fi
 
-# added by travis gem
-#
-[ -f /Users/nick/.travis/travis.sh ] && source /Users/nick/.travis/travis.sh
-
 # load zgen and plugins
 # https://github.com/tarjoilija/zgen
 #
@@ -138,13 +136,10 @@ source "${HOME}/.zgen/zgen.zsh"
 if ! zgen saved; then
   echo "Creating a zgen save"
 
-  zgen load mafredri/zsh-async
-  zgen load sindresorhus/pure
   zgen load junegunn/fzf
   zgen load junegunn/fzf shell/completion.zsh
   zgen load junegunn/fzf shell/key-bindings.zsh
   zgen load rupa/z
-  zgen load felixr/docker-zsh-completion
   zgen load supercrabtree/k
 
   zgen save

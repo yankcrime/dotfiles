@@ -61,6 +61,8 @@
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
 (global-set-key (kbd "M-o") 'counsel-find-file)
+(global-set-key (kbd "C-s") 'counsel-projectile-ag)
+(global-set-key (kbd "C-b") 'ivy-switch-buffer)
 
 ;; Package management
 (require 'package)
@@ -69,7 +71,7 @@
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
 
 (package-initialize)
 
@@ -85,16 +87,25 @@
   :ensure t
   :config
   (ivy-mode 1)
+  (setq ivy-height 20)
   (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
+  (define-key ivy-minibuffer-map (kbd "C-.")
+  (lambda () (interactive) (insert (format "%s" (with-ivy-window (thing-at-point 'symbol))))))
+  (define-key ivy-minibuffer-map (kbd "M-.")
+  (lambda () (interactive) (insert (format "%s" (with-ivy-window (thing-at-point 'word))))))
+  (add-hook 'minibuffer-setup-hook
+            (lambda ()
+              (setq show-trailing-whitespace nil)))
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t))
 
 (use-package counsel
-  :ensure t
-  :config
-  (counsel-projectile-on))
+  :ensure t)
+
+(use-package counsel-projectile
+  :ensure t)
 
 (use-package ivy-rich
   :ensure t
@@ -103,6 +114,12 @@
         ivy-rich-switch-buffer-align-virtual-buffer t)
   (setq ivy-rich-abbreviate-paths t)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
+
+(use-package org-download
+  :ensure t
+  :config
+  (setq org-download-method 'attach))
+
 
 (use-package git-gutter-fringe
   :ensure t
@@ -113,6 +130,12 @@
   (set-face-background 'git-gutter-fr:modified "#e2e2e2")
   (require 'git-gutter)
   (require 'git-gutter-fringe))
+
+(use-package leuven-theme
+   :ensure t
+   :init
+   (setq leuven-scale-outline-headlines nil)
+   (setq leuven-scale-org-agenda-structure nil))
 
 (use-package smart-mode-line
   :init
@@ -139,6 +162,7 @@
       "b" 'ivy-switch-buffer
       "pp" 'projectile-switch-project
       "pf" 'projectile-find-file
+      "m" 'magit-file-popup
       "d" 'deft
       "gg" 'magit-status
       "ga" 'magit-stage-file
@@ -160,11 +184,15 @@
   (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
   (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
   (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+  (define-key evil-normal-state-map (kbd "Q") 'fill-paragraph)
   (define-key evil-motion-state-map ";" 'evil-ex)
   (global-set-key (kbd "M-s") 'evil-write)
   (global-set-key (kbd "M-f") 'evil-search-forward)
   (setq evil-mode-line-format '(before . mode-line-front-space))
   (setq evil-want-C-u-scroll t)
+  (setq evil-normal-state-tag " N ")
+  (setq evil-insert-state-tag " I ")
+  (setq evil-visual-state-tag " V ")
 
   (use-package evil-magit
     :ensure t)
@@ -177,17 +205,6 @@
 
   (use-package evil-visual-mark-mode
     :ensure t)))
-
-;; Neotree
-(use-package neotree
-  :ensure t
-  :config
-  (define-key evil-normal-state-map "\C-n" 'neotree-toggle)
-  (define-key evil-normal-state-map "\C-n" 'neotree-toggle)
-  (define-key evil-normal-state-map "\C-n" 'neotree-toggle)
-  (define-key neotree-mode-map [return] 'neotree-enter)
-  (define-key neotree-mode-map (kbd "\C-g") 'neotree-refresh)
-  (define-key neotree-mode-map (kbd "C-<return>") 'neo-node-do-change-root))
 
 ;; org-mode
 (use-package org
@@ -206,12 +223,16 @@
   (define-key global-map (kbd "C-c t l") 'org-todo-list)
   (setq org-log-done 'time)
   (setq org-adapt-indentation nil)
-
+  (setq org-startup-indented 'true)
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 2)))
   (setq org-capture-templates
-        '(("a" "My TODO task format." entry
+        '(("a" "New TODO:" entry
            (file "todo.org")
-           "* TODO %?
-SCHEDULED: %t")))
+           "* TODO%?
+SCHEDULED: %t
+:PROPERTIES:
+:CREATED: %U\n
+:END:")))
 
   (defun org-task-capture ()
     (interactive)
@@ -224,18 +245,18 @@ SCHEDULED: %t")))
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((shell . t)
+   (http . t)
+   (ipython . t)
+   (ruby . t)))
+
 (use-package ob-http
   :ensure t)
 
 (use-package ob-ipython
   :ensure t)
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((sh . t)
-   (http . t)
-   (ipython . t)
-   (ruby . t)))
 
 (eval-after-load 'org-agenda
  '(progn
@@ -327,6 +348,17 @@ SCHEDULED: %t")))
       "[" 'org-agenda-manipulate-query-add
       "g\\" 'org-agenda-filter-by-tag-refine
       "]" 'org-agenda-manipulate-query-subtract)))
+
+;; mmm-mode
+(use-package mmm-mode
+  :ensure t)
+
+;; mmm-jinja2
+(use-package mmm-jinja2
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.j2\\'" . ansible))
+  (mmm-add-mode-ext-class 'jinja2-mode "\\.j2\\'" 'jinja2))
 
 ;; MultiTerm
 (use-package multi-term
@@ -427,7 +459,7 @@ SCHEDULED: %t")))
   :ensure t
   :config
   (global-set-key [f3] 'deft)
-  (setq deft-extensions '("txt" "tex" "org"))
+  (setq deft-extensions '("org" "txt"))
   (setq deft-directory "~/Dropbox/org")
   (defun deft-enter-insert-mode ()
     ;; delay seems necessary
@@ -444,7 +476,7 @@ SCHEDULED: %t")))
   :config
   (which-key-mode))
 
-(use-package pyenv-mode
+(use-package pyenv-mode-auto
   :ensure t
   :config
   (pyenv-mode))
@@ -493,6 +525,11 @@ SCHEDULED: %t")))
 
 (use-package toml-mode
   :ensure t)
+
+(use-package ansible
+  :ensure t
+  :config
+  (add-hook 'yaml-mode-hook '(lambda () (ansible 1))))
 
 ;; Fantastical
 (defun applescript-quote-string (argument)
@@ -562,6 +599,11 @@ and subsequent lines as the event note."
 ;; use Marked.app to preview Markdown
 (setq markdown-open-command "~/bin/mark")
 
+;; Open mail messages
+(org-add-link-type "message" 'org-email-open)
+  (defun org-email-open (record-location)
+    (shell-command (concat "open \"message:" record-location "\"")))
+
 ;; Hide some menu junk
 (define-key global-map [menu-bar tools gnus] nil)
 (define-key global-map [menu-bar tools rmail] nil)
@@ -586,7 +628,7 @@ and subsequent lines as the event note."
   (dim-minor-name 'projectile-mode "")
   (dim-minor-name 'git-gutter-mode "")
   (dim-minor-name 'ivy-mode "")
-  (dim-minor-name 'org-indent-mode "")
+  (dim-minor-name 'evil-escape-mode "")
   (dim-minor-name 'auto-revert-mode ""))
 
 ; Always wrap text in compilation windows
@@ -608,30 +650,24 @@ and subsequent lines as the event note."
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
-    ("41c926d688a69c7d3c7d2eeb54b2ea3c32c49c058004483f646c1d7d1f7bf6ac" "bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
+    ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "4bfced46dcfc40c45b076a1758ca106a947b1b6a6ff79a3281f3accacfb3243c" "5e402ccb94e32d7d09e300fb07a62dc0094bb2f16cd2ab8847b94b01b9d5e866" "9a155066ec746201156bb39f7518c1828a73d67742e11271e4f24b7b178c4710" "b8c5adfc0230bd8e8d73450c2cd4044ad7ba1d24458e37b6dec65607fc392980" "41c926d688a69c7d3c7d2eeb54b2ea3c32c49c058004483f646c1d7d1f7bf6ac" "bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
  '(evil-escape-mode t)
+ '(fci-rule-color "#222222")
  '(hl-sexp-background-color "#efebe9")
  '(ivy-mode t)
  '(nyan-mode nil)
  '(package-selected-packages
    (quote
-    (counsel-projectile neotree ivy-rich counsel ivy zerodark-theme all-the-icons-dired all-the-icons ag ob-http smart-mode-line github-modern-theme smart-mode-line-powerline-theme go-projectile json-mode evil-surround powerline yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter powerline-evil telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
- '(powerline-buffer-size-suffix nil)
- '(powerline-display-buffer-size nil)
- '(powerline-gui-use-vcs-glyph nil))
+    (color-theme-sanityinc-tomorrow smart-mode-line pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+ '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
+ '(pyenv-mode t)
+ '(tramp-syntax (quote default) nil (tramp))
+ '(vc-annotate-background "#222222"))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-document-title ((t (:foreground "black" :weight bold :height 1.2 :family "Triplicate T4c")))))
+ '(org-document-title ((t (:weight bold :height 1.2 :family "Triplicate T4c")))))
 
-(use-package leuven-theme
-   :ensure t
-   :init
-   (setq leuven-scale-outline-headlines nil)
-   (setq leuven-scale-org-agenda-structure nil))
-   :config
-   (load-theme 'leuven t)
-
-(load-theme 'whiteboard)
