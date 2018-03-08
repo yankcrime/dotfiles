@@ -86,6 +86,12 @@ zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
 setopt print_exit_value
 PS1='%n@%m:%25<..<%~%(!.#.>) '
 
+case $TERM in
+    xterm*|screen*)
+        precmd () {print -Pn "\e]0;%n@%m:%~\a"}
+        ;;
+esac
+
 # make it work like vim
 # thanks dougblack - http://dougblack.io/words/zsh-vi-mode.html
 #
