@@ -2,7 +2,7 @@
 " nick@dischord.org
 
 " {{{ Plugins
-call plug#begin('~/.vim/plugged')
+silent! call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-unimpaired'
@@ -16,6 +16,7 @@ Plug 'godlygeek/tabular'
 Plug 'cespare/vim-sbd'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
+Plug 'pearofducks/ansible-vim', { 'branch': 'v2', 'for': ['yaml.ansible'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
 Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
 Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby', 'ansible'] }
@@ -24,11 +25,14 @@ Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'wvffle/vimterm'
+Plug 'jszakmeister/vim-togglecursor'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'chriskempson/base16-vim'
 Plug 'romainl/vim-sweet16'
 Plug 'yankcrime/vim-colors-off'
 Plug 'sjl/badwolf'
+Plug 'robertmeta/nofrils'
+Plug 'itchyny/lightline.vim'
 
 call plug#end()
 
@@ -100,13 +104,15 @@ cmap w!! w !sudo tee % >/dev/null
 
 " appearance
 set t_Co=256
-set termguicolors
-set background=light
-colorscheme off
+" set termguicolors
+colorscheme goodwolf
 hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
-" hi Statusline term=reverse cterm=reverse gui=reverse
+hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
+hi StatuslineTerm cterm=bold ctermbg=237 ctermfg=231 gui=bold
+hi StatuslineTermNC term=reverse ctermfg=243 ctermbg=236 guifg=#767676 guibg=#303030
 hi clear SignColumn
 set laststatus=2
+set statusline=\ %t\ %m%r%h%w%=\ %{&ft}\ %{&ff}\ %{&fenc}\ %l,%v\ -\ %L\ |
 
 " insert a datestamp at the top of a file
 nnoremap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
@@ -133,6 +139,9 @@ nnoremap <BS>       :buffer#<CR>
 nnoremap <Space><Space> :'{,'}s/\<<C-r>=expand("<cword>")<CR>\>/
 nnoremap <Space>%       :%s/\<<C-r>=expand("<cword>")<CR>\>/
 
+" terminal stuff
+tnoremap <leader><Esc> <C-W>N
+
 " do some sensible things with listings
 cnoremap <expr> <CR> <SID>CCR()
 function! s:CCR()
@@ -153,6 +162,73 @@ function! s:CCR()
 endfunction
 
 " }}} End basic settings
+" {{{ Lightline
+" Lightline
+let g:lightline = {
+\ 'colorscheme': 'wombat',
+\ 'active': {
+\   'left': [['mode', 'paste'], ['filename', 'modified'], ['filetype']],
+\   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok'], ['gitbranch']]
+\ },
+\ 'component_function': {
+\   'gitbranch': 'fugitive#head'
+\ },
+\ 'component_expand': {
+\   'linter_warnings': 'LightlineLinterWarnings',
+\   'linter_errors': 'LightlineLinterErrors',
+\   'linter_ok': 'LightlineLinterOK'
+\ },
+\ 'component_type': {
+\   'readonly': 'error',
+\   'linter_warnings': 'warning',
+\   'linter_errors': 'error'
+\ },
+\ 'mode_map': {
+\ 'n': 'N',
+\ 'i': 'I',
+\ 'r': 'R',
+\ 'V': 'V',
+\ 'v': 'V-L',
+\ "\<C-v>": 'V-B',
+\ "c": 'C',
+\ "s": 'S',
+\ "S": 'S-L',
+\ "\<C-s>": 'S-B',
+\ "t": 'T',
+\ }
+\ }
+
+function! LightlineLinterWarnings() abort
+  let l:counts = ale#statusline#Count(bufnr(''))
+  let l:all_errors = l:counts.error + l:counts.style_error
+  let l:all_non_errors = l:counts.total - l:all_errors
+  return l:counts.total == 0 ? '' : printf('%d ◆', all_non_errors)
+endfunction
+
+function! LightlineLinterErrors() abort
+  let l:counts = ale#statusline#Count(bufnr(''))
+  let l:all_errors = l:counts.error + l:counts.style_error
+  let l:all_non_errors = l:counts.total - l:all_errors
+  return l:counts.total == 0 ? '' : printf('%d ✗', all_errors)
+endfunction
+
+function! LightlineLinterOK() abort
+  let l:counts = ale#statusline#Count(bufnr(''))
+  let l:all_errors = l:counts.error + l:counts.style_error
+  let l:all_non_errors = l:counts.total - l:all_errors
+  return l:counts.total == 0 ? '✓ ' : ''
+endfunction
+
+autocmd User ALELint call s:MaybeUpdateLightline()
+
+" Update and show lightline but only if it's visible (e.g., not in Goyo)
+function! s:MaybeUpdateLightline()
+  if exists('#lightline')
+    call lightline#update()
+  end
+endfunction
+let g:lightline.subseparator = { 'left': '', 'right': '' }
+" }}}
 " {{{ Folding
 augroup ft_vim
     au!
@@ -196,9 +272,15 @@ if has('nvim')
 end
 " }}}
 " {{{ FZF
-nnoremap <silent> <expr> <C-f> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
+" Hide statusline
+autocmd! FileType fzf
+autocmd  FileType fzf set laststatus=0 noshowmode noruler
+  \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+
+nnoremap <silent> <C-f> :Files <CR>
 nnoremap <silent> <C-b> :Buffers <CR>
 nnoremap <silent> <C-t> :call fzf#vim#tags(expand('<cword>'))<cr>
+
 let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-x': 'split',
@@ -214,19 +296,14 @@ let g:fzf_tags_command = 'ctags -R'
 " Workaround for https://github.com/junegunn/fzf/issues/809
 let $FZF_DEFAULT_OPTS .= ' --no-height'
 
-function! s:fzf_statusline()
-  " Override statusline as you like
-  highlight fzf1 ctermfg=161 ctermbg=251
-  highlight fzf2 ctermfg=23 ctermbg=251
-  highlight fzf3 ctermfg=237 ctermbg=251
-  setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
-endfunction
-
 " Default fzf layout
 " - down / up / left / right
 let g:fzf_layout = { 'down': '~40%' }
 
 autocmd! User FzfStatusLine call <SID>fzf_statusline()
+
+command! -bang -nargs=? -complete=dir Files
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 
 " }}}
 " {{{ Golang
@@ -240,6 +317,11 @@ au FileType go nnoremap <Leader>gv <Plug>(go-doc-vertical)
 au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
 let g:go_term_enabled = 1
 let g:go_term_mode = "split"
+" }}}
+" {{{ Ansible
+" Fix annoying and often wrong reindentation
+set indentkeys-=<:>
+let g:ansible_yamlKeyName = 'yamlKey'
 " }}}
 " {{{ SBD (Smart Buffer Delete)
 nnoremap <silent> <C-x> :Sbd<CR>
@@ -284,12 +366,14 @@ tnoremap <F7> <C-\><C-n>:call vimterm#toggle() <CR>
 " }}}
 " {{{ GUI overrides
 if has('gui_running')
-    set linespace=1
+    set linespace=2
     set fuoptions=maxvert,maxhorz
-    let macvim_skip_colorscheme=1
     set background=light
     set guifont=Triplicate\ T4c:h14
     colorscheme off
+    hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
+    hi StatuslineTerm cterm=bold ctermbg=237 ctermfg=231 gui=bold
+    hi StatuslineTermNC term=reverse ctermfg=243 ctermbg=236 guifg=#767676 guibg=#303030
     set guioptions=e " don't use gui tab apperance
     set guioptions=T " hide toolbar
     set guioptions=r " don't show scrollbars
@@ -309,14 +393,14 @@ let g:look_up = {
     \ '^S' : 'S', 't'  : 'T',
 \}
 
-set statusline=
-set statusline+=%(\ %{g:look_up[mode()]}%)
-set statusline+=%(%{&paste?'\ p\ ':''}%)
-set statusline+=%(\ ⎇\ \ %{fugitive#head()}%)
-set statusline+=%(\ %<%F%)
-set statusline+=\ %h%m%r%w
-set statusline+=%=
-set statusline+=%(%<\ %p%%\ ☰\ \ %l/%L:%c\ %)
+" set statusline=
+" set statusline+=%(\ %{g:look_up[mode()]}%)
+" set statusline+=%(%{&paste?'\ p\ ':''}%)
+" set statusline+=%(\ ⎇\ \ %{fugitive#head()}%)
+" set statusline+=%(\ %<%F%)
+" set statusline+=\ %h%m%r%w
+" set statusline+=%=
+" set statusline+=%(%<\☰\ \ %l/%L:%c\ %)
 
 " }}}
 
