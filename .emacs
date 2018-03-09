@@ -1,3 +1,8 @@
+;; Startup speed tweaks / cheats
+;; https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
+(setq gc-cons-threshold 402653184
+      gc-cons-percentage 0.6)
+
 ;;========================================
 ;; start the emacsserver that listens to emacsclient
 (server-start)
@@ -131,22 +136,28 @@
   (require 'git-gutter)
   (require 'git-gutter-fringe))
 
-(use-package leuven-theme
-   :ensure t
-   :init
-   (setq leuven-scale-outline-headlines nil)
-   (setq leuven-scale-org-agenda-structure nil))
-
 (use-package smart-mode-line
+  :ensure t
   :init
   (progn
     (setq sml/theme 'light
           sml/mode-width 'right
-          sml/name-width 20
+          sml/name-width 40
           sml/shorten-modes t
-          sml/shorten-directory t
           sml/no-confirm-load-theme t)
     (sml/setup)))
+
+; (use-package leuven-theme
+;    :ensure t
+;    :init
+;    (setq leuven-scale-outline-headlines nil)
+;    (setq leuven-scale-org-agenda-structure nil))
+
+
+(use-package jbeans-theme
+  :ensure t
+  :config
+  (load-theme 'jbeans))
 
 ; Evil mode and related
 (use-package evil
@@ -190,6 +201,7 @@
   (global-set-key (kbd "M-f") 'evil-search-forward)
   (setq evil-mode-line-format '(before . mode-line-front-space))
   (setq evil-want-C-u-scroll t)
+  (setq evil-symbol-word-search t)
   (setq evil-normal-state-tag " N ")
   (setq evil-insert-state-tag " I ")
   (setq evil-visual-state-tag " V ")
@@ -650,7 +662,7 @@ and subsequent lines as the event note."
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
-    ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "4bfced46dcfc40c45b076a1758ca106a947b1b6a6ff79a3281f3accacfb3243c" "5e402ccb94e32d7d09e300fb07a62dc0094bb2f16cd2ab8847b94b01b9d5e866" "9a155066ec746201156bb39f7518c1828a73d67742e11271e4f24b7b178c4710" "b8c5adfc0230bd8e8d73450c2cd4044ad7ba1d24458e37b6dec65607fc392980" "41c926d688a69c7d3c7d2eeb54b2ea3c32c49c058004483f646c1d7d1f7bf6ac" "bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
+    ("42b8102c1234a9f680722953161c1127cc59ec68ad8d5c710af60d68c3b6e6ef" "a94f1a015878c5f00afab321e4fef124b2fc3b823c8ddd89d360d710fc2bddfc" "53d1bb57dadafbdebb5fbd1a57c2d53d2b4db617f3e0e05849e78a4f78df3a1b" "b5ecb5523d1a1e119dfed036e7921b4ba00ef95ac408b51d0cd1ca74870aeb14" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "4bfced46dcfc40c45b076a1758ca106a947b1b6a6ff79a3281f3accacfb3243c" "5e402ccb94e32d7d09e300fb07a62dc0094bb2f16cd2ab8847b94b01b9d5e866" "9a155066ec746201156bb39f7518c1828a73d67742e11271e4f24b7b178c4710" "b8c5adfc0230bd8e8d73450c2cd4044ad7ba1d24458e37b6dec65607fc392980" "41c926d688a69c7d3c7d2eeb54b2ea3c32c49c058004483f646c1d7d1f7bf6ac" "bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
  '(evil-escape-mode t)
  '(fci-rule-color "#222222")
  '(hl-sexp-background-color "#efebe9")
@@ -658,7 +670,7 @@ and subsequent lines as the event note."
  '(nyan-mode nil)
  '(package-selected-packages
    (quote
-    (color-theme-sanityinc-tomorrow smart-mode-line pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (jbeans-theme smart-mode-line spacemacs-theme color-theme-sanityinc-tomorrow pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-syntax (quote default) nil (tramp))
@@ -669,5 +681,8 @@ and subsequent lines as the event note."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-document-title ((t (:weight bold :height 1.2 :family "Triplicate T4c")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T3c")))))
 
+;; Startup speed tweaks / cheats
+(setq gc-cons-threshold 16777216
+      gc-cons-percentage 0.1)
