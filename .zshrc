@@ -83,8 +83,48 @@ local knownhosts
 knownhosts=( ${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[0-9]*}%%\ *}%%,*} )
 zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
 
+# Prompt
+#
+# Salient bits pilfered from
+# https://github.com/gnachman/iterm2-website/tree/master/source/utilities
+#
 setopt print_exit_value
-PS1='%n@%m:%25<..<%~%(!.#.>) '
+setopt PROMPT_SUBST
+
+if [[ $(hostname -s) == deadline ]]; then
+    print_osc() {
+        if [[ $TERM == screen* ]] ; then
+            printf "\033Ptmux;\033\033]"
+        else
+            printf "\033]"
+        fi
+    }
+
+    print_st() {
+        if [[ $TERM == screen* ]] ; then
+            printf "\a\033\\"
+        else
+            printf "\a"
+        fi
+    }
+
+    git_status() {
+        if [ -d .git ]; then
+            print_osc
+            printf "1337;SetKeyLabel=%s=%s" "status" "🌱 $(git rev-parse --abbrev-ref HEAD)"
+            print_st
+        else
+            print_osc
+            printf "1337;SetKeyLabel=%s=%s" "status" "🙈"
+            print_st
+        fi
+    }
+    PS1='$(git_status)%n@%m:%25<..<%~%(!.#.>) '
+else
+    PS1='%n@%m:%25<..<%~%(!.#.>) '
+fi
+
+
 
 case $TERM in
     xterm*|screen*)
@@ -142,6 +182,7 @@ source "${HOME}/.zgen/zgen.zsh"
 if ! zgen saved; then
   echo "Creating a zgen save"
 
+  zgen load mafredri/zsh-async
   zgen load junegunn/fzf
   zgen load junegunn/fzf shell/completion.zsh
   zgen load junegunn/fzf shell/key-bindings.zsh
