@@ -35,10 +35,6 @@ alias tma='tmux attach-session -t'
 alias view='vim -R'
 alias se='sudoedit'
 alias topmem='ps -eo pmem,pcpu,rss,vsize,args | sort -k 1 -r | less'
-alias rip='dvdbackup -i /dev/sr0 -o . -M'
-# alias rake="noglob rake"
-alias trillian='mosh trillian.dischord.org'
-alias zarquon='mosh zarquon.dischord.org'
 alias sshx='ssh -c arcfour,blowfish-cbc -XC'
 alias pwplz='pwgen -n -y -s 12 1'
 alias keyplz='openssl rand -hex 10'
@@ -47,7 +43,6 @@ alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
 alias vim='/usr/local/bin/vim'
-alias papply='sudo puppet apply --modulepath /etc/dischord/modules --hiera_config /etc/dischord/hiera.yaml --manifestdir /etc/dischord/ /etc/dischord/default.pp'
 
 # <3 vagrant
 #
@@ -62,7 +57,7 @@ alias vhosts='vagrant hostmanager --provider=vmware_fusion'
 # git stuff
 #
 alias gitl='git log --pretty=format:"%h - %an, %ar : %s"'
-alias gits='git shortlog --numbered --summary'
+alias gits='git status'
 alias gitrs="git reset --soft 'HEAD^'"
 alias gitrsh='git reset --hard HEAD'
 alias gitsup='git submodule sync ; git submodule update --init'
@@ -91,46 +86,39 @@ zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
 setopt print_exit_value
 setopt PROMPT_SUBST
 
-if [[ $(hostname -s) == deadline ]]; then
-    print_osc() {
-        if [[ $TERM == screen* ]] ; then
-            printf "\033Ptmux;\033\033]"
-        else
-            printf "\033]"
-        fi
-    }
+PS1='%n@%m:%25<..<%~%(!.#.>) '
 
-    print_st() {
-        if [[ $TERM == screen* ]] ; then
-            printf "\a\033\\"
-        else
-            printf "\a"
-        fi
-    }
-
-    git_status() {
-        if [ -d .git ]; then
-            print_osc
-            printf "1337;SetKeyLabel=%s=%s" "status" "🌱 $(git rev-parse --abbrev-ref HEAD)"
-            print_st
-        else
-            print_osc
-            printf "1337;SetKeyLabel=%s=%s" "status" "🙈"
-            print_st
-        fi
-    }
-    PS1='$(git_status)%n@%m:%25<..<%~%(!.#.>) '
-else
-    PS1='%n@%m:%25<..<%~%(!.#.>) '
-fi
-
-
-
-case $TERM in
-    xterm*|screen*)
-        precmd () {print -Pn "\e]0;%n@%m:%~\a"}
-        ;;
-esac
+precmd() {
+    print -Pn "\e]0;%n@%m:%~\a"
+    if [[ $(hostname -s) == deadline ]]; then
+        print_osc() {
+            if [[ $TERM == tmux* ]] ; then
+                printf "\033Ptmux;\033\033]"
+            else
+                printf "\033]"
+            fi
+        }
+        print_st() {
+            if [[ $TERM == tmux* ]] ; then
+                printf "\a\033\\"
+            else
+                printf "\a"
+            fi
+        }
+        git_status() {
+            if [ -d .git ]; then
+                print_osc
+                printf "1337;SetKeyLabel=%s=%s" "status" "🌱 $(git rev-parse --abbrev-ref HEAD)"
+                print_st
+            else
+                print_osc
+                printf "1337;SetKeyLabel=%s=%s" "status" "🙈"
+                print_st
+            fi
+        }
+        PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.>) '
+    fi
+}
 
 # make it work like vim
 # thanks dougblack - http://dougblack.io/words/zsh-vi-mode.html
@@ -146,6 +134,7 @@ export KEYTIMEOUT=1
 
 # change cursor shape based on which vi mode we're in
 # via https://emily.st/2013/05/03/zsh-vi-cursor/
+#
 function zle-keymap-select zle-line-init
 {
     case $KEYMAP in
@@ -193,9 +182,10 @@ if ! zgen saved; then
 fi
 
 # Allow use of Ctrl-S in vim
+#
 stty -ixon
 
-# fzf
+# Last but definitely not least - FZF
 #
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
