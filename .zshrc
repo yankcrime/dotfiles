@@ -85,40 +85,40 @@ zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
 #
 setopt print_exit_value
 setopt PROMPT_SUBST
+# Set the window title
+#
+print -Pn "\e]0;%n@%m:%~\a"
 
-PS1='%n@%m:%25<..<%~%(!.#.>) '
-
-precmd() {
-    print -Pn "\e]0;%n@%m:%~\a"
-    if [[ $(hostname -s) == deadline ]]; then
-        print_osc() {
-            if [[ $TERM == tmux* ]] ; then
-                printf "\033Ptmux;\033\033]"
-            else
-                printf "\033]"
-            fi
-        }
-        print_st() {
-            if [[ $TERM == tmux* ]] ; then
-                printf "\a\033\\"
-            else
-                printf "\a"
-            fi
-        }
-        git_status() {
-            if [ -d .git ]; then
-                print_osc
-                printf "1337;SetKeyLabel=%s=%s" "status" "🌱 $(git rev-parse --abbrev-ref HEAD)"
-                print_st
-            else
-                print_osc
-                printf "1337;SetKeyLabel=%s=%s" "status" "🙈"
-                print_st
-            fi
-        }
-        PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.>) '
-    fi
-}
+if [[ $(hostname -s) == deadline ]]; then
+    print_osc() {
+        if [[ $TERM == tmux* ]] ; then
+            printf "\033Ptmux;\033\033]"
+        else
+            printf "\033]"
+        fi
+    }
+    print_st() {
+        if [[ $TERM == tmux* ]] ; then
+            printf "\a\033\\"
+        else
+            printf "\a"
+        fi
+    }
+    git_status() {
+        if [ -d .git ]; then
+            print_osc
+            printf "1337;SetKeyLabel=%s=%s" "status" "🌱 $(git rev-parse --abbrev-ref HEAD)"
+            print_st
+        else
+            print_osc
+            printf "1337;SetKeyLabel=%s=%s" "status" "🙈"
+            print_st
+        fi
+    }
+    PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.>) '
+else
+    PS1='%n@%m:%25<..<%~%(!.#.>) '
+fi
 
 # make it work like vim
 # thanks dougblack - http://dougblack.io/words/zsh-vi-mode.html
