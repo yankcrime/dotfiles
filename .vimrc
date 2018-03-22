@@ -11,7 +11,7 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-dispatch'
 Plug 'machakann/vim-sandwich'
-Plug 'pearofducks/ansible-vim'
+Plug 'pearofducks/ansible-vim', { 'for': ['yaml', 'ansible'] }
 Plug 'godlygeek/tabular'
 Plug 'cespare/vim-sbd'
 Plug 'christoomey/vim-tmux-navigator'
@@ -24,15 +24,11 @@ Plug 'rking/ag.vim'
 Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'wvffle/vimterm'
 Plug 'jszakmeister/vim-togglecursor'
-Plug 'skywind3000/asyncrun.vim'
 Plug 'chriskempson/base16-vim'
-Plug 'romainl/vim-sweet16'
 Plug 'yankcrime/vim-colors-off'
 Plug 'sjl/badwolf'
 Plug 'robertmeta/nofrils'
-Plug 'itchyny/lightline.vim'
 
 call plug#end()
 
@@ -47,9 +43,7 @@ set breakindent " indent wrapped lines, by...
 set breakindentopt=shift:4,sbr " indenting them another level and showing 'showbreak' char
 set showbreak=↪
 set number
-set noshowmode
 
-set pastetoggle=<F2> " Quickly enable paste mode
 set hidden " Don't moan about changes when switching buffers
 set matchpairs=(:),{:},[:],<:> " Add <> to % matching
 
@@ -58,7 +52,7 @@ set completefunc=emoji#complete
 
 set modelines=5 " Enable modelines
 
-" set cursorline
+set cursorline
 
 set cpo=aABceFs$
 
@@ -104,11 +98,15 @@ cmap w!! w !sudo tee % >/dev/null
 
 " appearance
 set t_Co=256
-" set termguicolors
-colorscheme goodwolf
+set termguicolors
+colorscheme nofrils-light
 hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
 hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
-hi StatuslineTerm cterm=bold ctermbg=237 ctermfg=231 gui=bold
+" hi Tabline cterm=bold ctermbg=237 ctermfg=231 gui=bold
+" hi TablineSel cterm=bold ctermbg=250 ctermfg=232 gui=bold
+" hi TablineFill cterm=bold ctermbg=237 ctermfg=231 gui=bold
+hi Terminal ctermbg=none ctermfg=none
+hi StatuslineTerm ctermbg=237 ctermfg=231 gui=bold
 hi StatuslineTermNC term=reverse ctermfg=243 ctermbg=236 guifg=#767676 guibg=#303030
 hi clear SignColumn
 set laststatus=2
@@ -148,7 +146,7 @@ function! s:CCR()
 	command! -bar Z silent set more|delcommand Z
 	if getcmdtype() == ":"
 		let cmdline = getcmdline()
-		    if cmdline =~ '\v\C^(dli|il)' | return "\<CR>:" . cmdline[0] . "jump   " . split(cmdline, " ")[1] . "\<S-Left>\<Left>\<Left>"
+	    if cmdline =~ '\v\C^(dli|il)' | return "\<CR>:" . cmdline[0] . "jump   " . split(cmdline, " ")[1] . "\<S-Left>\<Left>\<Left>"
 		elseif cmdline =~ '\v\C^(cli|lli)' | return "\<CR>:silent " . repeat(cmdline[0], 2) . "\<Space>"
 		elseif cmdline =~ '\C^changes' | set nomore | return "\<CR>:Z|norm! g;\<S-Left>"
 		elseif cmdline =~ '\C^ju' | set nomore | return "\<CR>:Z|norm! \<C-o>\<S-Left>"
@@ -162,72 +160,35 @@ function! s:CCR()
 endfunction
 
 " }}} End basic settings
-" {{{ Lightline
-" Lightline
-let g:lightline = {
-\ 'colorscheme': 'wombat',
-\ 'active': {
-\   'left': [['mode', 'paste'], ['filename', 'modified'], ['filetype']],
-\   'right': [['lineinfo'], ['percent'], ['readonly', 'linter_warnings', 'linter_errors', 'linter_ok'], ['gitbranch']]
-\ },
-\ 'component_function': {
-\   'gitbranch': 'fugitive#head'
-\ },
-\ 'component_expand': {
-\   'linter_warnings': 'LightlineLinterWarnings',
-\   'linter_errors': 'LightlineLinterErrors',
-\   'linter_ok': 'LightlineLinterOK'
-\ },
-\ 'component_type': {
-\   'readonly': 'error',
-\   'linter_warnings': 'warning',
-\   'linter_errors': 'error'
-\ },
-\ 'mode_map': {
-\ 'n': 'N',
-\ 'i': 'I',
-\ 'r': 'R',
-\ 'V': 'V',
-\ 'v': 'V-L',
-\ "\<C-v>": 'V-B',
-\ "c": 'C',
-\ "s": 'S',
-\ "S": 'S-L',
-\ "\<C-s>": 'S-B',
-\ "t": 'T',
-\ }
-\ }
+" {{{ Statusline
+function! LinterStatus() abort
+    let l:counts = ale#statusline#Count(bufnr(''))
 
-function! LightlineLinterWarnings() abort
-  let l:counts = ale#statusline#Count(bufnr(''))
-  let l:all_errors = l:counts.error + l:counts.style_error
-  let l:all_non_errors = l:counts.total - l:all_errors
-  return l:counts.total == 0 ? '' : printf('%d ◆', all_non_errors)
+    let l:all_errors = l:counts.error + l:counts.style_error
+    let l:all_non_errors = l:counts.total - l:all_errors
+
+    return l:counts.total == 0 ? 'OK' : printf(
+    \   '%dW %dE',
+    \   all_non_errors,
+    \   all_errors
+    \)
 endfunction
 
-function! LightlineLinterErrors() abort
-  let l:counts = ale#statusline#Count(bufnr(''))
-  let l:all_errors = l:counts.error + l:counts.style_error
-  let l:all_non_errors = l:counts.total - l:all_errors
-  return l:counts.total == 0 ? '' : printf('%d ✗', all_errors)
-endfunction
+function! s:statusline_expr()
+  let ale = "%{LinterStatus()}"
+  let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
+  let ro  = "%{&readonly ? '[RO] ' : ''}"
+  let ft  = "%{len(&filetype) ? '['.&filetype.'] ' : ''}"
+  let fug = "%{exists('g:loaded_fugitive') ? fugitive#statusline() : ''}"
+  let sep = ' %= '
+  let pos = ' %-12(%l : %c%V%) '
+  let pct = ' %P '
 
-function! LightlineLinterOK() abort
-  let l:counts = ale#statusline#Count(bufnr(''))
-  let l:all_errors = l:counts.error + l:counts.style_error
-  let l:all_non_errors = l:counts.total - l:all_errors
-  return l:counts.total == 0 ? '✓ ' : ''
+  return ' [%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
+"  return '[%n] %< %.50F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
 endfunction
-
-autocmd User ALELint call s:MaybeUpdateLightline()
-
-" Update and show lightline but only if it's visible (e.g., not in Goyo)
-function! s:MaybeUpdateLightline()
-  if exists('#lightline')
-    call lightline#update()
-  end
-endfunction
-let g:lightline.subseparator = { 'left': '', 'right': '' }
+let &statusline = s:statusline_expr()
+ 
 " }}}
 " {{{ Folding
 augroup ft_vim
@@ -360,18 +321,12 @@ hi ALEErrorSign ctermfg=red ctermbg=none
 let g:ale_sign_error='●'
 hi ALEWarningSign ctermfg=yellow ctermbg=none
 " }}}
-" {{{ vimterm
-nnoremap <F7> :call vimterm#toggle() <CR>
-tnoremap <F7> <C-\><C-n>:call vimterm#toggle() <CR>
-" }}}
 " {{{ GUI overrides
 if has('gui_running')
     set linespace=2
     set fuoptions=maxvert,maxhorz
     set background=light
     set guifont=Triplicate\ T4c:h14
-    colorscheme off
-    hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
     hi StatuslineTerm cterm=bold ctermbg=237 ctermfg=231 gui=bold
     hi StatuslineTermNC term=reverse ctermfg=243 ctermbg=236 guifg=#767676 guibg=#303030
     set guioptions=e " don't use gui tab apperance
@@ -382,26 +337,6 @@ if has('gui_running')
     set guioptions-=L " don't show scrollbars
     set gtl=%t gtt=%F " tab headings
 end
-" }}}
-" {{{ Statusline
-let g:look_up = {
-    \ '__' : '-', 'n'  : 'N',
-    \ 'i'  : 'I', 'R'  : 'R',
-    \ 'v'  : 'V', 'V'  : 'V',
-    \ 'c'  : 'C', '' : 'V',
-    \ 's'  : 'S', '' : 'S',
-    \ '^S' : 'S', 't'  : 'T',
-\}
-
-" set statusline=
-" set statusline+=%(\ %{g:look_up[mode()]}%)
-" set statusline+=%(%{&paste?'\ p\ ':''}%)
-" set statusline+=%(\ ⎇\ \ %{fugitive#head()}%)
-" set statusline+=%(\ %<%F%)
-" set statusline+=\ %h%m%r%w
-" set statusline+=%=
-" set statusline+=%(%<\☰\ \ %l/%L:%c\ %)
-
 " }}}
 
 " vim:ts=4:sw=4:ft=vimrc:et
