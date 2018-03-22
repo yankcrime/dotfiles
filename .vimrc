@@ -42,17 +42,13 @@ set noswapfile
 set breakindent " indent wrapped lines, by...
 set breakindentopt=shift:4,sbr " indenting them another level and showing 'showbreak' char
 set showbreak=↪
+
 set number
 
 set hidden " Don't moan about changes when switching buffers
 set matchpairs=(:),{:},[:],<:> " Add <> to % matching
 
-" Emoji completion with CTRL-X CTRL-U
-set completefunc=emoji#complete
-
-set modelines=5 " Enable modelines
-
-set cursorline
+set modelines=5
 
 set cpo=aABceFs$
 
@@ -75,28 +71,23 @@ set wildmenu
 filetype plugin on
 set ai
 
+" formatting shortcuts
 vmap Q gq
 nnoremap Q gqap
 
-" Clear search
+" clear search
 nnoremap <silent> ,/ :noh<cr>
 
 au BufEnter *.sh if getline(1) == "" | :call setline(1, "#!/usr/bin/env bash") | endif
 au BufEnter *.py if getline(1) == "" | :call setline(1, "#!/usr/bin/env python") | endif
 au BufEnter *.rb if getline(1) == "" | :call setline(1, "#!/usr/bin/env ruby") | endif
 
-autocmd BufRead ~/.mutt/tmp/*      :source ~/.mutt/mail.vim
-
 set tags=./tags; " Tell vim to look upwards in the directory hierarchy for a tags file until it finds one
-
-" Make vim deal with scoped identifiers instead of just hitting top-level
-" modules when using ctags with Puppet code
-set iskeyword=-,:,@,48-57,_,192-255
-au FileType puppet setlocal isk+=:
 
 cmap w!! w !sudo tee % >/dev/null
 
 " appearance
+set cursorline
 set t_Co=256
 set termguicolors
 colorscheme nofrils-light
@@ -110,7 +101,6 @@ hi StatuslineTerm ctermbg=237 ctermfg=231 gui=bold
 hi StatuslineTermNC term=reverse ctermfg=243 ctermbg=236 guifg=#767676 guibg=#303030
 hi clear SignColumn
 set laststatus=2
-set statusline=\ %t\ %m%r%h%w%=\ %{&ft}\ %{&ff}\ %{&fenc}\ %l,%v\ -\ %L\ |
 
 " insert a datestamp at the top of a file
 nnoremap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
@@ -159,33 +149,23 @@ function! s:CCR()
 	else | return "\<CR>" | endif
 endfunction
 
-" }}} End basic settings
+" Make vim deal with scoped identifiers instead of just hitting top-level
+" modules when using ctags with Puppet code
+set iskeyword=-,:,@,48-57,_,192-255
+au FileType puppet setlocal isk+=:
+
+" }}} End general settings
 " {{{ Statusline
-function! LinterStatus() abort
-    let l:counts = ale#statusline#Count(bufnr(''))
-
-    let l:all_errors = l:counts.error + l:counts.style_error
-    let l:all_non_errors = l:counts.total - l:all_errors
-
-    return l:counts.total == 0 ? 'OK' : printf(
-    \   '%dW %dE',
-    \   all_non_errors,
-    \   all_errors
-    \)
-endfunction
-
 function! s:statusline_expr()
-  let ale = "%{LinterStatus()}"
   let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
   let ro  = "%{&readonly ? '[RO] ' : ''}"
   let ft  = "%{len(&filetype) ? '['.&filetype.'] ' : ''}"
   let fug = "%{exists('g:loaded_fugitive') ? fugitive#statusline() : ''}"
   let sep = ' %= '
-  let pos = ' %-12(%l : %c%V%) '
+  let pos = ' %-5(%l:%c%V%) '
   let pct = ' %P '
 
-  return ' [%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
-"  return '[%n] %< %.50F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
+  return ' [%n] %.40F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
 endfunction
 let &statusline = s:statusline_expr()
  
@@ -214,23 +194,6 @@ augroup ft_muttrc
     au BufRead,BufNewFile *.muttrc set ft=muttrc
     au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
 augroup END
-" }}}
-" {{{ Neovim
-if has('nvim')
-    nnoremap <BS> <C-w>h
-"    tnoremap <C-h> <C-\><C-N><C-w>h
-"    tnoremap <C-j> <C-\><C-N><C-w>j
-"    tnoremap <C-k> <C-\><C-N><C-w>k
-"    tnoremap <C-l> <C-\><C-N><C-w>l
-    tnoremap <leader><esc> <C-\><C-n>
-    au TermOpen * setlocal nonumber norelativenumber
-    let g:terminal_scrollback_buffer_size = 10000
-    let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
-    set inccommand=nosplit
-    command! -nargs=* T split | terminal <args>
-    command! -nargs=* VT vsplit | terminal <args>
-    nnoremap <leader>t :T<cr>
-end
 " }}}
 " {{{ FZF
 " Hide statusline
@@ -307,10 +270,6 @@ nnoremap <C-s> :call AGSearch()<cr>
 au FileType puppet nnoremap <c-]> :exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>
 au FileType puppet nnoremap <c-w><c-]> :tab split<CR>:exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>
 " }}}
-" {{{ Asyncrun
-nnoremap <leader>ar :AsyncRun 
-noremap <leader>arqf :call asyncrun#quickfix_toggle(8)<cr>
-" }}}
 " {{{ ALE
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_enter = 0
@@ -321,13 +280,29 @@ hi ALEErrorSign ctermfg=red ctermbg=none
 let g:ale_sign_error='●'
 hi ALEWarningSign ctermfg=yellow ctermbg=none
 " }}}
+" {{{ Neovim
+if has('nvim')
+    nnoremap <BS> <C-w>h
+"    tnoremap <C-h> <C-\><C-N><C-w>h
+"    tnoremap <C-j> <C-\><C-N><C-w>j
+"    tnoremap <C-k> <C-\><C-N><C-w>k
+"    tnoremap <C-l> <C-\><C-N><C-w>l
+    tnoremap <leader><esc> <C-\><C-n>
+    au TermOpen * setlocal nonumber norelativenumber
+    let g:terminal_scrollback_buffer_size = 10000
+    let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+    set inccommand=nosplit
+    command! -nargs=* T split | terminal <args>
+    command! -nargs=* VT vsplit | terminal <args>
+    nnoremap <leader>t :T<cr>
+end
+" }}}
 " {{{ GUI overrides
 if has('gui_running')
     set linespace=2
     set fuoptions=maxvert,maxhorz
     set background=light
     set guifont=Triplicate\ T4c:h14
-    hi StatuslineTerm cterm=bold ctermbg=237 ctermfg=231 gui=bold
     hi StatuslineTermNC term=reverse ctermfg=243 ctermbg=236 guifg=#767676 guibg=#303030
     set guioptions=e " don't use gui tab apperance
     set guioptions=T " hide toolbar
