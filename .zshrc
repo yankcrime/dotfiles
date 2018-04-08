@@ -78,16 +78,17 @@ local knownhosts
 knownhosts=( ${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[0-9]*}%%\ *}%%,*} )
 zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
 
-# Prompt
+# prompt
 #
-# Salient bits pilfered from
+# salient bits pilfered from
 # https://github.com/gnachman/iterm2-website/tree/master/source/utilities
 #
 setopt print_exit_value
 setopt PROMPT_SUBST
-# Set the window title
+
+# set the window title
 #
-print -Pn "\e]0;%n@%m:%~\a"
+precmd() { print -Pn "\e]0;%n@%m:%~\a" }
 
 if [[ $(hostname -s) == deadline ]]; then
     print_osc() {
@@ -116,7 +117,7 @@ if [[ $(hostname -s) == deadline ]]; then
         fi
     }
     PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.>) '
-else
+ else
     PS1='%n@%m:%25<..<%~%(!.#.>) '
 fi
 
