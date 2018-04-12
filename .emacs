@@ -60,7 +60,7 @@
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
 (global-set-key (kbd "M-w") 'kill-this-buffer)
 (global-set-key (kbd "M-s") 'evil-write)
-(global-set-key (kbd "M-v") 'evil-visual-paste)
+;; (global-set-key (kbd "M-v") 'evil-visual-paste)
 (global-set-key (kbd "M-f") 'evil-search-forward)
 (global-set-key (kbd "M-F") 'query-replace)
 (global-set-key (kbd "M-\=") 'text-scale-increase)
@@ -136,6 +136,32 @@
   (require 'git-gutter)
   (require 'git-gutter-fringe))
 
+(use-package leuven-theme
+    :ensure t
+    :init
+    (setq leuven-scale-outline-headlines nil)
+    (setq leuven-scale-org-agenda-structure nil))
+
+(load-theme 'whiteboard)
+
+(use-package solaire-mode
+  :ensure t
+  :config
+  (require 'solaire-mode)
+  (add-hook 'after-change-major-mode-hook #'turn-on-solaire-mode)
+  (add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
+  (solaire-mode-swap-bg))
+
+;(use-package doom-themes
+;  :ensure t
+;  :init
+;  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;      doom-themes-enable-italic t)
+;  :config
+;  (doom-themes-visual-bell-config)
+;  (doom-themes-org-config)
+;  (load-theme 'doom-one t))
+
 (use-package smart-mode-line
   :ensure t
   :init
@@ -146,18 +172,6 @@
           sml/shorten-modes t
           sml/no-confirm-load-theme t)
     (sml/setup)))
-
-; (use-package leuven-theme
-;    :ensure t
-;    :init
-;    (setq leuven-scale-outline-headlines nil)
-;    (setq leuven-scale-org-agenda-structure nil))
-
-
-(use-package jbeans-theme
-  :ensure t
-  :config
-  (load-theme 'jbeans))
 
 ; Evil mode and related
 (use-package evil
@@ -257,18 +271,18 @@ SCHEDULED: %t
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
+(use-package ob-http
+  :ensure t)
+
+(use-package ob-ipython
+  :ensure t)
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((shell . t)
    (http . t)
    (ipython . t)
    (ruby . t)))
-
-(use-package ob-http
-  :ensure t)
-
-(use-package ob-ipython
-  :ensure t)
 
 (eval-after-load 'org-agenda
  '(progn
@@ -543,6 +557,9 @@ SCHEDULED: %t
   :config
   (add-hook 'yaml-mode-hook '(lambda () (ansible 1))))
 
+(use-package json-mode
+  :ensure t)
+
 ;; Fantastical
 (defun applescript-quote-string (argument)
   "Quote a string for passing as a string to AppleScript."
@@ -662,7 +679,7 @@ and subsequent lines as the event note."
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
-    ("42b8102c1234a9f680722953161c1127cc59ec68ad8d5c710af60d68c3b6e6ef" "a94f1a015878c5f00afab321e4fef124b2fc3b823c8ddd89d360d710fc2bddfc" "53d1bb57dadafbdebb5fbd1a57c2d53d2b4db617f3e0e05849e78a4f78df3a1b" "b5ecb5523d1a1e119dfed036e7921b4ba00ef95ac408b51d0cd1ca74870aeb14" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "4bfced46dcfc40c45b076a1758ca106a947b1b6a6ff79a3281f3accacfb3243c" "5e402ccb94e32d7d09e300fb07a62dc0094bb2f16cd2ab8847b94b01b9d5e866" "9a155066ec746201156bb39f7518c1828a73d67742e11271e4f24b7b178c4710" "b8c5adfc0230bd8e8d73450c2cd4044ad7ba1d24458e37b6dec65607fc392980" "41c926d688a69c7d3c7d2eeb54b2ea3c32c49c058004483f646c1d7d1f7bf6ac" "bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
+    ("dcb9fd142d390bb289fee1d1bb49cb67ab7422cd46baddf11f5c9b7ff756f64c" "5adc266aa04b9419a6ce88b3ec9993d03e1f96d8365b2864158204fdffb36474" "42b8102c1234a9f680722953161c1127cc59ec68ad8d5c710af60d68c3b6e6ef" "a94f1a015878c5f00afab321e4fef124b2fc3b823c8ddd89d360d710fc2bddfc" "53d1bb57dadafbdebb5fbd1a57c2d53d2b4db617f3e0e05849e78a4f78df3a1b" "b5ecb5523d1a1e119dfed036e7921b4ba00ef95ac408b51d0cd1ca74870aeb14" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "4bfced46dcfc40c45b076a1758ca106a947b1b6a6ff79a3281f3accacfb3243c" "5e402ccb94e32d7d09e300fb07a62dc0094bb2f16cd2ab8847b94b01b9d5e866" "9a155066ec746201156bb39f7518c1828a73d67742e11271e4f24b7b178c4710" "b8c5adfc0230bd8e8d73450c2cd4044ad7ba1d24458e37b6dec65607fc392980" "41c926d688a69c7d3c7d2eeb54b2ea3c32c49c058004483f646c1d7d1f7bf6ac" "bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
  '(evil-escape-mode t)
  '(fci-rule-color "#222222")
  '(hl-sexp-background-color "#efebe9")
@@ -681,7 +698,18 @@ and subsequent lines as the event note."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T3c")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
+
+(defun my/org-mode-hook ()
+  "Stop the org-level headers from increasing in height relative to the other text."
+  (dolist (face '(org-level-1
+                  org-level-2
+                  org-level-3
+                  org-level-4
+                  org-level-5))
+    (set-face-attribute face nil :height 1.0)))
+
+(add-hook 'org-mode-hook 'my/org-mode-hook)
 
 ;; Startup speed tweaks / cheats
 (setq gc-cons-threshold 16777216
