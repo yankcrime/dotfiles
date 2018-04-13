@@ -55,6 +55,7 @@
 ;; Use y / n instead of yes / no
 (fset 'yes-or-no-p 'y-or-n-p)
 
+
 ;; Global keybindings, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
@@ -68,6 +69,12 @@
 (global-set-key (kbd "M-o") 'counsel-find-file)
 (global-set-key (kbd "C-s") 'counsel-projectile-ag)
 (global-set-key (kbd "C-b") 'ivy-switch-buffer)
+(global-set-key (kbd "M-v") 'yank)
+(global-set-key (kbd "M-c") 'kill-ring-save)
+(global-set-key (kbd "M-a") 'mark-whole-buffer)
+(global-set-key [(kbd "M-w")]
+                (lambda () (interactive) (delete-window)))
+(global-set-key (kbd "M-z") 'undo)
 
 ;; Package management
 (require 'package)
@@ -250,6 +257,7 @@
   (setq org-log-done 'time)
   (setq org-adapt-indentation nil)
   (setq org-startup-indented 'true)
+  (setq org-src-tab-acts-natively t)
   (setq org-refile-targets '((org-agenda-files :maxlevel . 2)))
   (setq org-capture-templates
         '(("a" "New TODO:" entry
