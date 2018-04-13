@@ -18,9 +18,6 @@
                     :height 140
                     :width 'normal)
 
-;; Ligatures
-;; (mac-auto-operator-composition-mode)
-
 (setq initial-scratch-message "")
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -54,7 +51,6 @@
 
 ;; Use y / n instead of yes / no
 (fset 'yes-or-no-p 'y-or-n-p)
-
 
 ;; Global keybindings, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
@@ -169,16 +165,16 @@
 ;  (doom-themes-org-config)
 ;  (load-theme 'doom-one t))
 
-(use-package smart-mode-line
-  :ensure t
-  :init
-  (progn
-    (setq sml/theme 'light
-          sml/mode-width 'right
-          sml/name-width 40
-          sml/shorten-modes t
-          sml/no-confirm-load-theme t)
-    (sml/setup)))
+;(use-package smart-mode-line
+;  :ensure t
+;  :init
+;  (progn
+;    (setq sml/theme 'light
+;          sml/mode-width 'right
+;          sml/name-width 40
+;          sml/shorten-modes t
+;          sml/no-confirm-load-theme t)
+;    (sml/setup)))
 
 ; Evil mode and related
 (use-package evil
@@ -695,7 +691,7 @@ and subsequent lines as the event note."
  '(nyan-mode nil)
  '(package-selected-packages
    (quote
-    (jbeans-theme smart-mode-line spacemacs-theme color-theme-sanityinc-tomorrow pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (all-the-icons jbeans-theme smart-mode-line spacemacs-theme color-theme-sanityinc-tomorrow pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-syntax (quote default) nil (tramp))
@@ -718,6 +714,75 @@ and subsequent lines as the event note."
     (set-face-attribute face nil :height 1.0)))
 
 (add-hook 'org-mode-hook 'my/org-mode-hook)
+
+
+;; Modeline
+(use-package all-the-icons
+  :ensure t
+  :init
+  (progn (defun -custom-modeline-github-vc ()
+           (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
+             (concat
+              (propertize (format " %s" (all-the-icons-octicon "git-branch"))
+                          'face `(:height 1 :family ,(all-the-icons-octicon-family))
+                          'display '(raise 0))
+              (propertize (format " %s" branch)))))
+
+         (defun -custom-modeline-svn-vc ()
+           (let ((revision (cadr (split-string vc-mode "-"))))
+             (concat
+              (propertize (format " %s" (all-the-icons-faicon "cloud"))
+                          'face `(:height 1)
+                          'display '(raise 0))
+              (propertize (format " %s" revision) 'face `(:height 0.9)))))
+
+         (defun simple-mode-line-render (left right)
+           "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
+           (let* ((available-width (- (window-width) (length left) 0)))
+             (format (format " %%s %%%ds " available-width) left right)))
+
+         (defvar mode-line-my-vc
+           '(:propertize
+             (:eval (when vc-mode
+             (cond
+              ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
+              ((string-match "SVN-" vc-mode) (-custom-modeline-svn-vc))
+              (t (format "%s" vc-mode)))))
+             face mode-line-directory)
+           "Formats the current directory.")
+
+         ;; (setcar mode-line-position "")
+         )
+  :config
+  (progn (setq-default mode-line-format
+                       '((:eval (simple-mode-line-render
+                                 ;; left
+                                 (format-mode-line (list
+                                                    mode-line-mule-info
+                                                    " "
+                                                    mode-line-modified
+                                                    "  "
+                                                    mode-line-buffer-identification
+                                                    mode-line-my-vc))
+                                 ;; right
+                                 (format-mode-line (list
+                                                    mode-line-modes
+                                                    " "
+                                                    "ℓ %l:%c %p%%"))))))))
+
+(set-face-attribute 'mode-line nil
+                    :background "#f1f1f1"
+                    :foreground "#332233"
+                    :box '(:line-width 1 :color "#cccccc")
+                    :overline nil
+                    :underline nil)
+
+(set-face-attribute 'mode-line-inactive nil
+                    :background "#fdfdfd"
+                    :foreground "#aaaaaa"
+                    :box '(:line-width 1 :color "#cccccc")
+                    :overline nil
+                    :underline nil)
 
 ;; Startup speed tweaks / cheats
 (setq gc-cons-threshold 16777216
