@@ -165,17 +165,6 @@
 ;  (doom-themes-org-config)
 ;  (load-theme 'doom-one t))
 
-;(use-package smart-mode-line
-;  :ensure t
-;  :init
-;  (progn
-;    (setq sml/theme 'light
-;          sml/mode-width 'right
-;          sml/name-width 40
-;          sml/shorten-modes t
-;          sml/no-confirm-load-theme t)
-;    (sml/setup)))
-
 ; Evil mode and related
 (use-package evil
   :init
@@ -691,7 +680,7 @@ and subsequent lines as the event note."
  '(nyan-mode nil)
  '(package-selected-packages
    (quote
-    (all-the-icons jbeans-theme smart-mode-line spacemacs-theme color-theme-sanityinc-tomorrow pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (all-the-icons jbeans-theme spacemacs-theme color-theme-sanityinc-tomorrow pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-syntax (quote default) nil (tramp))
