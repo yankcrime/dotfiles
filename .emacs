@@ -394,13 +394,6 @@ SCHEDULED: %t
   (interactive "s")
   (rename-buffer (concat "*term* " name)))
 
-;; Nyan
-(use-package nyan-mode
-  :ensure t
-  :config
-  (setq nyan-bar-length 20)
-(setq-default nyan-wavy-trail t))
-
 ;; Magit
 (use-package magit
   :ensure t
@@ -677,10 +670,9 @@ and subsequent lines as the event note."
  '(fci-rule-color "#222222")
  '(hl-sexp-background-color "#efebe9")
  '(ivy-mode t)
- '(nyan-mode nil)
  '(package-selected-packages
    (quote
-    (all-the-icons jbeans-theme spacemacs-theme color-theme-sanityinc-tomorrow pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile nyan-mode multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (all-the-icons jbeans-theme spacemacs-theme color-theme-sanityinc-tomorrow pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-syntax (quote default) nil (tramp))
@@ -736,15 +728,14 @@ and subsequent lines as the event note."
              (cond
               ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
               ((string-match "SVN-" vc-mode) (-custom-modeline-svn-vc))
-              (t (format "%s" vc-mode)))))
-             face mode-line-directory)
+              (t (format "%s" vc-mode))))))
            "Formats the current directory.")
 
          ;; (setcar mode-line-position "")
          )
   :config
   (progn (setq-default mode-line-format
-                       '((:eval (simple-mode-line-render
+                       '(:eval (simple-mode-line-render
                                  ;; left
                                  (format-mode-line (list
                                                     mode-line-mule-info
@@ -757,10 +748,11 @@ and subsequent lines as the event note."
                                  (format-mode-line (list
                                                     mode-line-modes
                                                     " "
-                                                    "ℓ %l:%c %p%%"))))))))
+                                                    "ℓ %l:%c %p%%"))))))
+  :after(dim))
 
 (set-face-attribute 'mode-line nil
-                    :background "#f1f1f1"
+                    :background "#e9e9e9"
                     :foreground "#332233"
                     :box '(:line-width 1 :color "#cccccc")
                     :overline nil
