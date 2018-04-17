@@ -72,6 +72,9 @@
                 (lambda () (interactive) (delete-window)))
 (global-set-key (kbd "M-z") 'undo)
 
+(setq-default tab-width 4 indent-tabs-mode nil)
+(define-key global-map (kbd "RET") 'newline-and-indent)
+
 ;; Package management
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -87,9 +90,43 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+;; Modeline
+(use-package all-the-icons
+  :ensure t
+  :init
+  (progn (defun -custom-modeline-github-vc ()
+           (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
+             (concat
+              (propertize (format " %s" (all-the-icons-octicon "git-branch"))
+                          'face `(:height 2 :family ,(all-the-icons-octicon-family))
+                          'display '(raise 0))
+              (propertize (format " %s" branch)))))
 
-(setq-default tab-width 4 indent-tabs-mode nil)
-(define-key global-map (kbd "RET") 'newline-and-indent)
+         (defun simple-mode-line-render (left right)
+           "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
+           (let* ((available-width (- (window-width) (length left) 0)))
+             (format (format " %%s %%%ds " available-width) left right)))
+
+         (defvar mode-line-my-vc
+           '(:propertize
+             (:eval (when vc-mode
+             (cond
+              ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
+              (t (format "%s" vc-mode)))))))
+         )
+  :config
+  (progn (setq-default mode-line-format
+                       (list
+                        "  "
+                        mode-line-modified
+                        "  "
+                        mode-line-buffer-identification
+                        "  "
+                        ; "ℓ %l:%c %p%  "
+                        mode-line-position
+                        mode-line-my-vc
+                        "  "
+                        mode-line-modes))))
 
 (use-package ivy
   :ensure t
@@ -128,6 +165,19 @@
   :config
   (setq org-download-method 'attach))
 
+(use-package ein
+  :ensure t
+  :commands (ein:notebooklist-open))
+
+(use-package elpy
+  :ensure t
+  :disabled
+  :init
+  (with-eval-after-load 'python
+    (flycheck-mode)
+    (elpy-enable)
+    (elpy-use-ipython)
+    (delete 'elpy-module-highlight-indentation elpy-modules)))
 
 (use-package git-gutter-fringe
   :ensure t
@@ -146,24 +196,6 @@
     (setq leuven-scale-org-agenda-structure nil))
 
 (load-theme 'whiteboard)
-
-(use-package solaire-mode
-  :ensure t
-  :config
-  (require 'solaire-mode)
-  (add-hook 'after-change-major-mode-hook #'turn-on-solaire-mode)
-  (add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
-  (solaire-mode-swap-bg))
-
-;(use-package doom-themes
-;  :ensure t
-;  :init
-;  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-;      doom-themes-enable-italic t)
-;  :config
-;  (doom-themes-visual-bell-config)
-;  (doom-themes-org-config)
-;  (load-theme 'doom-one t))
 
 ; Evil mode and related
 (use-package evil
@@ -205,7 +237,6 @@
   (define-key evil-motion-state-map ";" 'evil-ex)
   (global-set-key (kbd "M-s") 'evil-write)
   (global-set-key (kbd "M-f") 'evil-search-forward)
-  (setq evil-mode-line-format '(before . mode-line-front-space))
   (setq evil-want-C-u-scroll t)
   (setq evil-symbol-word-search t)
   (setq evil-normal-state-tag " N ")
@@ -416,7 +447,8 @@ SCHEDULED: %t
   :ensure t
   :config
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
-  )
+  (add-hook 'python-mode-hook 'flycheck-mode)
+  (setq-default flycheck-flake8-maximum-line-length 110))
 
 ;; Tame window arrangement for consistency's sake
 (use-package shackle
@@ -445,6 +477,12 @@ SCHEDULED: %t
           ("*vc-diff*"         :align below :size 15  :noselect t)
           ("*vc-change-log*"   :align below :size 15  :select t)
           (vc-annotate-mode    :same t))))
+
+;; Do something about popups as well
+(use-package popwin
+  :ensure t
+  :config
+  (popwin-mode 1))
 
 ;; Which modes are active?
 (defun which-active-modes ()
@@ -511,11 +549,6 @@ SCHEDULED: %t
   :config
   (add-hook 'puppet-mode-hook 'flycheck-mode))
 
-(use-package python-mode
-  :ensure t
-  :config
-  (add-hook 'python-mode-hook 'flycheck-mode))
-
 (use-package yaml-mode
   :ensure t
   :config
@@ -544,7 +577,9 @@ SCHEDULED: %t
   (add-hook 'yaml-mode-hook '(lambda () (ansible 1))))
 
 (use-package json-mode
-  :ensure t)
+  :ensure t
+  :config
+  (add-hook 'json-mode-hook 'flycheck-mode))
 
 ;; Fantastical
 (defun applescript-quote-string (argument)
@@ -672,7 +707,7 @@ and subsequent lines as the event note."
  '(ivy-mode t)
  '(package-selected-packages
    (quote
-    (all-the-icons jbeans-theme spacemacs-theme color-theme-sanityinc-tomorrow pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode python-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (ein popwin spaceline all-the-icons pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-syntax (quote default) nil (tramp))
@@ -683,6 +718,7 @@ and subsequent lines as the event note."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(magit-mode-line-process ((t (:foreground "spring green"))))
  '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
 
 (defun my/org-mode-hook ()
@@ -695,61 +731,6 @@ and subsequent lines as the event note."
     (set-face-attribute face nil :height 1.0)))
 
 (add-hook 'org-mode-hook 'my/org-mode-hook)
-
-
-;; Modeline
-(use-package all-the-icons
-  :ensure t
-  :init
-  (progn (defun -custom-modeline-github-vc ()
-           (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
-             (concat
-              (propertize (format " %s" (all-the-icons-octicon "git-branch"))
-                          'face `(:height 1 :family ,(all-the-icons-octicon-family))
-                          'display '(raise 0))
-              (propertize (format " %s" branch)))))
-
-         (defun -custom-modeline-svn-vc ()
-           (let ((revision (cadr (split-string vc-mode "-"))))
-             (concat
-              (propertize (format " %s" (all-the-icons-faicon "cloud"))
-                          'face `(:height 1)
-                          'display '(raise 0))
-              (propertize (format " %s" revision) 'face `(:height 0.9)))))
-
-         (defun simple-mode-line-render (left right)
-           "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
-           (let* ((available-width (- (window-width) (length left) 0)))
-             (format (format " %%s %%%ds " available-width) left right)))
-
-         (defvar mode-line-my-vc
-           '(:propertize
-             (:eval (when vc-mode
-             (cond
-              ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
-              ((string-match "SVN-" vc-mode) (-custom-modeline-svn-vc))
-              (t (format "%s" vc-mode))))))
-           "Formats the current directory.")
-
-         ;; (setcar mode-line-position "")
-         )
-  :config
-  (progn (setq-default mode-line-format
-                       '(:eval (simple-mode-line-render
-                                 ;; left
-                                 (format-mode-line (list
-                                                    mode-line-mule-info
-                                                    " "
-                                                    mode-line-modified
-                                                    "  "
-                                                    mode-line-buffer-identification
-                                                    mode-line-my-vc))
-                                 ;; right
-                                 (format-mode-line (list
-                                                    mode-line-modes
-                                                    " "
-                                                    "ℓ %l:%c %p%%"))))))
-  :after(dim))
 
 (set-face-attribute 'mode-line nil
                     :background "#e9e9e9"
