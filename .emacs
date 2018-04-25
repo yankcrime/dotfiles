@@ -3,26 +3,20 @@
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
 
-;;========================================
-;; start the emacsserver that listens to emacsclient
-(server-start)
+(setq user-mail-address "nick@dischord.org")
 
 ;; User-interface stuff
-
 (add-to-list 'default-frame-alist '(width . 110))
 (scroll-bar-mode 0)
 (tool-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "Triplicate T4c"
+                    :family "Source Code Pro"
                     :height 140
                     :width 'normal)
 
 (setq initial-scratch-message "")
 (fset 'yes-or-no-p 'y-or-n-p)
-
-;; Custom themes outside of ELPA etc.
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 
 ;; Tooltips etc.
 (set-face-attribute 'variable-pitch nil
@@ -57,14 +51,12 @@
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
 (global-set-key (kbd "M-w") 'kill-this-buffer)
 (global-set-key (kbd "M-s") 'evil-write)
-;; (global-set-key (kbd "M-v") 'evil-visual-paste)
 (global-set-key (kbd "M-f") 'evil-search-forward)
 (global-set-key (kbd "M-F") 'query-replace)
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
 (global-set-key (kbd "M-o") 'counsel-find-file)
 (global-set-key (kbd "C-s") 'counsel-projectile-ag)
-(global-set-key (kbd "C-b") 'ivy-switch-buffer)
 (global-set-key (kbd "M-v") 'yank)
 (global-set-key (kbd "M-c") 'kill-ring-save)
 (global-set-key (kbd "M-a") 'mark-whole-buffer)
@@ -78,55 +70,46 @@
 ;; Package management
 (require 'package)
 (setq package-enable-at-startup nil)
+(package-initialize)
 
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 (add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
 
-(package-initialize)
-
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
+(eval-when-compile
+  (require 'use-package))
+
 ;; Modeline
-(use-package all-the-icons
-  :ensure t
-  :init
-  (progn (defun -custom-modeline-github-vc ()
-           (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
-             (concat
-              (propertize (format " %s" (all-the-icons-octicon "git-branch"))
-                          'face `(:height 2 :family ,(all-the-icons-octicon-family))
-                          'display '(raise 0))
-              (propertize (format " %s" branch)))))
+(progn (defun -custom-modeline-github-vc ()
+         (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
+           (concat
+            (propertize (format " %s" branch)))))
 
-         (defun simple-mode-line-render (left right)
-           "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
-           (let* ((available-width (- (window-width) (length left) 0)))
-             (format (format " %%s %%%ds " available-width) left right)))
+       (defvar mode-line-my-vc
+         '(:propertize
+           (:eval (when vc-mode
+           (cond
+            ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
+            (t (format "%s" vc-mode)))))))
+       )
 
-         (defvar mode-line-my-vc
-           '(:propertize
-             (:eval (when vc-mode
-             (cond
-              ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
-              (t (format "%s" vc-mode)))))))
-         )
-  :config
-  (progn (setq-default mode-line-format
-                       (list
-                        "  "
-                        mode-line-modified
-                        "  "
-                        mode-line-buffer-identification
-                        "  "
-                        ; "ℓ %l:%c %p%  "
-                        mode-line-position
-                        mode-line-my-vc
-                        "  "
-                        mode-line-modes))))
+(progn (setq-default mode-line-format
+                     (list
+                      "  "
+                      mode-line-modified
+                      "  "
+                      mode-line-buffer-identification
+                      "  "
+                      ; "ℓ %l:%c %p%  "
+                      mode-line-position
+                      mode-line-my-vc
+                      "  "
+                      mode-line-modes)))
 
 (use-package ivy
   :ensure t
@@ -160,10 +143,23 @@
   (setq ivy-rich-abbreviate-paths t)
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
+(use-package company
+  :ensure t)
+
 (use-package org-download
   :ensure t
   :config
   (setq org-download-method 'attach))
+
+(use-package tramp
+  :ensure nil
+  :init
+  (use-package tramp-theme
+    :ensure t)
+  (use-package vagrant-tramp
+    :ensure t)
+  :custom
+  (tramp-default-method "ssh"))
 
 (use-package ein
   :ensure t
@@ -189,13 +185,14 @@
   (require 'git-gutter)
   (require 'git-gutter-fringe))
 
-(use-package leuven-theme
-    :ensure t
-    :init
-    (setq leuven-scale-outline-headlines nil)
-    (setq leuven-scale-org-agenda-structure nil))
-
-(load-theme 'whiteboard)
+(use-package doom-themes
+  :ensure t
+  :init
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  :config
+  (doom-themes-org-config)
+  (load-theme 'doom-one-light t))
 
 ; Evil mode and related
 (use-package evil
@@ -204,13 +201,16 @@
     :init (global-evil-leader-mode)
     :ensure t
     :config
+    (setq evil-normal-state-tag "NORMAL")
+    (setq evil-insert-state-tag "INSERT")
+    (setq evil-visual-state-tag "VISUAL")
     (setq evil-leader/in-all-states t)
     (evil-leader/set-leader "<SPC>")
     (evil-leader/set-key
       "<SPC>" 'evil-buffer
       "b" 'ivy-switch-buffer
-      "pp" 'projectile-switch-project
-      "pf" 'projectile-find-file
+      "pp" 'counsel-projectile-switch-project
+      "pf" 'counsel-projectile-find-file
       "m" 'magit-file-popup
       "d" 'deft
       "gg" 'magit-status
@@ -248,12 +248,20 @@
 
   (use-package evil-escape
     :ensure t
-    :diminish evil-escape-mode
     :init
     (evil-escape-mode))
 
   (use-package evil-visual-mark-mode
     :ensure t)))
+
+(use-package yasnippet
+  :ensure t
+  :init
+  (yas-global-mode)
+  :config
+  (use-package yasnippet-snippets
+  :ensure t)
+  (yas-reload-all))
 
 ;; org-mode
 (use-package org
@@ -284,120 +292,127 @@ SCHEDULED: %t
 :CREATED: %U\n
 :END:")))
 
+  (use-package ob-http
+    :ensure t)
+
+  (use-package ob-ipython
+    :ensure t)
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t)
+     (http . t)
+     (ipython . t)
+     (ruby . t)))
+
+  (eval-after-load 'org-agenda
+    '(progn
+       (evil-set-initial-state 'org-agenda-mode 'normal)
+       (evil-define-key 'normal org-agenda-mode-map
+         (kbd "<DEL>") 'org-agenda-show-scroll-down
+         (kbd "<RET>") 'org-agenda-switch-to
+         (kbd "\t") 'org-agenda-goto
+         "\C-n" 'org-agenda-next-line
+         "\C-p" 'org-agenda-previous-line
+         "\C-r" 'org-agenda-redo
+         "a" 'org-agenda-archive-default-with-confirmation
+                                        ;b
+         "c" 'org-agenda-goto-calendar
+         "d" 'org-agenda-day-view
+         "e" 'org-agenda-set-effort
+                                        ;f
+         "g " 'org-agenda-show-and-scroll-up
+         "gG" 'org-agenda-toggle-time-grid
+         "gh" 'org-agenda-holidays
+         "gj" 'org-agenda-goto-date
+         "gJ" 'org-agenda-clock-goto
+         "gk" 'org-agenda-action
+         "gm" 'org-agenda-bulk-mark
+         "go" 'org-agenda-open-link
+         "gO" 'delete-other-windows
+         "gr" 'org-agenda-redo
+         "gv" 'org-agenda-view-mode-dispatch
+         "gw" 'org-agenda-week-view
+         "g/" 'org-agenda-filter-by-tag
+         "h"  'org-agenda-earlier
+         "i"  'org-agenda-diary-entry
+         "j"  'org-agenda-next-line
+         "k"  'org-agenda-previous-line
+         "l"  'org-agenda-later
+         "m" 'org-agenda-bulk-mark
+         "n" nil                           ; evil-search-next
+         "o" 'delete-other-windows
+                                        ;p
+         "q" 'org-agenda-quit
+         "r" 'org-agenda-redo
+         "s" 'org-save-all-org-buffers
+         "t" 'org-agenda-todo
+         "u" 'org-agenda-bulk-unmark
+                                        ;v
+         "x" 'org-agenda-exit
+         "y" 'org-agenda-year-view
+         "z" 'org-agenda-add-note
+         "{" 'org-agenda-manipulate-query-add-re
+         "}" 'org-agenda-manipulate-query-subtract-re
+         "$" 'org-agenda-archive
+         "%" 'org-agenda-bulk-mark-regexp
+         "+" 'org-agenda-priority-up
+         "," 'org-agenda-priority
+         "-" 'org-agenda-priority-down
+         "." 'org-agenda-goto-today
+         "0" 'evil-digit-argument-or-evil-beginning-of-line
+         ":" 'org-agenda-set-tags
+         ";" 'org-timer-set-timer
+         "<" 'org-agenda-filter-by-category
+         ">" 'org-agenda-date-prompt
+         "?" 'org-agenda-show-the-flagging-note
+         "A" 'org-agenda-append-agenda
+         "B" 'org-agenda-bulk-action
+         "C" 'org-agenda-convert-date
+         "D" 'org-agenda-toggle-diary
+         "E" 'org-agenda-entry-text-mode
+         "F" 'org-agenda-follow-mode
+                                        ;G
+         "H" 'org-agenda-holidays
+         "I" 'org-agenda-clock-in
+         "J" 'org-agenda-next-date-line
+         "K" 'org-agenda-previous-date-line
+         "L" 'org-agenda-recenter
+         "M" 'org-agenda-phases-of-moon
+                                        ;N
+         "O" 'org-agenda-clock-out
+         "P" 'org-agenda-show-priority
+                                        ;Q
+         "R" 'org-agenda-clockreport-mode
+         "S" 'org-agenda-sunrise-sunset
+         "T" 'org-agenda-show-tags
+                                        ;U
+                                        ;V
+                                        ;W
+         "X" 'org-agenda-clock-cancel
+                                        ;Y
+                                        ;Z
+         "[" 'org-agenda-manipulate-query-add
+         "g\\" 'org-agenda-filter-by-tag-refine
+         "]" 'org-agenda-manipulate-query-subtract)))
+
   (defun org-task-capture ()
     (interactive)
     (org-capture nil "a"))
 
+  ;; Open mail messages
+  (org-add-link-type "message" 'org-email-open)
+
+  (defun org-email-open (record-location)
+    (shell-command (concat "open \"message:" record-location "\"")))
+
+  ;; Appearance stuff
   (setq org-ellipsis "•••")
 
   (use-package org-bullets
     :ensure t
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
-
-(use-package ob-http
-  :ensure t)
-
-(use-package ob-ipython
-  :ensure t)
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((shell . t)
-   (http . t)
-   (ipython . t)
-   (ruby . t)))
-
-(eval-after-load 'org-agenda
- '(progn
-    (evil-set-initial-state 'org-agenda-mode 'normal)
-    (evil-define-key 'normal org-agenda-mode-map
-      (kbd "<DEL>") 'org-agenda-show-scroll-down
-      (kbd "<RET>") 'org-agenda-switch-to
-      (kbd "\t") 'org-agenda-goto
-      "\C-n" 'org-agenda-next-line
-      "\C-p" 'org-agenda-previous-line
-      "\C-r" 'org-agenda-redo
-      "a" 'org-agenda-archive-default-with-confirmation
-      ;b
-      "c" 'org-agenda-goto-calendar
-      "d" 'org-agenda-day-view
-      "e" 'org-agenda-set-effort
-      ;f
-      "g " 'org-agenda-show-and-scroll-up
-      "gG" 'org-agenda-toggle-time-grid
-      "gh" 'org-agenda-holidays
-      "gj" 'org-agenda-goto-date
-      "gJ" 'org-agenda-clock-goto
-      "gk" 'org-agenda-action
-      "gm" 'org-agenda-bulk-mark
-      "go" 'org-agenda-open-link
-      "gO" 'delete-other-windows
-      "gr" 'org-agenda-redo
-      "gv" 'org-agenda-view-mode-dispatch
-      "gw" 'org-agenda-week-view
-      "g/" 'org-agenda-filter-by-tag
-      "h"  'org-agenda-earlier
-      "i"  'org-agenda-diary-entry
-      "j"  'org-agenda-next-line
-      "k"  'org-agenda-previous-line
-      "l"  'org-agenda-later
-      "m" 'org-agenda-bulk-mark
-      "n" nil                           ; evil-search-next
-      "o" 'delete-other-windows
-      ;p
-      "q" 'org-agenda-quit
-      "r" 'org-agenda-redo
-      "s" 'org-save-all-org-buffers
-      "t" 'org-agenda-todo
-      "u" 'org-agenda-bulk-unmark
-      ;v
-      "x" 'org-agenda-exit
-      "y" 'org-agenda-year-view
-      "z" 'org-agenda-add-note
-      "{" 'org-agenda-manipulate-query-add-re
-      "}" 'org-agenda-manipulate-query-subtract-re
-      "$" 'org-agenda-archive
-      "%" 'org-agenda-bulk-mark-regexp
-      "+" 'org-agenda-priority-up
-      "," 'org-agenda-priority
-      "-" 'org-agenda-priority-down
-      "." 'org-agenda-goto-today
-      "0" 'evil-digit-argument-or-evil-beginning-of-line
-      ":" 'org-agenda-set-tags
-      ";" 'org-timer-set-timer
-      "<" 'org-agenda-filter-by-category
-      ">" 'org-agenda-date-prompt
-      "?" 'org-agenda-show-the-flagging-note
-      "A" 'org-agenda-append-agenda
-      "B" 'org-agenda-bulk-action
-      "C" 'org-agenda-convert-date
-      "D" 'org-agenda-toggle-diary
-      "E" 'org-agenda-entry-text-mode
-      "F" 'org-agenda-follow-mode
-      ;G
-      "H" 'org-agenda-holidays
-      "I" 'org-agenda-clock-in
-      "J" 'org-agenda-next-date-line
-      "K" 'org-agenda-previous-date-line
-      "L" 'org-agenda-recenter
-      "M" 'org-agenda-phases-of-moon
-      ;N
-      "O" 'org-agenda-clock-out
-      "P" 'org-agenda-show-priority
-      ;Q
-      "R" 'org-agenda-clockreport-mode
-      "S" 'org-agenda-sunrise-sunset
-      "T" 'org-agenda-show-tags
-      ;U
-      ;V
-      ;W
-      "X" 'org-agenda-clock-cancel
-      ;Y
-      ;Z
-      "[" 'org-agenda-manipulate-query-add
-      "g\\" 'org-agenda-filter-by-tag-refine
-      "]" 'org-agenda-manipulate-query-subtract)))
 
 ;; mmm-mode
 (use-package mmm-mode
@@ -439,6 +454,7 @@ SCHEDULED: %t
   (projectile-global-mode +1)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
+  (setq projectile-mode-line '(:eval (format " Proj[%s]" (projectile-project-name))))
   (global-set-key (kbd "<f1>") 'projectile-switch-project)
   (global-set-key (kbd "<f2>") 'projectile-find-file))
 
@@ -526,11 +542,6 @@ SCHEDULED: %t
   :config
   (which-key-mode))
 
-(use-package pyenv-mode-auto
-  :ensure t
-  :config
-  (pyenv-mode))
-
 ;; Modes
 
 ;; Golang
@@ -581,51 +592,6 @@ SCHEDULED: %t
   :config
   (add-hook 'json-mode-hook 'flycheck-mode))
 
-;; Fantastical
-(defun applescript-quote-string (argument)
-  "Quote a string for passing as a string to AppleScript."
-  (if (or (not argument) (string-equal argument ""))
-      "\"\""
-    ;; Quote using double quotes, but escape any existing quotes or
-    ;; backslashes in the argument with backslashes.
-    (let ((result "")
-          (start 0)
-          end)
-      (save-match-data
-        (if (or (null (string-match "[^\"\\]" argument))
-                (< (match-end 0) (length argument)))
-            (while (string-match "[\"\\]" argument start)
-              (setq end (match-beginning 0)
-                    result (concat result (substring argument start end)
-                                   "\\" (substring argument end (1+ end)))
-                    start (1+ end))))
-        (concat "\"" result (substring argument start) "\"")))))
-
-(defun send-region-to-fantastical (beg end)
-  "Send the selected region to Fantastical.
-Parse the first line to create the event and use the second
-and subsequent lines as the event note."
-  (interactive "r")
-  (let* ((region (buffer-substring-no-properties beg end))
-         (match (string-match "^\\(.*\\)$" region))
-         (event (substring region (match-beginning 1) (match-end 1)))
-         (notes (if (< (match-end 0) (length region))
-                   (concat (substring region (+ (match-end 0) 1) nil) "\n\n")
-                 "")))
-    (do-applescript
-     (format "set theDate to current date
-              set eventText to %s
-              set eventNotes to %s
-              set eventNotes to (eventNotes) & \"Added from Emacs on \" & (theDate as string)
-              tell application \"Fantastical\"
-                parse sentence (eventText) notes (eventNotes)
-              end tell"
-             (applescript-quote-string event)
-             (applescript-quote-string notes)))))
-
-(autoload 'send-region-to-fantastical "fantastical-capture" "Send region to Fantastical" t)
-(global-set-key (kbd "C-c C-f") 'send-region-to-fantastical)
-
 ;; Rename current buffer and file
 (defun rename-current-buffer-file ()
   "Renames current buffer and file it is visiting."
@@ -649,11 +615,6 @@ and subsequent lines as the event note."
 ;; use Marked.app to preview Markdown
 (setq markdown-open-command "~/bin/mark")
 
-;; Open mail messages
-(org-add-link-type "message" 'org-email-open)
-  (defun org-email-open (record-location)
-    (shell-command (concat "open \"message:" record-location "\"")))
-
 ;; Hide some menu junk
 (define-key global-map [menu-bar tools gnus] nil)
 (define-key global-map [menu-bar tools rmail] nil)
@@ -673,6 +634,12 @@ and subsequent lines as the event note."
   (dim-major-name 'mode "mode")
   (dim-major-name 'diff "diff")
   (dim-major-name 'fundamental "fund")
+  (dim-major-name 'json-mode "")
+  (dim-major-name 'python-mode "")
+  (dim-major-name 'ruby-mode "")
+  (dim-major-name 'gfm-mode "")
+  (dim-minor-name 'yas-minor-mode " YAS")
+  (dim-minor-name 'company-mode " CoA")
   (dim-minor-name 'undo-tree-mode "")
   (dim-minor-name 'which-key-mode "")
   (dim-minor-name 'projectile-mode "")
@@ -698,19 +665,16 @@ and subsequent lines as the event note."
  '(ansi-color-names-vector
    ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
  '(column-number-mode t)
- '(custom-safe-themes
-   (quote
-    ("dcb9fd142d390bb289fee1d1bb49cb67ab7422cd46baddf11f5c9b7ff756f64c" "5adc266aa04b9419a6ce88b3ec9993d03e1f96d8365b2864158204fdffb36474" "42b8102c1234a9f680722953161c1127cc59ec68ad8d5c710af60d68c3b6e6ef" "a94f1a015878c5f00afab321e4fef124b2fc3b823c8ddd89d360d710fc2bddfc" "53d1bb57dadafbdebb5fbd1a57c2d53d2b4db617f3e0e05849e78a4f78df3a1b" "b5ecb5523d1a1e119dfed036e7921b4ba00ef95ac408b51d0cd1ca74870aeb14" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "4bfced46dcfc40c45b076a1758ca106a947b1b6a6ff79a3281f3accacfb3243c" "5e402ccb94e32d7d09e300fb07a62dc0094bb2f16cd2ab8847b94b01b9d5e866" "9a155066ec746201156bb39f7518c1828a73d67742e11271e4f24b7b178c4710" "b8c5adfc0230bd8e8d73450c2cd4044ad7ba1d24458e37b6dec65607fc392980" "41c926d688a69c7d3c7d2eeb54b2ea3c32c49c058004483f646c1d7d1f7bf6ac" "bb749a38c5cb7d13b60fa7fc40db7eced3d00aa93654d150b9627cabd2d9b361" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "43c1a8090ed19ab3c0b1490ce412f78f157d69a29828aa977dae941b994b4147" "d5f17ae86464ef63c46ed4cb322703d91e8ed5e718bf5a7beb69dd63352b26b2" "ad9747dc51ca23d1c1382fa9bd5d76e958a5bfe179784989a6a666fe801aadf2" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "5dc0ae2d193460de979a463b907b4b2c6d2c9c4657b2e9e66b8898d2592e3de5" "fed140fbad5134f2ca780b4507d79060cd4fcd59e6f647bbc24a9b4face10420" "b9e9ba5aeedcc5ba8be99f1cc9301f6679912910ff92fdf7980929c2fc83ab4d" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "9aace541a72eb1e70a84aa08e5dd4d05678d321509b8d7bff25aa61f59e84d7d" "8ea17fc2a0a0641aa444372e328610b26d0cd6ced5dea3732f2ce94f601b4433" default)))
  '(evil-escape-mode t)
  '(fci-rule-color "#222222")
  '(hl-sexp-background-color "#efebe9")
  '(ivy-mode t)
  '(package-selected-packages
    (quote
-    (ein popwin spaceline all-the-icons pyenv-mode-auto jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
- '(tramp-syntax (quote default) nil (tramp))
+ '(tramp-default-method "ssh" nil (tramp))
  '(vc-annotate-background "#222222"))
 
 (custom-set-faces
@@ -719,8 +683,9 @@ and subsequent lines as the event note."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(magit-mode-line-process ((t (:foreground "spring green"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Source Code Pro")))))
 
+;; Appeareance-related overrides
 (defun my/org-mode-hook ()
   "Stop the org-level headers from increasing in height relative to the other text."
   (dolist (face '(org-level-1
