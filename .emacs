@@ -11,7 +11,7 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "Source Code Pro"
+                    :family "Triplicate T4c"
                     :height 140
                     :width 'normal)
 
@@ -66,6 +66,12 @@
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
+
+;; Make Dired a bit more like vim's dirvish
+(define-key dired-mode-map "-"
+    (lambda ()
+      (interactive)
+      (find-alternate-file "..")))
 
 ;; Package management
 (require 'package)
@@ -247,21 +253,22 @@
     :ensure t)
 
   (use-package evil-escape
-    :ensure t
+    :defer t
+    :commands
+    (evil-escape-pre-command-hook)
     :init
-    (evil-escape-mode))
+    (add-hook 'pre-command-hook 'evil-escape-pre-command-hook))
 
   (use-package evil-visual-mark-mode
     :ensure t)))
 
 (use-package yasnippet
-  :ensure t
-  :init
-  (yas-global-mode)
+  :defer t
   :config
+  (unless yas-global-mode (yas-global-mode 1))
+  (yas-minor-mode 1)
   (use-package yasnippet-snippets
-  :ensure t)
-  (yas-reload-all))
+  :defer t))
 
 ;; org-mode
 (use-package org
@@ -292,18 +299,20 @@ SCHEDULED: %t
 :CREATED: %U\n
 :END:")))
 
-  (use-package ob-http
-    :ensure t)
+  (use-package ob-python
+  :defer t
+  :ensure org-plus-contrib
+  :commands (org-babel-execute:python))
 
-  (use-package ob-ipython
-    :ensure t)
+  (use-package ob-shell
+    :defer t
+    :ensure org-plus-contrib
+    :commands
+    (org-babel-execute:sh
+     org-babel-expand-body:sh
 
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((shell . t)
-     (http . t)
-     (ipython . t)
-     (ruby . t)))
+     org-babel-execute:bash
+     org-babel-expand-body:bash))
 
   (eval-after-load 'org-agenda
     '(progn
@@ -416,14 +425,16 @@ SCHEDULED: %t
 
 ;; mmm-mode
 (use-package mmm-mode
-  :ensure t)
+  :ensure t
+  :config
+  (setq mmm-global-mode 'maybe))
 
 ;; mmm-jinja2
 (use-package mmm-jinja2
   :ensure t
   :config
-  (add-to-list 'auto-mode-alist '("\\.j2\\'" . ansible))
-  (mmm-add-mode-ext-class 'jinja2-mode "\\.j2\\'" 'jinja2))
+  (add-to-list 'auto-mode-alist '("Dockerfile.j2" . dockerfile-mode))
+  (mmm-add-mode-ext-class 'dockerfile-mode "Dockerfile.j2" 'jinja2))
 
 ;; MultiTerm
 (use-package multi-term
@@ -538,7 +549,7 @@ SCHEDULED: %t
 
 ;; Which-key - command previews
 (use-package which-key
-  :ensure t
+  :defer t
   :config
   (which-key-mode))
 
@@ -546,22 +557,22 @@ SCHEDULED: %t
 
 ;; Golang
 (use-package go-mode
-  :ensure t
+  :defer t
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
   (set (make-local-variable 'compile-command)
        "go build -v && go test -v && go vet"))
 
 (use-package go-projectile
-  :ensure t)
+  :defer t)
 
 (use-package puppet-mode
-  :ensure t
+  :defer t
   :config
   (add-hook 'puppet-mode-hook 'flycheck-mode))
 
 (use-package yaml-mode
-  :ensure t
+  :defer t
   :config
   (add-hook 'yaml-mode-hook 'flycheck-mode))
 
@@ -574,18 +585,21 @@ SCHEDULED: %t
   :init (setq markdown-command "multimarkdown"))
 
 (use-package dockerfile-mode
-  :ensure t)
+  :defer t)
 
 (use-package ruby-mode
-  :ensure t)
+  :defer t)
 
 (use-package toml-mode
-  :ensure t)
+  :defer t)
 
 (use-package ansible
   :ensure t
   :config
   (add-hook 'yaml-mode-hook '(lambda () (ansible 1))))
+
+(use-package jinja2-mode
+  :ensure t)
 
 (use-package json-mode
   :ensure t
@@ -638,6 +652,7 @@ SCHEDULED: %t
   (dim-major-name 'python-mode "")
   (dim-major-name 'ruby-mode "")
   (dim-major-name 'gfm-mode "")
+  (dim-minor-name 'yas-global-mode "")
   (dim-minor-name 'yas-minor-mode " YAS")
   (dim-minor-name 'company-mode " CoA")
   (dim-minor-name 'undo-tree-mode "")
@@ -665,7 +680,6 @@ SCHEDULED: %t
  '(ansi-color-names-vector
    ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
  '(column-number-mode t)
- '(evil-escape-mode t)
  '(fci-rule-color "#222222")
  '(hl-sexp-background-color "#efebe9")
  '(ivy-mode t)
@@ -683,7 +697,7 @@ SCHEDULED: %t
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(magit-mode-line-process ((t (:foreground "spring green"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Source Code Pro")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
 
 ;; Appeareance-related overrides
 (defun my/org-mode-hook ()
