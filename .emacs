@@ -11,8 +11,8 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "Triplicate T4c"
-                    :height 140
+                    :family "PragmataPro"
+                    :height 150
                     :width 'normal)
 
 (setq initial-scratch-message "")
@@ -67,11 +67,6 @@
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
-;; Make Dired a bit more like vim's dirvish
-(define-key dired-mode-map "-"
-    (lambda ()
-      (interactive)
-      (find-alternate-file "..")))
 
 ;; Package management
 (require 'package)
@@ -181,6 +176,11 @@
     (elpy-use-ipython)
     (delete 'elpy-module-highlight-indentation elpy-modules)))
 
+(use-package ranger
+  :ensure t
+  :config
+  (ranger-override-dired-mode t))
+
 (use-package git-gutter-fringe
   :ensure t
   :config
@@ -207,9 +207,6 @@
     :init (global-evil-leader-mode)
     :ensure t
     :config
-    (setq evil-normal-state-tag "NORMAL")
-    (setq evil-insert-state-tag "INSERT")
-    (setq evil-visual-state-tag "VISUAL")
     (setq evil-leader/in-all-states t)
     (evil-leader/set-leader "<SPC>")
     (evil-leader/set-key
@@ -217,11 +214,13 @@
       "b" 'ivy-switch-buffer
       "pp" 'counsel-projectile-switch-project
       "pf" 'counsel-projectile-find-file
+      "ps" 'counsel-projectile-ag
       "m" 'magit-file-popup
       "d" 'deft
-      "gg" 'magit-status
+      "gs" 'magit-status
       "ga" 'magit-stage-file
       "gc" 'magit-commit
+      "gp" 'magit-push
       "tl" 'org-todo-list
       "ta" 'org-agenda
       "tc" 'org-task-capture
@@ -253,7 +252,7 @@
     :ensure t)
 
   (use-package evil-escape
-    :defer t
+    :ensure t
     :commands
     (evil-escape-pre-command-hook)
     :init
@@ -263,12 +262,12 @@
     :ensure t)))
 
 (use-package yasnippet
-  :defer t
+  :ensure t
   :config
   (unless yas-global-mode (yas-global-mode 1))
   (yas-minor-mode 1)
   (use-package yasnippet-snippets
-  :defer t))
+  :ensure t))
 
 ;; org-mode
 (use-package org
@@ -440,7 +439,7 @@ SCHEDULED: %t
 (use-package multi-term
   :ensure t
   :config
-  (setq multi-term-program "/usr/local/bin/zsh")
+  (setq multi-term-program "/bin/bash")
   (set-face-attribute 'term nil :background 'unspecified)
   (add-hook 'term-mode-hook
             (lambda ()
@@ -465,7 +464,7 @@ SCHEDULED: %t
   (projectile-global-mode +1)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
-  (setq projectile-mode-line '(:eval (format " Proj[%s]" (projectile-project-name))))
+  (setq projectile-mode-line '(:eval (format "  %s " (projectile-project-name))))
   (global-set-key (kbd "<f1>") 'projectile-switch-project)
   (global-set-key (kbd "<f2>") 'projectile-find-file))
 
@@ -526,6 +525,11 @@ SCHEDULED: %t
 ;; Open files in dired mode using 'open'
 (eval-after-load "dired"
   '(progn
+     ;; Make Dired a bit more like vim's dirvish
+     (define-key dired-mode-map "-"
+         (lambda ()
+           (interactive)
+           (find-alternate-file "..")))
      (define-key dired-mode-map (kbd "z")
        (lambda () (interactive)
          (let ((fn (dired-get-file-for-visit)))
@@ -549,7 +553,7 @@ SCHEDULED: %t
 
 ;; Which-key - command previews
 (use-package which-key
-  :defer t
+  :ensure t
   :config
   (which-key-mode))
 
@@ -557,22 +561,22 @@ SCHEDULED: %t
 
 ;; Golang
 (use-package go-mode
-  :defer t
+  :ensure t
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
   (set (make-local-variable 'compile-command)
        "go build -v && go test -v && go vet"))
 
 (use-package go-projectile
-  :defer t)
+  :ensure t)
 
 (use-package puppet-mode
-  :defer t
+  :ensure t
   :config
   (add-hook 'puppet-mode-hook 'flycheck-mode))
 
 (use-package yaml-mode
-  :defer t
+  :ensure t
   :config
   (add-hook 'yaml-mode-hook 'flycheck-mode))
 
@@ -585,13 +589,13 @@ SCHEDULED: %t
   :init (setq markdown-command "multimarkdown"))
 
 (use-package dockerfile-mode
-  :defer t)
+  :ensure t)
 
 (use-package ruby-mode
-  :defer t)
+  :ensure t)
 
 (use-package toml-mode
-  :defer t)
+  :ensure t)
 
 (use-package ansible
   :ensure t
@@ -599,7 +603,9 @@ SCHEDULED: %t
   (add-hook 'yaml-mode-hook '(lambda () (ansible 1))))
 
 (use-package jinja2-mode
-  :ensure t)
+  :ensure t
+  :config
+  (add-hook 'jinja2-mode-hook 'jinja2-mode))
 
 (use-package json-mode
   :ensure t
@@ -640,7 +646,8 @@ SCHEDULED: %t
   :ensure t
   :config
   (dim-major-name 'emacs-lisp-mode "EL")
-  (dim-major-name 'lisp-mode "L")
+  (dim-minor-name 'emacs-lisp-doc-mode "")
+  (dim-major-name 'lisp-mode "")
   (dim-major-name 'buffer "b")
   (dim-major-name 'inferior "i")
   (dim-major-name 'interaction "i")
@@ -652,9 +659,11 @@ SCHEDULED: %t
   (dim-major-name 'python-mode "")
   (dim-major-name 'ruby-mode "")
   (dim-major-name 'gfm-mode "")
+  (dim-minor-name 'eldoc-mode "")
+  (dim-minor-name 'global-eldoc-mode "")
   (dim-minor-name 'yas-global-mode "")
-  (dim-minor-name 'yas-minor-mode " YAS")
-  (dim-minor-name 'company-mode " CoA")
+  (dim-minor-name 'yas-minor-mode "")
+  (dim-minor-name 'company-mode "")
   (dim-minor-name 'undo-tree-mode "")
   (dim-minor-name 'which-key-mode "")
   (dim-minor-name 'projectile-mode "")
@@ -700,7 +709,7 @@ SCHEDULED: %t
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(magit-mode-line-process ((t (:foreground "spring green"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "PragmataPro")))))
 
 ;; Appeareance-related overrides
 (defun my/org-mode-hook ()
