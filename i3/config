@@ -13,13 +13,13 @@ font pango:Helvetica Neue 8
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec urxvt
+bindsym $mod+Return exec --no-startup-id urxvtc
 
 # kill focused window
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run
+bindsym $mod+d exec dmenu_run -fn 'Helvetica Neue-8'
 
 # change focus
 bindsym $mod+j focus left
@@ -128,8 +128,35 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+client.focused #555555 #AA0000 #ffffff #2e9ef4 #CC0000
+
+# Make the currently focused window a scratchpad
+bindsym $mod+Shift+minus move scratchpad
+
+# Show the first scratchpad window
+bindsym $mod+minus scratchpad show
+
+# Show / hide Neomutt from the scratchpad workspace
+bindsym $mod+Shift+m exec --no-startup-id urxvtc -name mail -e neomutt
+bindsym $mod+Shift+t exec --no-startup-id urxvtc -name quake
+
+# Have a handy terminal instance on the scratchpad as well
+bindsym $mod+m [instance="mail"] scratchpad show
+bindsym $mod+t [instance="quake"] scratchpad show
+
+for_window [class="Pavucontrol"] floating enable
+for_window [class="Nvidia-settings"] floating enable
+for_window [class="Lxappearance"] floating enable
+for_window [class="Firefox" instance="Browser"] floating enable
+for_window [class="google-chrome"] floating enable
+for_window [class="Google-chrome"] floating enable
+for_window [class="Rox"] floating enable
+for_window [instance="mail"] move window to scratchpad, scratchpad show
+for_window [instance="quake"] move window to scratchpad, scratchpad show
+
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
+        position top
         status_command i3status
 }
