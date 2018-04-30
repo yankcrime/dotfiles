@@ -11,8 +11,8 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "PragmataPro"
-                    :height 150
+                    :family "Triplicate T4c"
+                    :height 140
                     :width 'normal)
 
 (setq initial-scratch-message "")
@@ -86,31 +86,39 @@
   (require 'use-package))
 
 ;; Modeline
-(progn (defun -custom-modeline-github-vc ()
-         (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
-           (concat
-            (propertize (format " %s" branch)))))
 
-       (defvar mode-line-my-vc
-         '(:propertize
-           (:eval (when vc-mode
-           (cond
-            ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
-            (t (format "%s" vc-mode)))))))
-       )
+(defun simple-mode-line-render (left right)
+  "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
+  (let* ((available-width (- (window-width) (length left) 0)))
+    (format (format " %%s %%%ds " available-width) left right)))
 
 (progn (setq-default mode-line-format
-                     (list
-                      "  "
-                      mode-line-modified
-                      "  "
-                      mode-line-buffer-identification
-                      "  "
-                      ; "ℓ %l:%c %p%  "
-                      mode-line-position
-                      mode-line-my-vc
-                      "  "
-                      mode-line-modes)))
+                     '(:eval (simple-mode-line-render
+                              ;; left
+                              (format-mode-line (list
+                                                 mode-line-modified
+                                                 " "
+                                                 "%10b"
+                                                 " "
+                                                 mode-line-modes
+                                                 vc-mode))
+                              ;; right
+                              (format-mode-line (list
+                                                 "ℓ %l:%c %p%%"))))))
+
+
+;(progn (setq-default mode-line-format
+;                     (list
+;                      "  "
+;                      mode-line-modified
+;                      "  "
+;                      mode-line-buffer-identification
+;                      "  "
+;                      ; "ℓ %l:%c %p%  "
+;                      mode-line-position
+;                      mode-line-my-vc
+;                      "  "
+;                      mode-line-modes)))
 
 (use-package ivy
   :ensure t
@@ -464,7 +472,11 @@ SCHEDULED: %t
   (projectile-global-mode +1)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
-  (setq projectile-mode-line '(:eval (format "  %s " (projectile-project-name))))
+  (setq projectile-mode-line
+      '(:eval
+        (if (file-remote-p default-directory)
+            " Projectile[*remote*]"
+          (format " Projectile[%s]" (projectile-project-name)))))
   (global-set-key (kbd "<f1>") 'projectile-switch-project)
   (global-set-key (kbd "<f2>") 'projectile-find-file))
 
@@ -570,6 +582,12 @@ SCHEDULED: %t
 (use-package go-projectile
   :ensure t)
 
+(use-package slime
+  :ensure t
+  :config
+  (setq inferior-lisp-program "/usr/local/bin/sbcl")
+  (setq slime-contribs '(slime-fancy)))
+
 (use-package puppet-mode
   :ensure t
   :config
@@ -646,7 +664,6 @@ SCHEDULED: %t
   :ensure t
   :config
   (dim-major-name 'emacs-lisp-mode "EL")
-  (dim-minor-name 'emacs-lisp-doc-mode "")
   (dim-major-name 'lisp-mode "")
   (dim-major-name 'buffer "b")
   (dim-major-name 'inferior "i")
@@ -697,7 +714,7 @@ SCHEDULED: %t
  '(ivy-mode t)
  '(package-selected-packages
    (quote
-    (ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-default-method "ssh" nil (tramp))
@@ -709,7 +726,7 @@ SCHEDULED: %t
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(magit-mode-line-process ((t (:foreground "spring green"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "PragmataPro")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
 
 ;; Appeareance-related overrides
 (defun my/org-mode-hook ()
