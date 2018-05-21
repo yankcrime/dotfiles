@@ -106,20 +106,6 @@
                               (format-mode-line (list
                                                  "ℓ %l:%c %p%%"))))))
 
-
-;(progn (setq-default mode-line-format
-;                     (list
-;                      "  "
-;                      mode-line-modified
-;                      "  "
-;                      mode-line-buffer-identification
-;                      "  "
-;                      ; "ℓ %l:%c %p%  "
-;                      mode-line-position
-;                      mode-line-my-vc
-;                      "  "
-;                      mode-line-modes)))
-
 (use-package ivy
   :ensure t
   :config
@@ -129,9 +115,13 @@
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
   (define-key ivy-minibuffer-map (kbd "C-.")
-  (lambda () (interactive) (insert (format "%s" (with-ivy-window (thing-at-point 'symbol))))))
+    (lambda ()
+      (interactive)
+      (insert (format "%s" (with-ivy-window (thing-at-point 'symbol))))))
   (define-key ivy-minibuffer-map (kbd "M-.")
-  (lambda () (interactive) (insert (format "%s" (with-ivy-window (thing-at-point 'word))))))
+    (lambda ()
+      (interactive)
+      (insert (format "%s" (with-ivy-window (thing-at-point 'word))))))
   (add-hook 'minibuffer-setup-hook
             (lambda ()
               (setq show-trailing-whitespace nil)))
@@ -167,8 +157,10 @@
     :ensure t)
   (use-package vagrant-tramp
     :ensure t)
-  :custom
-  (tramp-default-method "ssh"))
+  :config
+  (add-to-list 'tramp-default-proxies-alist
+               '("stack@dev-director" nil "/ssh:ilab-gate:"))
+  (setq tramp-default-method "ssh"))
 
 (use-package ein
   :ensure t
@@ -290,6 +282,7 @@
       (delete-other-windows)))
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (define-key global-map (kbd "C-c c") 'org-capture)
+  (define-key global-map (kbd "C-c l") 'org-store-link)
   (define-key global-map (kbd "C-c t a") 'pop-to-org-agenda)
   (define-key global-map (kbd "C-c t l") 'org-todo-list)
   (setq org-log-done 'time)
@@ -306,10 +299,13 @@ SCHEDULED: %t
 :CREATED: %U\n
 :END:")))
 
+  (use-package ob-async
+    :defer t)
+
   (use-package ob-python
-  :defer t
-  :ensure org-plus-contrib
-  :commands (org-babel-execute:python))
+    :defer t
+    :ensure org-plus-contrib
+    :commands (org-babel-execute:python))
 
   (use-package ob-shell
     :defer t
@@ -332,11 +328,9 @@ SCHEDULED: %t
          "\C-p" 'org-agenda-previous-line
          "\C-r" 'org-agenda-redo
          "a" 'org-agenda-archive-default-with-confirmation
-                                        ;b
          "c" 'org-agenda-goto-calendar
          "d" 'org-agenda-day-view
          "e" 'org-agenda-set-effort
-                                        ;f
          "g " 'org-agenda-show-and-scroll-up
          "gG" 'org-agenda-toggle-time-grid
          "gh" 'org-agenda-holidays
@@ -356,15 +350,13 @@ SCHEDULED: %t
          "k"  'org-agenda-previous-line
          "l"  'org-agenda-later
          "m" 'org-agenda-bulk-mark
-         "n" nil                           ; evil-search-next
+         "n" nil
          "o" 'delete-other-windows
-                                        ;p
          "q" 'org-agenda-quit
          "r" 'org-agenda-redo
          "s" 'org-save-all-org-buffers
          "t" 'org-agenda-todo
          "u" 'org-agenda-bulk-unmark
-                                        ;v
          "x" 'org-agenda-exit
          "y" 'org-agenda-year-view
          "z" 'org-agenda-add-note
@@ -388,26 +380,18 @@ SCHEDULED: %t
          "D" 'org-agenda-toggle-diary
          "E" 'org-agenda-entry-text-mode
          "F" 'org-agenda-follow-mode
-                                        ;G
          "H" 'org-agenda-holidays
          "I" 'org-agenda-clock-in
          "J" 'org-agenda-next-date-line
          "K" 'org-agenda-previous-date-line
          "L" 'org-agenda-recenter
          "M" 'org-agenda-phases-of-moon
-                                        ;N
          "O" 'org-agenda-clock-out
          "P" 'org-agenda-show-priority
-                                        ;Q
          "R" 'org-agenda-clockreport-mode
          "S" 'org-agenda-sunrise-sunset
          "T" 'org-agenda-show-tags
-                                        ;U
-                                        ;V
-                                        ;W
          "X" 'org-agenda-clock-cancel
-                                        ;Y
-                                        ;Z
          "[" 'org-agenda-manipulate-query-add
          "g\\" 'org-agenda-filter-by-tag-refine
          "]" 'org-agenda-manipulate-query-subtract)))
@@ -418,6 +402,9 @@ SCHEDULED: %t
 
   ;; Open mail messages
   (org-add-link-type "message" 'org-email-open)
+
+  (defun turn-on-visual-line-mode () (visual-line-mode 1))
+  (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
 
   (defun org-email-open (record-location)
     (shell-command (concat "open \"message:" record-location "\"")))
@@ -510,8 +497,7 @@ SCHEDULED: %t
           (compilation-mode    :align below :size 15  :noselect t)
           (eww-mode            :align below :size 30  :select t)
           ("*command-log*"     :align right :size 28  :noselect t)
-          ;; vcs
-          ("*magit" :align below :size 50 :select t)
+          ("*magit*"            :align below :size 50 :select t)
           ("*vc-diff*"         :align below :size 15  :noselect t)
           ("*vc-change-log*"   :align below :size 15  :select t)
           (vc-annotate-mode    :same t))))
@@ -551,14 +537,16 @@ SCHEDULED: %t
 (use-package deft
   :ensure t
   :config
-  (global-set-key [f3] 'deft)
   (setq deft-extensions '("org" "txt"))
   (setq deft-directory "~/Dropbox/org")
+  (setq deft-text-mode 'org-mode)
+  (setq deft-use-filename-as-title t)
+  (setq deft-use-filter-string-for-filename t)
+  (setq deft-default-extension "org")
   (defun deft-enter-insert-mode ()
     ;; delay seems necessary
     (run-at-time "0.1 sec" nil 'evil-insert-state))
-  (add-hook 'deft-mode-hook 'deft-enter-insert-mode)
-  (setq deft-use-filename-as-title t))
+  (add-hook 'deft-mode-hook 'deft-enter-insert-mode))
 
 (use-package exec-path-from-shell
   :ensure t)
