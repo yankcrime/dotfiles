@@ -86,13 +86,16 @@
   (require 'use-package))
 
 ;; Modeline
-
 (defun simple-mode-line-render (left right)
   "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
   (let* ((available-width (- (window-width) (length left) 0)))
     (format (format " %%s %%%ds " available-width) left right)))
 
-(progn (setq-default mode-line-format
+(setq-default mode-line-buffer-identification
+              (list (propertize "%12b" 'face
+                                (list :weight 'bold))))
+
+(setq-default mode-line-format
                      '(:eval (simple-mode-line-render
                               ;; left
                               (format-mode-line (list
@@ -104,7 +107,7 @@
                                                  vc-mode))
                               ;; right
                               (format-mode-line (list
-                                                 "ℓ %l:%c %p%%"))))))
+                                                 "ℓ %l:%c %p%%")))))
 
 (use-package ivy
   :ensure t
@@ -134,13 +137,13 @@
 (use-package counsel-projectile
   :ensure t)
 
-(use-package ivy-rich
-  :ensure t
-  :config
-  (setq ivy-virtual-abbreviate 'full
-        ivy-rich-switch-buffer-align-virtual-buffer t)
-  (setq ivy-rich-abbreviate-paths t)
-  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
+;(use-package ivy-rich
+;  :ensure t
+;  :config
+;  (setq ivy-virtual-abbreviate 'full
+;        ivy-rich-switch-buffer-align-virtual-buffer t)
+;  (setq ivy-rich-abbreviate-paths t)
+;  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package company
   :ensure t)
@@ -408,6 +411,8 @@ SCHEDULED: %t
 
   (defun org-email-open (record-location)
     (shell-command (concat "open \"message:" record-location "\"")))
+
+  (add-hook 'org-mode-hook 'turn-on-flyspell)
 
   ;; Appearance stuff
   (setq org-ellipsis "•••")
