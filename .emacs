@@ -85,7 +85,7 @@
 (eval-when-compile
   (require 'use-package))
 
-;; Modeline
+;; Mode-line
 (defun simple-mode-line-render (left right)
   "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
   (let* ((available-width (- (window-width) (length left) 0)))
@@ -108,6 +108,11 @@
                               ;; right
                               (format-mode-line (list
                                                  "ℓ %l:%c %p%%")))))
+
+(use-package hide-mode-line
+  :ensure t
+  :config
+  (add-hook 'completion-list-mode-hook #'hide-mode-line-mode))
 
 (use-package ivy
   :ensure t
@@ -137,6 +142,7 @@
 (use-package counsel-projectile
   :ensure t)
 
+; This is too slow on macOS with TRAMP buffers....
 ;(use-package ivy-rich
 ;  :ensure t
 ;  :config
@@ -224,10 +230,12 @@
       "ga" 'magit-stage-file
       "gc" 'magit-commit
       "gp" 'magit-push
-      "tl" 'org-todo-list
-      "ta" 'org-agenda
-      "tc" 'org-task-capture
-      "o" 'delete-other-windows
+      "aol" 'org-todo-list
+      "aoa" 'org-agenda
+      "aoc" 'org-task-capture
+      "tm" 'hide-mode-line-mode
+      "ts" 'flyspell-mode
+      "wo" 'delete-other-windows
       "q" 'evil-quit
       "x" 'evil-save-and-close
       "ws" 'evil-window-split
@@ -274,7 +282,7 @@
 
 ;; org-mode
 (use-package org
-  :ensure t
+  :defer t
   :config
   (setq org-directory "~/Dropbox/org")
   (setq org-agenda-files '("~/Dropbox/org/"))
@@ -452,14 +460,14 @@ SCHEDULED: %t
 
 ;; Magit
 (use-package magit
-  :ensure t
+  :defer t
   :config
   (setq magit-completing-read-function 'ivy-completing-read)
   (global-set-key (kbd "<f10>") 'magit-status))
 
 ;; Projectile
 (use-package projectile
-  :ensure t
+  :defer t
   :config
   (projectile-global-mode +1)
   (setq projectile-completion-system 'ivy)
@@ -474,7 +482,7 @@ SCHEDULED: %t
 
 ;; Flycheck
 (use-package flycheck
-  :ensure t
+  :defer t
   :config
   ;; (add-hook 'after-init-hook #'global-flycheck-mode)
   (add-hook 'python-mode-hook 'flycheck-mode)
@@ -707,7 +715,7 @@ SCHEDULED: %t
  '(ivy-mode t)
  '(package-selected-packages
    (quote
-    (slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-default-method "ssh" nil (tramp))
