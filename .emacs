@@ -86,9 +86,16 @@
   (require 'use-package))
 
 ;; Mode-line
+(use-package hide-mode-line
+  :ensure t
+  :config
+  (add-hook 'completion-list-mode-hook #'hide-mode-line-mode))
+
+(setq mode-line-percent-position '(-3 "%o"))
+
 (defun simple-mode-line-render (left right)
   "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
-  (let* ((available-width (- (window-width) (length left) 0)))
+  (let* ((available-width (- (window-width) (length left) -0)))
     (format (format " %%s %%%ds " available-width) left right)))
 
 (setq-default mode-line-buffer-identification
@@ -109,10 +116,15 @@
                               (format-mode-line (list
                                                  "ℓ %l:%c %p%%")))))
 
-(use-package hide-mode-line
+
+
+
+(use-package minions
   :ensure t
-  :config
-  (add-hook 'completion-list-mode-hook #'hide-mode-line-mode))
+  :init (minions-mode)
+  :config (setq minions-direct '(cider-mode
+                                 flycheck-mode
+                                 overwrite-mode)))
 
 (use-package ivy
   :ensure t
@@ -255,7 +267,7 @@
   (global-set-key (kbd "M-f") 'evil-search-forward)
   (setq evil-want-C-u-scroll t)
   (setq evil-symbol-word-search t)
-  (setq evil-normal-state-tag " N ")
+    (setq evil-normal-state-tag " N ")
   (setq evil-insert-state-tag " I ")
   (setq evil-visual-state-tag " V ")
 
@@ -660,36 +672,6 @@ SCHEDULED: %t
 (define-key global-map [menu-bar tools compose-mail] nil)
 (define-key global-map [menu-bar tools games] nil)
 
-; Shorten major and minor mode names
-(use-package dim
-  :ensure t
-  :config
-  (dim-major-name 'emacs-lisp-mode "EL")
-  (dim-major-name 'lisp-mode "")
-  (dim-major-name 'buffer "b")
-  (dim-major-name 'inferior "i")
-  (dim-major-name 'interaction "i")
-  (dim-major-name 'interactive "i")
-  (dim-major-name 'mode "mode")
-  (dim-major-name 'diff "diff")
-  (dim-major-name 'fundamental "fund")
-  (dim-major-name 'json-mode "")
-  (dim-major-name 'python-mode "")
-  (dim-major-name 'ruby-mode "")
-  (dim-major-name 'gfm-mode "")
-  (dim-minor-name 'eldoc-mode "")
-  (dim-minor-name 'global-eldoc-mode "")
-  (dim-minor-name 'yas-global-mode "")
-  (dim-minor-name 'yas-minor-mode "")
-  (dim-minor-name 'company-mode "")
-  (dim-minor-name 'undo-tree-mode "")
-  (dim-minor-name 'which-key-mode "")
-  (dim-minor-name 'projectile-mode "")
-  (dim-minor-name 'git-gutter-mode "")
-  (dim-minor-name 'ivy-mode "")
-  (dim-minor-name 'evil-escape-mode "")
-  (dim-minor-name 'auto-revert-mode ""))
-
 ; Always wrap text in compilation windows
 (add-hook 'compilation-mode-hook
           (lambda () (visual-line-mode 1)))
@@ -715,7 +697,10 @@ SCHEDULED: %t
  '(ivy-mode t)
  '(package-selected-packages
    (quote
-    (hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-theme-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the
+e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil
+escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path
+from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-default-method "ssh" nil (tramp))
@@ -758,3 +743,4 @@ SCHEDULED: %t
 ;; Startup speed tweaks / cheats
 (setq gc-cons-threshold 16777216
       gc-cons-percentage 0.1)
+
