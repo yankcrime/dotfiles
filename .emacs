@@ -267,7 +267,7 @@
   (global-set-key (kbd "M-f") 'evil-search-forward)
   (setq evil-want-C-u-scroll t)
   (setq evil-symbol-word-search t)
-    (setq evil-normal-state-tag " N ")
+  (setq evil-normal-state-tag " N ")
   (setq evil-insert-state-tag " I ")
   (setq evil-visual-state-tag " V ")
 
@@ -473,8 +473,10 @@ SCHEDULED: %t
 ;; Magit
 (use-package magit
   :defer t
-  :config
+  :init
   (setq magit-completing-read-function 'ivy-completing-read)
+  (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
+  :config
   (global-set-key (kbd "<f10>") 'magit-status))
 
 ;; Projectile
@@ -643,6 +645,9 @@ SCHEDULED: %t
   :config
   (add-hook 'json-mode-hook 'flycheck-mode))
 
+(use-package terraform-mode
+  :defer t)
+
 ;; Rename current buffer and file
 (defun rename-current-buffer-file ()
   "Renames current buffer and file it is visiting."
@@ -697,10 +702,7 @@ SCHEDULED: %t
  '(ivy-mode t)
  '(package-selected-packages
    (quote
-    (hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the
-e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil
-escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path
-from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (terraform-mode flycheck hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-default-method "ssh" nil (tramp))
@@ -743,4 +745,3 @@ from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visu
 ;; Startup speed tweaks / cheats
 (setq gc-cons-threshold 16777216
       gc-cons-percentage 0.1)
-
