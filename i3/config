@@ -1,25 +1,31 @@
-# i3 config file (v4)
+# i3 configuration for running alongside Gnome
 #
-# Please see https://i3wm.org/docs/userguide.html for a complete reference!
+exec ~/.xinitrc
+exec --no-startup-id nm-applet
+exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
+exec_always --no-startup-id gnome-power-manager
+exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec --no-startup-id gnome-screensaver
+exec --no-startup-id gnome-flashback
 
 set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 #font pango:monospace 8
-font pango:Helvetica Neue 8
+font pango: Helvetica Neue 8
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec --no-startup-id urxvtc
+bindsym $mod+Return exec --no-startup-id tinyterm
 
 # kill focused window
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run -fn 'Helvetica Neue-8'
+bindsym $mod+d exec dmenu_run -fn 'Helvetica Neue-9'
 
 # change focus
 bindsym $mod+j focus left
@@ -137,12 +143,12 @@ bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
 # Show / hide Neomutt from the scratchpad workspace
-bindsym $mod+Shift+m exec --no-startup-id urxvtc -name mail -e neomutt
-bindsym $mod+Shift+t exec --no-startup-id urxvtc -name quake
+bindsym $mod+Shift+m exec --no-startup-id tinyterm --name mail --title mail --execute neomutt
+bindsym $mod+Shift+t exec --no-startup-id tinyterm --name quake --title quake
 
 # Have a handy terminal instance on the scratchpad as well
-bindsym $mod+m [instance="mail"] scratchpad show
-bindsym $mod+t [instance="quake"] scratchpad show
+bindsym $mod+m [title="^mail"] scratchpad show
+bindsym $mod+t [title="^quake"] scratchpad show
 
 for_window [class="Pavucontrol"] floating enable
 for_window [class="Nvidia-settings"] floating enable
@@ -151,12 +157,13 @@ for_window [class="Firefox" instance="Browser"] floating enable
 for_window [class="google-chrome"] floating enable
 for_window [class="Google-chrome"] floating enable
 for_window [class="Rox"] floating enable
-for_window [instance="mail"] move window to scratchpad, scratchpad show
-for_window [instance="quake"] move window to scratchpad, scratchpad show
+for_window [title="^mail"] move window to scratchpad, scratchpad show
+for_window [title="^quake"] move window to scratchpad, scratchpad show
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
+        font pango: Helvetica Neue, Awesome 8
         position top
         status_command i3status
 }
