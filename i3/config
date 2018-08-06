@@ -1,7 +1,5 @@
 # i3 configuration for running alongside Gnome
 #
-exec ~/.xinitrc
-exec --no-startup-id nm-applet
 exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
 exec_always --no-startup-id gnome-power-manager
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
@@ -12,26 +10,25 @@ set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-#font pango:monospace 8
-font pango: Helvetica Neue 8
+font pango: San Francisco Text 8
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec --no-startup-id tinyterm
+bindsym $mod+Return exec --no-startup-id gnome-terminal --hide-menubar
 
 # kill focused window
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run -fn 'Helvetica Neue-9'
+bindsym $mod+d exec "rofi -font 'San Francisco Text 20' -combi-modi window,drun -show combi -modi combi"
 
 # change focus
-bindsym $mod+j focus left
-bindsym $mod+k focus down
-bindsym $mod+l focus up
-bindsym $mod+semicolon focus right
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
@@ -52,10 +49,10 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-bindsym $mod+h split h
+bindsym $mod+minus split h
 
 # split in vertical orientation
-bindsym $mod+v split v
+bindsym $mod+bar split v
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
@@ -110,12 +107,6 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
-        # These bindings trigger as soon as you enter the resize mode
-
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
         bindsym j resize shrink width 10 px or 10 ppt
         bindsym k resize grow height 10 px or 10 ppt
         bindsym l resize shrink height 10 px or 10 ppt
@@ -137,14 +128,14 @@ bindsym $mod+r mode "resize"
 client.focused #555555 #AA0000 #ffffff #2e9ef4 #CC0000
 
 # Make the currently focused window a scratchpad
-bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+q move scratchpad
 
 # Show the first scratchpad window
-bindsym $mod+minus scratchpad show
+bindsym $mod+z scratchpad show
 
 # Show / hide Neomutt from the scratchpad workspace
-bindsym $mod+Shift+m exec --no-startup-id tinyterm --name mail --title mail --execute neomutt
-bindsym $mod+Shift+t exec --no-startup-id tinyterm --name quake --title quake
+bindsym $mod+Shift+m exec --no-startup-id gnome-terminal --title=mail --class=mail --name=mail --hide-menubar -e neomutt
+bindsym $mod+Shift+t exec --no-startup-id gnome-terminal --title=quake --class=quake --name=quake --hide-menubar
 
 # Have a handy terminal instance on the scratchpad as well
 bindsym $mod+m [title="^mail"] scratchpad show
@@ -154,16 +145,13 @@ for_window [class="Pavucontrol"] floating enable
 for_window [class="Nvidia-settings"] floating enable
 for_window [class="Lxappearance"] floating enable
 for_window [class="Firefox" instance="Browser"] floating enable
-for_window [class="google-chrome"] floating enable
-for_window [class="Google-chrome"] floating enable
-for_window [class="Rox"] floating enable
 for_window [title="^mail"] move window to scratchpad, scratchpad show
 for_window [title="^quake"] move window to scratchpad, scratchpad show
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        font pango: Helvetica Neue, Awesome 8
+        font pango: San Franciso Text 8
         position top
         status_command i3status
 }
