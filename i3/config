@@ -22,7 +22,7 @@ bindsym $mod+Return exec --no-startup-id gnome-terminal --hide-menubar
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec "rofi -font 'San Francisco Text 20' -combi-modi window,drun -show combi -modi combi"
+bindsym $mod+space exec "rofi -font 'San Francisco Text 20' -combi-modi window,drun -show combi -modi combi"
 
 # change focus
 bindsym $mod+h focus left
@@ -66,7 +66,7 @@ bindsym $mod+e layout toggle split
 bindsym $mod+Shift+space floating toggle
 
 # change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
+#bindsym $mod+space focus mode_toggle
 
 # focus the parent container
 bindsym $mod+a focus parent
@@ -134,7 +134,7 @@ bindsym $mod+q move scratchpad
 bindsym $mod+z scratchpad show
 
 # Show / hide Neomutt from the scratchpad workspace
-bindsym $mod+Shift+m exec --no-startup-id gnome-terminal --title=mail --class=mail --name=mail --hide-menubar -e neomutt
+bindsym $mod+Shift+m exec --no-startup-id gnome-terminal --title=mail --class=mail --name=mail --geometry=120x40 --hide-menubar -e neomutt
 bindsym $mod+Shift+t exec --no-startup-id gnome-terminal --title=quake --class=quake --name=quake --hide-menubar
 
 # Have a handy terminal instance on the scratchpad as well
