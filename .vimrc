@@ -2,6 +2,13 @@
 " nick@dischord.org
 
 " {{{ Plugins
+
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 silent! call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-fugitive'
@@ -89,8 +96,13 @@ cmap w!! w !sudo tee % >/dev/null
 " appearance
 set cursorline
 set t_Co=256
-set termguicolors
-colorscheme nofrils-light
+if exists('+termguicolors')
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
+colorscheme nofrils-dark
+
 hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
 hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
 " hi Tabline cterm=bold ctermbg=237 ctermfg=231 gui=bold
@@ -169,31 +181,6 @@ function! s:statusline_expr()
 endfunction
 let &statusline = s:statusline_expr()
  
-" }}}
-" {{{ Folding
-augroup ft_vim
-    au!
-    au FileType vim setlocal foldmethod=marker keywordprg=:help
-    au BufWinEnter *.txt if &ft == 'help' | wincmd L | endif
-augroup END
-
-augroup ft_ruby
-    au!
-    au Filetype ruby setlocal foldmethod=syntax
-    au BufRead,BufNewFile Capfile setlocal filetype=ruby
-augroup END
-
-augroup ft_puppet
-    au!
-    au Filetype puppet setlocal foldmethod=marker
-    au Filetype puppet setlocal foldmarker={,}
-augroup END
-
-augroup ft_muttrc
-    au!
-    au BufRead,BufNewFile *.muttrc set ft=muttrc
-    au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
-augroup END
 " }}}
 " {{{ FZF
 " Hide statusline
