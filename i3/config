@@ -1,11 +1,17 @@
 # i3 configuration for running alongside Gnome
 #
 exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
-exec_always --no-startup-id gnome-power-manager
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-screensaver
 exec --no-startup-id gnome-flashback
-exec --no-startup-id ~/bin/twilight
+exec --no-startup-id compton --config ~/.config/compton/compton.conf -b
+
+#i3 gaps
+#
+for_window [class="^.*"] border pixel 1
+smart_gaps on
+gaps inner 8
+gaps outer 1
 
 set $mod Mod4
 
@@ -73,7 +79,7 @@ bindsym $mod+Shift+space floating toggle
 bindsym $mod+a focus parent
 
 # focus the child container
-#bindsym $mod+d focus child
+bindsym $mod+c focus child
 
 # switch to workspace
 bindsym $mod+1 workspace 1
@@ -85,7 +91,7 @@ bindsym $mod+6 workspace 6
 bindsym $mod+7 workspace 7
 bindsym $mod+8 workspace 8
 bindsym $mod+9 workspace 9
-bindsym $mod+0 workspace 10
+bindsym $mod+0 workspace 0
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace 1
@@ -97,7 +103,7 @@ bindsym $mod+Shift+6 move container to workspace 6
 bindsym $mod+Shift+7 move container to workspace 7
 bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
-bindsym $mod+Shift+0 move container to workspace 10
+bindsym $mod+Shift+0 move container to workspace 0
 
 bindsym $mod+Tab workspace back_and_forth
 
@@ -128,10 +134,8 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# class    border  backgr. text    indicator child_border
-#client.focused #555555 #AA0000 #ffffff #2e9ef4 #CC0000
-#client.focused #0052A5 #81CBF8 #002127 #2e9ef4 #9EE7FA
-#client.unfocused #0052A5 #779BD3 #CCCCCC #292d2e   #222222
+# class border  backgr. text indicator child_border
+client.focused #555555 #AA4444 #ffffff #2e9ef4 #AA4444
 
 # Make the currently focused window a scratchpad
 bindsym $mod+q move scratchpad
@@ -166,7 +170,4 @@ bar {
         position top
         status_command i3status
         tray_output none
-#        mode hide
-#        hidden_state hide
-#        modifier Mod1
 }
