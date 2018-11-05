@@ -11,9 +11,11 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "Triplicate T4c"
-                    :height 140
+                    :family "IBM Plex Mono"
+                    :height 130
                     :width 'normal)
+;; Light
+(set-background-color "#F4F4F4")
 
 (setq initial-scratch-message "")
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -40,29 +42,12 @@
 (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 
 ;; Disable auto-save and auto-backup
-(setq auto-save-default nil)
-(setq make-backup-files nil)
+(setq auto-save-default nil
+  make-backup-files nil)
 
 ;; Use y / n instead of yes / no
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; Global keybindings, some mirroring macOS behaviour
-(global-set-key (kbd "C--") 'split-window-vertically)
-(global-set-key (kbd "C-\\") 'split-window-horizontally)
-(global-set-key (kbd "M-w") 'kill-this-buffer)
-(global-set-key (kbd "M-s") 'evil-write)
-(global-set-key (kbd "M-f") 'evil-search-forward)
-(global-set-key (kbd "M-F") 'query-replace)
-(global-set-key (kbd "M-\=") 'text-scale-increase)
-(global-set-key (kbd "M--") 'text-scale-decrease)
-(global-set-key (kbd "M-o") 'counsel-find-file)
-(global-set-key (kbd "C-s") 'counsel-projectile-ag)
-(global-set-key (kbd "M-v") 'yank)
-(global-set-key (kbd "M-c") 'kill-ring-save)
-(global-set-key (kbd "M-a") 'mark-whole-buffer)
-(global-set-key [(kbd "M-w")]
-                (lambda () (interactive) (delete-window)))
-(global-set-key (kbd "M-z") 'undo)
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
@@ -116,21 +101,19 @@
                               (format-mode-line (list
                                                  "ℓ %l:%c %p%%")))))
 
-
-
-
 (use-package minions
   :ensure t
   :init (minions-mode)
   :config (setq minions-direct '(cider-mode
-                                 flycheck-mode
                                  overwrite-mode)))
 
 (use-package ivy
   :ensure t
   :config
   (ivy-mode 1)
-  (setq ivy-height 20)
+  (setq ivy-height 20
+        ivy-use-virtual-buffers t
+        enable-recursive-minibuffers t)
   (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
@@ -144,9 +127,7 @@
       (insert (format "%s" (with-ivy-window (thing-at-point 'word))))))
   (add-hook 'minibuffer-setup-hook
             (lambda ()
-              (setq show-trailing-whitespace nil)))
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t))
+              (setq show-trailing-whitespace nil))))
 
 (use-package counsel
   :ensure t)
@@ -154,17 +135,13 @@
 (use-package counsel-projectile
   :ensure t)
 
-; This is too slow on macOS with TRAMP buffers....
-;(use-package ivy-rich
-;  :ensure t
-;  :config
-;  (setq ivy-virtual-abbreviate 'full
-;        ivy-rich-switch-buffer-align-virtual-buffer t)
-;  (setq ivy-rich-abbreviate-paths t)
-;  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
-
 (use-package company
   :ensure t)
+
+(use-package eyebrowse
+  :ensure t
+  :config
+  (setq eyebrowse-mode 1))
 
 (use-package org-download
   :ensure t
@@ -192,7 +169,6 @@
   :disabled
   :init
   (with-eval-after-load 'python
-    (flycheck-mode)
     (elpy-enable)
     (elpy-use-ipython)
     (delete 'elpy-module-highlight-indentation elpy-modules)))
@@ -233,6 +209,13 @@
     (evil-leader/set-key
       "<SPC>" 'evil-buffer
       "b" 'ivy-switch-buffer
+      "el" 'eyebrowse-switch-to-window-config
+      "e," 'eyebrowse-rename-window-config
+      "e0" 'eyebrowse-switch-to-window-config-0
+      "e1" 'eyebrowse-switch-to-window-config-1
+      "e2" 'eyebrowse-switch-to-window-config-2
+      "e3" 'eyebrowse-switch-to-window-config-3
+      "e4" 'eyebrowse-switch-to-window-config-4
       "pp" 'counsel-projectile-switch-project
       "pf" 'counsel-projectile-find-file
       "ps" 'counsel-projectile-ag
@@ -242,9 +225,9 @@
       "ga" 'magit-stage-file
       "gc" 'magit-commit
       "gp" 'magit-push
-      "aol" 'org-todo-list
-      "aoa" 'org-agenda
-      "aoc" 'org-task-capture
+      "ol" 'org-todo-list
+      "oa" 'org-agenda
+      "oc" 'org-task-capture
       "tm" 'hide-mode-line-mode
       "ts" 'flyspell-mode
       "wo" 'delete-other-windows
@@ -281,6 +264,10 @@
     :init
     (add-hook 'pre-command-hook 'evil-escape-pre-command-hook))
 
+  (add-hook 'evil-command-window-hook
+            (lambda ()
+              (setq show-trailing-whitespace nil)))
+
   (use-package evil-visual-mark-mode
     :ensure t)))
 
@@ -294,6 +281,7 @@
 
 ;; org-mode
 (use-package org
+  :ensure t
   :defer t
   :config
   (setq org-directory "~/Dropbox/org")
@@ -442,18 +430,8 @@ SCHEDULED: %t
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
-;; mmm-mode
-(use-package mmm-mode
-  :ensure t
-  :config
-  (setq mmm-global-mode 'maybe))
-
-;; mmm-jinja2
-(use-package mmm-jinja2
-  :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '("Dockerfile.j2" . dockerfile-mode))
-  (mmm-add-mode-ext-class 'dockerfile-mode "Dockerfile.j2" 'jinja2))
+(use-package poly-markdown
+  :ensure t)
 
 ;; MultiTerm
 (use-package multi-term
@@ -494,14 +472,6 @@ SCHEDULED: %t
   (global-set-key (kbd "<f1>") 'projectile-switch-project)
   (global-set-key (kbd "<f2>") 'projectile-find-file))
 
-;; Flycheck
-(use-package flycheck
-  :defer t
-  :config
-  ;; (add-hook 'after-init-hook #'global-flycheck-mode)
-  (add-hook 'python-mode-hook 'flycheck-mode)
-  (setq-default flycheck-flake8-maximum-line-length 110))
-
 ;; Tame window arrangement for consistency's sake
 (use-package shackle
   :ensure t
@@ -520,11 +490,11 @@ SCHEDULED: %t
           ("*Messages*"        :align below :size 15  :select t)
           ("*Warnings*"        :align below :size 10  :noselect t)
           ("*compilation*"     :align below :size 15  :noselect t)
-          ("*Flycheck errors*" :align below :size 15  :noselect t)
           (compilation-mode    :align below :size 15  :noselect t)
           (eww-mode            :align below :size 30  :select t)
           ("*command-log*"     :align right :size 28  :noselect t)
           ("*magit*"            :align below :size 50 :select t)
+          ("*evil*"            :align below :size 50 :select t)
           ("*vc-diff*"         :align below :size 15  :noselect t)
           ("*vc-change-log*"   :align below :size 15  :select t)
           (vc-annotate-mode    :same t))))
@@ -592,7 +562,39 @@ SCHEDULED: %t
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
   (set (make-local-variable 'compile-command)
-       "go build -v && go test -v && go vet"))
+       "go build -v && go test -v && go vet")
+  :config
+  ;; Define function to call when go-mode loads
+  (defun my-go-mode-hook ()
+  (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
+  (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
+  (if (not (string-match "go" compile-command))   ; set compile command default
+      (set (make-local-variable 'compile-command)
+           "go build -v && go test -v && go vet"))
+
+  ;; guru settings
+  (go-guru-hl-identifier-mode)                    ; highlight identifiers
+
+  ;; Key bindings specific to go-mode
+  (local-set-key (kbd "M-.") 'godef-jump)         ; Go to definition
+  (local-set-key (kbd "M-*") 'pop-tag-mark)       ; Return from whence you came
+  (local-set-key (kbd "M-p") 'compile)            ; Invoke compiler
+  (local-set-key (kbd "M-P") 'recompile)          ; Redo most recent compile cmd
+  (local-set-key (kbd "M-]") 'next-error)         ; Go to next error (or msg)
+  (local-set-key (kbd "M-[") 'previous-error)     ; Go to previous error or msg
+
+  ;; Misc go stuff
+  (auto-complete-mode 1))                         ; Enable auto-complete mode
+
+;; Connect go-mode-hook with the function we just defined
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+
+;; Ensure the go specific autocomplete is active in go-mode.
+(with-eval-after-load 'go-mode
+   (require 'go-autocomplete)))
+
+(use-package go-autocomplete
+  :ensure t)
 
 (use-package go-projectile
   :ensure t)
@@ -603,15 +605,9 @@ SCHEDULED: %t
   (setq inferior-lisp-program "/usr/local/bin/sbcl")
   (setq slime-contribs '(slime-fancy)))
 
-(use-package puppet-mode
-  :ensure t
-  :config
-  (add-hook 'puppet-mode-hook 'flycheck-mode))
 
 (use-package yaml-mode
-  :ensure t
-  :config
-  (add-hook 'yaml-mode-hook 'flycheck-mode))
+  :ensure t)
 
 (use-package markdown-mode
   :ensure t
@@ -641,9 +637,7 @@ SCHEDULED: %t
   (add-hook 'jinja2-mode-hook 'jinja2-mode))
 
 (use-package json-mode
-  :ensure t
-  :config
-  (add-hook 'json-mode-hook 'flycheck-mode))
+  :ensure t)
 
 (use-package terraform-mode
   :defer t)
@@ -702,7 +696,7 @@ SCHEDULED: %t
  '(ivy-mode t)
  '(package-selected-packages
    (quote
-    (terraform-mode flycheck hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (eyebrowse go-autocomplete auto-complete-rst doom-modeline terraform-mode hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-default-method "ssh" nil (tramp))
@@ -714,7 +708,7 @@ SCHEDULED: %t
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(magit-mode-line-process ((t (:foreground "spring green"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "IBM Plex Mono")))))
 
 ;; Appeareance-related overrides
 (defun my/org-mode-hook ()
@@ -741,6 +735,25 @@ SCHEDULED: %t
                     :box '(:line-width 1 :color "#cccccc")
                     :overline nil
                     :underline nil)
+
+;; Global keybindings, some mirroring macOS behaviour
+(global-set-key (kbd "C--") 'split-window-vertically)
+(global-set-key (kbd "C-\\") 'split-window-horizontally)
+(global-set-key (kbd "M-w") 'kill-this-buffer)
+(global-set-key (kbd "M-s") 'evil-write)
+(global-set-key (kbd "M-f") 'evil-search-forward)
+(global-set-key (kbd "M-F") 'query-replace)
+(global-set-key (kbd "M-\=") 'text-scale-increase)
+(global-set-key (kbd "M--") 'text-scale-decrease)
+(global-set-key (kbd "M-o") 'counsel-find-file)
+(global-set-key (kbd "C-s") 'counsel-projectile-ag)
+(global-set-key (kbd "C-,") 'counsel-imenu)
+(global-set-key (kbd "M-v") 'yank)
+(global-set-key (kbd "M-c") 'kill-ring-save)
+(global-set-key (kbd "M-a") 'mark-whole-buffer)
+(global-set-key [(kbd "M-w")]
+                (lambda () (interactive) (delete-window)))
+(global-set-key (kbd "M-z") 'undo)
 
 ;; Startup speed tweaks / cheats
 (setq gc-cons-threshold 16777216
