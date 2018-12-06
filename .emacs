@@ -1,7 +1,4 @@
-;; Startup speed tweaks / cheats
-;; https://github.com/hlissner/doom-emacs/wiki/FAQ#how-is-dooms-startup-so-fast
-(setq gc-cons-threshold 402653184
-      gc-cons-percentage 0.6)
+(setq gc-cons-threshold 100000000)
 
 (setq user-mail-address "nick@dischord.org")
 
@@ -11,8 +8,8 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "IBM Plex Mono"
-                    :height 130
+                    :family "Triplicate T4c"
+                    :height 140
                     :width 'normal)
 ;; Light
 (set-background-color "#F4F4F4")
@@ -48,10 +45,8 @@
 ;; Use y / n instead of yes / no
 (fset 'yes-or-no-p 'y-or-n-p)
 
-
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
-
 
 ;; Package management
 (require 'package)
@@ -130,21 +125,18 @@
               (setq show-trailing-whitespace nil))))
 
 (use-package counsel
-  :ensure t)
+  :defer t)
 
 (use-package counsel-projectile
-  :ensure t)
-
-(use-package company
-  :ensure t)
+  :defer t)
 
 (use-package eyebrowse
-  :ensure t
+  :defer t
   :config
   (setq eyebrowse-mode 1))
 
 (use-package org-download
-  :ensure t
+  :defer t
   :config
   (setq org-download-method 'attach))
 
@@ -152,20 +144,20 @@
   :ensure nil
   :init
   (use-package tramp-theme
-    :ensure t)
+    :defer t)
   (use-package vagrant-tramp
-    :ensure t)
+    :defer t)
   :config
   (add-to-list 'tramp-default-proxies-alist
                '("stack@dev-director" nil "/ssh:ilab-gate:"))
   (setq tramp-default-method "ssh"))
 
 (use-package ein
-  :ensure t
+  :defer t
   :commands (ein:notebooklist-open))
 
 (use-package elpy
-  :ensure t
+  :defer t
   :disabled
   :init
   (with-eval-after-load 'python
@@ -176,10 +168,11 @@
 (use-package ranger
   :ensure t
   :config
+  (define-key ranger-mode-map (kbd "-") 'ranger-up-directory)
   (ranger-override-dired-mode t))
 
 (use-package git-gutter-fringe
-  :ensure t
+  :defer t
   :config
   (set-face-foreground 'git-gutter-fr:added "darkgreen")
   (set-face-background 'git-gutter-fr:added "#e2e2e2")
@@ -209,13 +202,6 @@
     (evil-leader/set-key
       "<SPC>" 'evil-buffer
       "b" 'ivy-switch-buffer
-      "el" 'eyebrowse-switch-to-window-config
-      "e," 'eyebrowse-rename-window-config
-      "e0" 'eyebrowse-switch-to-window-config-0
-      "e1" 'eyebrowse-switch-to-window-config-1
-      "e2" 'eyebrowse-switch-to-window-config-2
-      "e3" 'eyebrowse-switch-to-window-config-3
-      "e4" 'eyebrowse-switch-to-window-config-4
       "pp" 'counsel-projectile-switch-project
       "pf" 'counsel-projectile-find-file
       "ps" 'counsel-projectile-ag
@@ -234,8 +220,7 @@
       "q" 'evil-quit
       "x" 'evil-save-and-close
       "ws" 'evil-window-split
-      "f" 'fzf)
-
+      "f" 'counsel-fzf)
   :ensure t
   :config
   (evil-mode 1)
@@ -250,9 +235,6 @@
   (global-set-key (kbd "M-f") 'evil-search-forward)
   (setq evil-want-C-u-scroll t)
   (setq evil-symbol-word-search t)
-  (setq evil-normal-state-tag " N ")
-  (setq evil-insert-state-tag " I ")
-  (setq evil-visual-state-tag " V ")
 
   (use-package evil-magit
     :ensure t)
@@ -272,16 +254,18 @@
     :ensure t)))
 
 (use-package yasnippet
-  :ensure t
+  :defer t
   :config
   (unless yas-global-mode (yas-global-mode 1))
   (yas-minor-mode 1)
   (use-package yasnippet-snippets
-  :ensure t))
+  :defer t))
+
+(use-package fzf
+  :ensure t)
 
 ;; org-mode
 (use-package org
-  :ensure t
   :defer t
   :config
   (setq org-directory "~/Dropbox/org")
@@ -435,7 +419,7 @@ SCHEDULED: %t
 
 ;; MultiTerm
 (use-package multi-term
-  :ensure t
+  :defer t
   :config
   (setq multi-term-program "/bin/bash")
   (set-face-attribute 'term nil :background 'unspecified)
@@ -532,7 +516,7 @@ SCHEDULED: %t
 
 ;; Deft
 (use-package deft
-  :ensure t
+  :defer t
   :config
   (setq deft-extensions '("org" "txt"))
   (setq deft-directory "~/Dropbox/org")
@@ -554,11 +538,14 @@ SCHEDULED: %t
   :config
   (which-key-mode))
 
+(use-package company
+  :defer t)
+
 ;; Modes
 
 ;; Golang
 (use-package go-mode
-  :ensure t
+  :defer t
   :init
   (add-hook 'before-save-hook 'gofmt-before-save)
   (set (make-local-variable 'compile-command)
@@ -586,6 +573,11 @@ SCHEDULED: %t
   ;; Misc go stuff
   (auto-complete-mode 1))                         ; Enable auto-complete mode
 
+  (add-hook 'go-mode-hook
+      (lambda ()
+        (set (make-local-variable 'company-backends) '(company-go))
+        (company-mode)))
+
 ;; Connect go-mode-hook with the function we just defined
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
@@ -594,23 +586,22 @@ SCHEDULED: %t
    (require 'go-autocomplete)))
 
 (use-package go-autocomplete
-  :ensure t)
+  :defer t)
 
 (use-package go-projectile
-  :ensure t)
+  :defer t)
 
 (use-package slime
-  :ensure t
+  :defer t
   :config
   (setq inferior-lisp-program "/usr/local/bin/sbcl")
   (setq slime-contribs '(slime-fancy)))
 
-
 (use-package yaml-mode
-  :ensure t)
+  :defer t)
 
 (use-package markdown-mode
-  :ensure t
+  :defer t
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
@@ -618,26 +609,26 @@ SCHEDULED: %t
   :init (setq markdown-command "multimarkdown"))
 
 (use-package dockerfile-mode
-  :ensure t)
+  :defer t)
 
 (use-package ruby-mode
-  :ensure t)
+  :defer t)
 
 (use-package toml-mode
-  :ensure t)
+  :defer t)
 
 (use-package ansible
-  :ensure t
+  :defer t
   :config
   (add-hook 'yaml-mode-hook '(lambda () (ansible 1))))
 
 (use-package jinja2-mode
-  :ensure t
+  :defer t
   :config
   (add-hook 'jinja2-mode-hook 'jinja2-mode))
 
 (use-package json-mode
-  :ensure t)
+  :defer t)
 
 (use-package terraform-mode
   :defer t)
@@ -696,7 +687,7 @@ SCHEDULED: %t
  '(ivy-mode t)
  '(package-selected-packages
    (quote
-    (eyebrowse go-autocomplete auto-complete-rst doom-modeline terraform-mode hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (company-go flycheck eyebrowse go-autocomplete auto-complete-rst doom-modeline terraform-mode hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-default-method "ssh" nil (tramp))
@@ -708,7 +699,7 @@ SCHEDULED: %t
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(magit-mode-line-process ((t (:foreground "spring green"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "IBM Plex Mono")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
 
 ;; Appeareance-related overrides
 (defun my/org-mode-hook ()
@@ -754,7 +745,3 @@ SCHEDULED: %t
 (global-set-key [(kbd "M-w")]
                 (lambda () (interactive) (delete-window)))
 (global-set-key (kbd "M-z") 'undo)
-
-;; Startup speed tweaks / cheats
-(setq gc-cons-threshold 16777216
-      gc-cons-percentage 0.1)
