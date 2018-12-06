@@ -43,7 +43,7 @@
                                     fancy-battery
                                     evil-ediff
                                     winner
-				                            persp-mode
+                                    persp-mode
                                     neotree)
    dotspacemacs-install-packages 'used-only))
 
@@ -116,7 +116,6 @@
    ))
 
 (defun dotspacemacs/user-config ()
-
   ;; Dark
   ;; (set-background-color "#0D0C0C")
 
@@ -147,6 +146,7 @@
   (setq powerline-default-separator 'nil)
 
   ;; Mirror some standard macOS keybindings
+  (setq mac-command-modifier 'meta)
   (global-set-key (kbd "M-s") 'evil-write)
   (global-set-key (kbd "M-v") 'yank)
   (global-set-key (kbd "M-c") 'kill-ring-save)
@@ -204,46 +204,46 @@
   (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
 
   (set-face-attribute 'spaceline-evil-normal nil
-                      :background "#e9e9e9")
+                      :background "#f9f9f9")
 
   (set-face-attribute 'mode-line nil
-                      :background "#e9e9e9"
-                      :foreground "#332233"
+                      :background "#f9f9f9"
+                      :foreground "#110011"
                       :box '(:line-width 1 :color "#ebebeb")
                       :overline nil
                       :underline nil)
 
   (set-face-attribute 'powerline-active1 nil
-                      :background "#e9e9e9"
-                      :foreground "#332233"
+                      :background "#f9f9f9"
+                      :foreground "#110011"
                       :box '(:line-width 1 :color "#ebebeb")
                       :overline nil
                       :underline nil)
 
   (set-face-attribute 'powerline-active2 nil
-                      :background "#e9e9e9"
-                      :foreground "#332233"
+                      :background "#f9f9f9"
+                      :foreground "#110011"
                       :box '(:line-width 1 :color "#ebebeb")
                       :overline nil
                       :underline nil)
 
   (set-face-attribute 'powerline-inactive1 nil
                       :background "#f9f9f9"
-                      :foreground "#110011"
+                      :foreground "#c6c6c6"
                       :box '(:line-width 1 :color "#ebebeb")
                       :overline nil
                       :underline nil)
 
   (set-face-attribute 'powerline-inactive2 nil
                       :background "#f9f9f9"
-                      :foreground "#110011"
+                      :foreground "#c6c6c6"
                       :box '(:line-width 1 :color "#ebebeb")
                       :overline nil
                       :underline nil)
 
   (set-face-attribute 'mode-line-inactive nil
                       :background "#f9f9f9"
-                      :foreground "#110011"
+                      :foreground "#c6c6c6"
                       :box '(:line-width 1 :color "#ebebeb")
                       :overline nil
                       :underline nil)
@@ -318,7 +318,7 @@ This function is called at the very end of Spacemacs initialization."
  '(jdee-db-spec-breakpoint-face-colors (cons "#f0f0f0" "#9ca0a4"))
  '(package-selected-packages
    (quote
-    (vagrant-tramp vagrant treepy graphql terraform-mode hcl-mode dim unfill reveal-in-osx-finder pbcopy osx-trash osx-dictionary mwim launchctl wgrep smex ivy-hydra flyspell-correct-ivy counsel-projectile counsel swiper ivy helm-company helm-c-yasnippet fuzzy company-statistics company-go company-ansible company-anaconda company auto-yasnippet yasnippet ac-ispell auto-complete rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv rake puppet-mode minitest chruby bundler inf-ruby yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc go-guru go-eldoc go-mode cython-mode anaconda-mode pythonic jinja2-mode ansible-doc ansible ranger yaml-mode doom-themes org-projectile org-plus-contrib xterm-color smeargle shell-pop orgit org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download multi-term mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit ghub with-editor eshell-z eshell-prompt-extras esh-help auto-dictionary ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin pcre2el paradox spinner org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+    (doom-modeline treepy graphql terraform-mode hcl-mode dim unfill reveal-in-osx-finder pbcopy osx-trash osx-dictionary mwim launchctl wgrep smex ivy-hydra flyspell-correct-ivy counsel-projectile counsel swiper ivy helm-company helm-c-yasnippet fuzzy company-statistics company-go company-ansible company-anaconda company auto-yasnippet yasnippet ac-ispell auto-complete rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv rake puppet-mode minitest chruby bundler inf-ruby yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc go-guru go-eldoc go-mode cython-mode anaconda-mode pythonic jinja2-mode ansible-doc ansible ranger yaml-mode doom-themes org-projectile org-plus-contrib xterm-color smeargle shell-pop orgit org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download multi-term mmm-mode markdown-toc markdown-mode magit-gitflow htmlize helm-gitignore gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit ghub with-editor eshell-z eshell-prompt-extras esh-help auto-dictionary ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
  '(vc-annotate-background "#fafafa")
  '(vc-annotate-color-map
    (list
