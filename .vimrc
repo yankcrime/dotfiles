@@ -7,17 +7,14 @@ silent! call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-vinegar'
-Plug 'tpope/vim-dispatch'
 Plug 'machakann/vim-sandwich'
-Plug 'godlygeek/tabular'
 Plug 'cespare/vim-sbd'
-Plug 'christoomey/vim-tmux-navigator'
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'pearofducks/ansible-vim', { 'branch': 'v2', 'for': ['yaml.ansible'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
-Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
 Plug 'w0rp/ale', { 'for': ['puppet','ansible','yaml','python','go','ruby'] }
 Plug 'rking/ag.vim'
 Plug 'justinmk/vim-dirvish'
@@ -25,13 +22,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'jszakmeister/vim-togglecursor'
 Plug 'hashivim/vim-terraform', { 'for': ['terraform'] }
-Plug 'chriskempson/base16-vim'
-Plug 'yankcrime/vim-colors-off'
-Plug 'sjl/badwolf'
 Plug 'robertmeta/nofrils'
-Plug 'Lokaltog/vim-monotone'
-Plug 'cormacrelf/vim-colors-github'
-Plug 'JaySandhu/xcode-vim'
 
 call plug#end()
 
@@ -47,14 +38,6 @@ set breakindentopt=shift:4,sbr " indenting them another level and showing 'showb
 set showbreak=↪
 
 set number
-
-" set number relativenumber
-" 
-" augroup numbertoggle
-"   autocmd!
-"   autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
-"   autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
-" augroup END
 
 set hidden " Don't moan about changes when switching buffers
 set matchpairs=(:),{:},[:],<:> " Add <> to % matching
@@ -112,57 +95,12 @@ hi Terminal ctermbg=none ctermfg=none
 hi clear SignColumn
 set laststatus=2
 
-" insert a datestamp at the top of a file
-nnoremap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
-
-" fugitive shortcuts
-noremap <leader>ga :Gwrite<CR>
-noremap <leader>gc :Gcommit<CR>
-noremap <leader>gp :Gpush<CR>
-noremap <leader>gs :Gstatus<CR>
-
-" convenience remap - one less key to press
-nnoremap ; :
-
-" juggling with quickfix entries
-nnoremap <End>  :cnext<CR>
-nnoremap <Home> :cprevious<CR>
-
-" juggling with buffers
-nnoremap <PageUp>   :bprevious<CR>
-nnoremap <PageDown> :bnext<CR>
-nnoremap <BS>       :buffer#<CR>
-
 " super quick search and replace
 nnoremap <Space><Space> :'{,'}s/\<<C-r>=expand("<cword>")<CR>\>/
 nnoremap <Space>%       :%s/\<<C-r>=expand("<cword>")<CR>\>/
 
 " terminal stuff
 tnoremap <leader><Esc> <C-W>N
-
-" do some sensible things with listings
-cnoremap <expr> <CR> <SID>CCR()
-function! s:CCR()
-	command! -bar Z silent set more|delcommand Z
-	if getcmdtype() == ":"
-		let cmdline = getcmdline()
-	    if cmdline =~ '\v\C^(dli|il)' | return "\<CR>:" . cmdline[0] . "jump   " . split(cmdline, " ")[1] . "\<S-Left>\<Left>\<Left>"
-		elseif cmdline =~ '\v\C^(cli|lli)' | return "\<CR>:silent " . repeat(cmdline[0], 2) . "\<Space>"
-		elseif cmdline =~ '\C^changes' | set nomore | return "\<CR>:Z|norm! g;\<S-Left>"
-		elseif cmdline =~ '\C^ju' | set nomore | return "\<CR>:Z|norm! \<C-o>\<S-Left>"
-		elseif cmdline =~ '\v\C(#|nu|num|numb|numbe|number)$' | return "\<CR>:"
-		elseif cmdline =~ '\C^ol' | set nomore | return "\<CR>:Z|e #<"
-		elseif cmdline =~ '\v\C^(ls|files|buffers)' | return "\<CR>:b"
-		elseif cmdline =~ '\C^marks' | return "\<CR>:norm! `"
-		elseif cmdline =~ '\C^undol' | return "\<CR>:u "
-		else | return "\<CR>" | endif
-	else | return "\<CR>" | endif
-endfunction
-
-" Make vim deal with scoped identifiers instead of just hitting top-level
-" modules when using ctags with Puppet code
-set iskeyword=-,:,@,48-57,_,192-255
-au FileType puppet setlocal isk+=:
 
 " }}} End general settings
 " {{{ Statusline
@@ -230,7 +168,7 @@ nnoremap <silent> <C-x> :Sbd<CR>
 nnoremap <silent> <leader>bdm :Sbdm<CR>
 " }}}
 " {{{ Markdown
-nnoremap <leader>m :silent !open -a Marked.app '%:p'<cr>
+nnoremap <leader>m :silent !open -a Marked 2.app '%:p'<cr>
 " }}}
 " {{{ Silver Searcher (Ag)
 function! AGSearch() abort
@@ -273,21 +211,6 @@ if has('nvim')
     command! -nargs=* T split | terminal <args>
     command! -nargs=* VT vsplit | terminal <args>
     nnoremap <leader>t :T<cr>
-end
-" }}}
-" {{{ GUI overrides
-if has('gui_running')
-    set linespace=1
-    set fuoptions=maxvert,maxhorz
-    set guifont=Triplicate\ T4c:h14
-    hi StatuslineTermNC term=reverse ctermfg=243 ctermbg=236 guifg=#767676 guibg=#303030
-    set guioptions=e " don't use gui tab apperance
-    set guioptions=T " hide toolbar
-    set guioptions=r " don't show scrollbars
-    set guioptions=l " don't show scrollbars
-    set guioptions=R " don't show scrollbars
-    set guioptions-=L " don't show scrollbars
-    set gtl=%t gtt=%F " tab headings
 end
 " }}}
 
