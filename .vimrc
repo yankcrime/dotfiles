@@ -141,11 +141,14 @@ nnoremap <silent> <leader>bdm :Sbdm<CR>
 nnoremap <leader>m :silent !open -a Marked 2.app '%:p'<cr>
 " }}}
 " {{{ Silver Searcher (Ag)
+if executable('ag')
+  let g:ackprg = 'ag --vimgrep'
+endif
 function! AGSearch() abort
     call inputsave()
     let searchterm = input('Search string: ')
     call inputrestore()
-    execute 'Ag' searchterm
+    execute 'Ack' searchterm
 endfunction
 nnoremap <C-s> :call AGSearch()<cr>
 " }}}
