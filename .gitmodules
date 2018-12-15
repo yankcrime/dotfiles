@@ -1,0 +1,51 @@
+[submodule ".vim/pack/default/ale"]
+	path = .vim/pack/default/ale
+	url = https://git::@github.com/w0rp/ale.git
+[submodule ".vim/pack/default/nofrils"]
+	path = .vim/pack/default/nofrils
+	url = https://github.com/robertmeta/nofrils.git
+[submodule ".vim/pack/default/dotfiles"]
+	path = .vim/pack/default/dotfiles
+	url = git@github.com:yankcrime/dotfiles.git
+[submodule ".vim/pack/default/vim-colors-off"]
+	path = .vim/pack/default/vim-colors-off
+	url = https://github.com/yankcrime/vim-colors-off.git
+[submodule ".vim/pack/default/vim-commentary"]
+	path = .vim/pack/default/vim-commentary
+	url = https://git::@github.com/tpope/vim-commentary.git
+[submodule ".vim/pack/default/vim-dirvish"]
+	path = .vim/pack/default/vim-dirvish
+	url = https://github.com/justinmk/vim-dirvish.git
+[submodule ".vim/pack/default/vim-fugitive"]
+	path = .vim/pack/default/vim-fugitive
+	url = https://git::@github.com/tpope/vim-fugitive.git
+[submodule ".vim/pack/default/vim-go"]
+	path = .vim/pack/default/vim-go
+	url = https://github.com/fatih/vim-go.git
+[submodule ".vim/pack/default/vim-markdown"]
+	path = .vim/pack/default/vim-markdown
+	url = https://github.com/tpope/vim-markdown.git
+[submodule ".vim/pack/default/vim-sandwich"]
+	path = .vim/pack/default/vim-sandwich
+	url = https://github.com/machakann/vim-sandwich.git
+[submodule ".vim/pack/default/vim-sbd"]
+	path = .vim/pack/default/vim-sbd
+	url = https://git::@github.com/cespare/vim-sbd.git
+[submodule ".vim/pack/default/vim-sleuth"]
+	path = .vim/pack/default/vim-sleuth
+	url = https://github.com/tpope/vim-sleuth.git
+[submodule ".vim/pack/default/vim-terraform"]
+	path = .vim/pack/default/vim-terraform
+	url = https://github.com/hashivim/vim-terraform.git
+[submodule ".vim/pack/default/vim-togglecursor"]
+	path = .vim/pack/default/vim-togglecursor
+	url = https://github.com/jszakmeister/vim-togglecursor.git
+[submodule ".vim/pack/default/vim-unimpaired"]
+	path = .vim/pack/default/vim-unimpaired
+	url = https://git::@github.com/tpope/vim-unimpaired.git
+[submodule ".vim/pack/default/vim-vinegar"]
+	path = .vim/pack/default/vim-vinegar
+	url = https://github.com/tpope/vim-vinegar.git
+[submodule ".vim/pack/default/vim-yaml"]
+	path = .vim/pack/default/vim-yaml
+	url = https://git::@github.com/stephpy/vim-yaml.git

@@ -1,32 +1,6 @@
 " .vimrc
 " nick@dischord.org
 
-" {{{ Plugins
-silent! call plug#begin('~/.vim/plugged')
-
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-unimpaired'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-markdown'
-Plug 'tpope/vim-sleuth'
-Plug 'tpope/vim-vinegar'
-Plug 'machakann/vim-sandwich'
-Plug 'cespare/vim-sbd'
-Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
-Plug 'pearofducks/ansible-vim', { 'branch': 'v2', 'for': ['yaml.ansible'] }
-Plug 'fatih/vim-go', { 'for': ['go'] }
-Plug 'w0rp/ale', { 'for': ['puppet','ansible','yaml','python','go','ruby'] }
-Plug 'rking/ag.vim'
-Plug 'justinmk/vim-dirvish'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'jszakmeister/vim-togglecursor'
-Plug 'hashivim/vim-terraform', { 'for': ['terraform'] }
-Plug 'robertmeta/nofrils'
-
-call plug#end()
-
-" }}} end vim-plug
 " {{{ General
 
 set nobackup " Irrelevant these days
@@ -81,17 +55,13 @@ set tags=./tags; " Tell vim to look upwards in the directory hierarchy for a tag
 cmap w!! w !sudo tee % >/dev/null
 
 " appearance
-" set cursorline
 set t_Co=256
 set termguicolors
 colorscheme nofrils-light
 
 hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
 hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
-" hi StatusLineNC guifg=#555555 guibg=NONE gui=underline
 hi Terminal ctermbg=none ctermfg=none
-" hi StatuslineTerm ctermbg=237 ctermfg=231 gui=bold
-" hi StatuslineTermNC term=reverse ctermfg=243 ctermbg=236 guifg=#767676 guibg=#303030
 hi clear SignColumn
 set laststatus=2
 
@@ -195,23 +165,6 @@ let g:ale_sign_warning='●'
 hi ALEErrorSign ctermfg=red ctermbg=none
 let g:ale_sign_error='●'
 hi ALEWarningSign ctermfg=yellow ctermbg=none
-" }}}
-" {{{ Neovim
-if has('nvim')
-    nnoremap <BS> <C-w>h
-"    tnoremap <C-h> <C-\><C-N><C-w>h
-"    tnoremap <C-j> <C-\><C-N><C-w>j
-"    tnoremap <C-k> <C-\><C-N><C-w>k
-"    tnoremap <C-l> <C-\><C-N><C-w>l
-    tnoremap <esc><esc> <C-\><C-n>
-    au TermOpen * setlocal nonumber norelativenumber
-    let g:terminal_scrollback_buffer_size = 10000
-    let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
-    set inccommand=nosplit
-    command! -nargs=* T split | terminal <args>
-    command! -nargs=* VT vsplit | terminal <args>
-    nnoremap <leader>t :T<cr>
-end
 " }}}
 
 " vim:ts=4:sw=4:ft=vimrc:et
