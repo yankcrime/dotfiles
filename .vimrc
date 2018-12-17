@@ -55,6 +55,7 @@ set tags=./tags; " Tell vim to look upwards in the directory hierarchy for a tag
 cmap w!! w !sudo tee % >/dev/null
 
 " appearance
+syntax on
 set t_Co=256
 set termguicolors
 colorscheme nofrils-light
