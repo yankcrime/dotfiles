@@ -4,7 +4,7 @@
 # usual suspects
 #
 export EDITOR="vim"
-export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
+export VAGRANT_DEFAULT_PROVIDER="libvirt"
 export PURE_PROMPT_SYMBOL="$"
 
 # history and general options
@@ -42,7 +42,7 @@ alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
-alias vim='/usr/local/bin/vim'
+alias neomutt='echo -n -e "\033]0;neomutt\007" && neomutt'
 
 # <3 vagrant
 #
@@ -64,7 +64,7 @@ alias gitsup='git submodule sync ; git submodule update --init'
 
 # emacs
 #
-alias emacs='open -a /Applications/Emacs.app $1'
+alias emacs='emacsclient -n'
 
 # stuff that makes zsh worthwhile
 #
@@ -117,7 +117,31 @@ if [[ $(hostname -s) == deadline ]]; then
         fi
     }
     PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.>) '
- else
+
+    # change cursor shape based on which vi mode we're in
+    # via https://emily.st/2013/05/03/zsh-vi-cursor/
+    #
+    # Dependency on iTerm, so macOS only for now
+    function zle-keymap-select zle-line-init
+    {
+        case $KEYMAP in
+            vicmd)      print -n -- "\E]50;CursorShape=0\C-G";;  # block cursor
+            viins|main) print -n -- "\E]50;CursorShape=1\C-G";;  # line cursor
+        esac
+
+        zle reset-prompt
+        zle -R
+    }
+
+    function zle-line-finish
+    {
+        print -n -- "\E]50;CursorShape=0\C-G"  # block cursor
+    }
+
+    zle -N zle-line-init
+    zle -N zle-line-finish
+    zle -N zle-keymap-select
+else
     PS1='%n@%m:%25<..<%~%(!.#.>) '
 fi
 
@@ -133,32 +157,10 @@ bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-pattern-search-backward
 export KEYTIMEOUT=1
 
-# change cursor shape based on which vi mode we're in
-# via https://emily.st/2013/05/03/zsh-vi-cursor/
-#
-function zle-keymap-select zle-line-init
-{
-    case $KEYMAP in
-        vicmd)      print -n -- "\E]50;CursorShape=0\C-G";;  # block cursor
-        viins|main) print -n -- "\E]50;CursorShape=1\C-G";;  # line cursor
-    esac
-
-    zle reset-prompt
-    zle -R
-}
-
-function zle-line-finish
-{
-    print -n -- "\E]50;CursorShape=0\C-G"  # block cursor
-}
-
-zle -N zle-line-init
-zle -N zle-line-finish
-zle -N zle-keymap-select
 
 # pyenv and rbenv junk
 #
-if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+# if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 if which pyenv > /dev/null; then
     export PYENV_ROOT="$HOME/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"

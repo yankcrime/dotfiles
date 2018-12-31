@@ -36,6 +36,8 @@ Plug 'chriskempson/base16-vim'
 Plug 'yankcrime/vim-colors-off'
 Plug 'sjl/badwolf'
 Plug 'robertmeta/nofrils'
+Plug 'Lokaltog/vim-monotone'
+Plug 'kamwitsta/flatwhite-vim'
 
 call plug#end()
 
@@ -93,8 +95,14 @@ set tags=./tags; " Tell vim to look upwards in the directory hierarchy for a tag
 
 cmap w!! w !sudo tee % >/dev/null
 
+nmap <silent> tt :tabnew<CR>
+nmap <silent> [g :tabprevious<CR>
+nmap <silent> ]g :tabnext<CR>
+nmap <silent> [G :tabrewind<CR>
+nmap <silent> ]G :tablast<CR>
+
 " appearance
-set cursorline
+set nocursorline
 set t_Co=256
 if exists('+termguicolors')
   let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
@@ -180,7 +188,6 @@ function! s:statusline_expr()
   return ' [%n] %.40F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
 endfunction
 let &statusline = s:statusline_expr()
- 
 " }}}
 " {{{ FZF
 " Hide statusline
@@ -215,6 +222,21 @@ autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
 command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+
+" let g:fzf_colors =
+" \ { 'fg':      ['fg', 'Normal'],
+"   \ 'bg':      ['bg', 'Normal'],
+"   \ 'hl':      ['fg', 'Comment'],
+"   \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+"   \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+"   \ 'hl+':     ['fg', 'Statement'],
+"   \ 'info':    ['fg', 'PreProc'],
+"   \ 'border':  ['fg', 'Ignore'],
+"   \ 'prompt':  ['fg', 'Conditional'],
+"   \ 'pointer': ['fg', 'Exception'],
+"   \ 'marker':  ['fg', 'Keyword'],
+"   \ 'spinner': ['fg', 'Label'],
+"   \ 'header':  ['fg', 'Comment'] }
 
 " }}}
 " {{{ Golang

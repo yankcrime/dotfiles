@@ -9,19 +9,23 @@
 (add-to-list 'default-frame-alist '(width . 110))
 (scroll-bar-mode 0)
 (tool-bar-mode -1)
+(menu-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "Triplicate T4c"
-                    :height 140
+                    :family "PragmataPro"
+                    :height 120
                     :width 'normal)
+
+;;                    :powerline-scale 0.8)
+
 
 (setq initial-scratch-message "")
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Tooltips etc.
 (set-face-attribute 'variable-pitch nil
-                    :family "Helvetica Neue"
-                    :height 140
+                    :family "San Francisco Text"
+                    :height 120
                     :weight 'regular)
 
 ;; Kill the welcome buffer
@@ -66,7 +70,6 @@
 
 (setq-default tab-width 4 indent-tabs-mode nil)
 (define-key global-map (kbd "RET") 'newline-and-indent)
-
 
 ;; Package management
 (require 'package)
@@ -116,9 +119,6 @@
                               (format-mode-line (list
                                                  "ℓ %l:%c %p%%")))))
 
-
-
-
 (use-package minions
   :ensure t
   :init (minions-mode)
@@ -153,15 +153,6 @@
 
 (use-package counsel-projectile
   :ensure t)
-
-; This is too slow on macOS with TRAMP buffers....
-;(use-package ivy-rich
-;  :ensure t
-;  :config
-;  (setq ivy-virtual-abbreviate 'full
-;        ivy-rich-switch-buffer-align-virtual-buffer t)
-;  (setq ivy-rich-abbreviate-paths t)
-;  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package company
   :ensure t)
@@ -218,8 +209,9 @@
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
   :config
-  (doom-themes-org-config)
-  (load-theme 'doom-one-light t))
+  (load-theme 'doom-one t))
+
+(set-background-color "#0D0C0C")
 
 ; Evil mode and related
 (use-package evil
@@ -242,9 +234,9 @@
       "ga" 'magit-stage-file
       "gc" 'magit-commit
       "gp" 'magit-push
-      "aol" 'org-todo-list
-      "aoa" 'org-agenda
-      "aoc" 'org-task-capture
+      "ol" 'org-todo-list
+      "oa" 'org-agenda
+      "oc" 'org-task-capture
       "tm" 'hide-mode-line-mode
       "ts" 'flyspell-mode
       "wo" 'delete-other-windows
@@ -270,6 +262,11 @@
   (setq evil-normal-state-tag " N ")
   (setq evil-insert-state-tag " I ")
   (setq evil-visual-state-tag " V ")
+
+  (use-package evil-surround
+    :ensure t
+    :config
+    (global-evil-surround-mode 1))
 
   (use-package evil-magit
     :ensure t)
@@ -442,6 +439,12 @@ SCHEDULED: %t
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
+;; Eyebrowse
+(use-package eyebrowse
+  :ensure t
+  :config
+  (eyebrowse-mode 1))
+
 ;; mmm-mode
 (use-package mmm-mode
   :ensure t
@@ -515,18 +518,18 @@ SCHEDULED: %t
           ;; Emacs
           ("*Pp Eval Output*"  :align below :size 0.3)
           ("*Apropos*"         :align below :size 0.3)
-          ("*Backtrace*"       :align below :size 25  :noselect t)
-          ("*Help*"            :align below :size 16  :select t)
-          ("*Messages*"        :align below :size 15  :select t)
-          ("*Warnings*"        :align below :size 10  :noselect t)
-          ("*compilation*"     :align below :size 15  :noselect t)
-          ("*Flycheck errors*" :align below :size 15  :noselect t)
-          (compilation-mode    :align below :size 15  :noselect t)
-          (eww-mode            :align below :size 30  :select t)
-          ("*command-log*"     :align right :size 28  :noselect t)
-          ("*magit*"            :align below :size 50 :select t)
-          ("*vc-diff*"         :align below :size 15  :noselect t)
-          ("*vc-change-log*"   :align below :size 15  :select t)
+          ("*Backtrace*"       :align below :size 25 :noselect t)
+          ("*Help*"            :align below :size 16 :select t)
+          ("*Messages*"        :align below :size 15 :select t)
+          ("*Warnings*"        :align below :size 10 :noselect t)
+          ("*compilation*"     :align below :size 15 :noselect t)
+          ("*Flycheck errors*" :align below :size 15 :noselect t)
+          (compilation-mode    :align below :size 15 :noselect t)
+          (eww-mode            :align below :size 30 :select t)
+          ("*command-log*"     :align right :size 28 :noselect t)
+          ("*magit*"           :align below :size 50 :select t)
+          ("*vc-diff*"         :align below :size 15 :noselect t)
+          ("*vc-change-log*"   :align below :size 15 :select t)
           (vc-annotate-mode    :same t))))
 
 ;; Do something about popups as well
@@ -698,11 +701,15 @@ SCHEDULED: %t
    (quote
     ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
  '(fci-rule-color "#222222")
+ '(feebleline-show-dir t t)
+ '(feebleline-show-git-branch t)
+ '(feebleline-show-previous-buffer nil)
+ '(feebleline-show-time nil)
  '(hl-sexp-background-color "#efebe9")
  '(ivy-mode t)
  '(package-selected-packages
    (quote
-    (terraform-mode flycheck hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
+    (moody sphinx-mode eyebrowse auto-dim-other-buffers minimal-theme terraform-mode flycheck hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
  '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
  '(pyenv-mode t)
  '(tramp-default-method "ssh" nil (tramp))
@@ -714,33 +721,19 @@ SCHEDULED: %t
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(magit-mode-line-process ((t (:foreground "spring green"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "PragmataPro")))))
 
-;; Appeareance-related overrides
+; Appeareance-related overrides
 (defun my/org-mode-hook ()
-  "Stop the org-level headers from increasing in height relative to the other text."
-  (dolist (face '(org-level-1
-                  org-level-2
-                  org-level-3
-                  org-level-4
-                  org-level-5))
-    (set-face-attribute face nil :height 1.0)))
+   "Stop the org-level headers from increasing in height relative to the other text."
+   (dolist (face '(org-level-1
+                   org-level-2
+                   org-level-3
+                   org-level-4
+                   org-level-5))
+     (set-face-attribute face nil :height 1.0)))
 
 (add-hook 'org-mode-hook 'my/org-mode-hook)
-
-(set-face-attribute 'mode-line nil
-                    :background "#e9e9e9"
-                    :foreground "#332233"
-                    :box '(:line-width 1 :color "#cccccc")
-                    :overline nil
-                    :underline nil)
-
-(set-face-attribute 'mode-line-inactive nil
-                    :background "#fdfdfd"
-                    :foreground "#aaaaaa"
-                    :box '(:line-width 1 :color "#cccccc")
-                    :overline nil
-                    :underline nil)
 
 ;; Startup speed tweaks / cheats
 (setq gc-cons-threshold 16777216
