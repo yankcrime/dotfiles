@@ -1,53 +1,39 @@
-Xft.dpi: 144
+!urxvt*font:             xft:Terminus:size=10
+urxvt*font:             xft:Bitstream Vera Sans Mono:size=10, xft:FontAwesome:size=6, xft:Icons:size:6
+urxvt*termName:         rxvt
+urxvt*background:       !000000
+urxvt*foreground:       !cccccc
+urxvt*scrollBar:        false
+urxvt*perl-lib:         /usr/lib/urxvt/perl/
+urxvt*perl-ext-common:  default,matcher
+!urxvt*urlLauncher:      /usr/bin/jumanji
+urxvt*matcher.button:   1
+!urxvt*fading:           50
+!urxvt*fadeColor:        !000000
 
-Xcursor.theme: adwaita
+!Xft*dpi:                96
+!Xft*antialias:          true
+!Xft*hinting:            full
 
-XTerm.vt100.faceName:           monospace:pixelsize=22
+urxvt*background:       rgba:0000/0000/0000/cccc
 
-URxvt.font:                     xft:PragmataPro:pixelsize=30
-URxvt.scrollBar:		false
-URxvt.keysym.M-v:               eval:paste_clipboard
-URxvt.clipboard.autocopy:   true
-URxvt.clipboard.copycmd:    xclip -i -selection clipboard
-URxvt.clipboard.pastecmd:   xclip -o -selection clipboard
-URxvt*fading: 30
-URxvt*cursorColor: #e06c70
-
-! Atom One Light theme
-urxvt*background: #F2F2F2
-urxvt*foreground: #383a42
-urxvt*color0: #000000
-urxvt*color1: #E45649
-urxvt*color2: #50A14F
-urxvt*color3: #986801
-urxvt*color4: #4078F2
-urxvt*color5: #A626A4
-urxvt*color6: #0184BC
-urxvt*color7: #A0A1A7
-urxvt*color8: #5c6370
-urxvt*color9: #e06c75
-urxvt*color10: #50A14F
-urxvt*color11: #986801
-urxvt*color12: #4078F2
-urxvt*color13: #A626A4
-urxvt*color14: #0184BC
-urxvt*color15: #000000
-
-*background: #F2F2F2
-*foreground: #383a42
-*color0: #000000
-*color1: #E45649
-*color2: #50A14F
-*color3: #986801
-*color4: #4078F2
-*color5: #A626A4
-*color6: #0184BC
-*color7: #A0A1A7
-*color8: #5c6370
-*color9: #e06c75
-*color10: #50A14F
-*color11: #986801
-*color12: #4078F2
-*color13: #A626A4
-*color14: #0184BC
-*color15: #000000
+URxvt.transparent:   true
+URxvt.tintColor:     white
+URxvt.shading:       20 
+ 
+URxvt*color0:      !000000
+URxvt*color1:      !9e1828
+URxvt*color2:      !aece92
+URxvt*color3:      !968a38
+URxvt*color4:      !414171
+URxvt*color5:      !963c59
+URxvt*color6:      !418179
+URxvt*color7:      !bebebe
+URxvt*color8:      !666666
+URxvt*color9:      !cf6171
+URxvt*color10:     !c5f779
+URxvt*color11:     !fff796
+URxvt*color12:     !4186be
+URxvt*color13:     !cf9ebe
+URxvt*color14:     !71bebe
+URxvt*color15:     !ffffff
