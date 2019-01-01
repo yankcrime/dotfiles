@@ -58,7 +58,8 @@ cmap w!! w !sudo tee % >/dev/null
 syntax on
 set t_Co=256
 set termguicolors
-colorscheme nofrils-light
+set background=light
+colorscheme off
 
 hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
 hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
