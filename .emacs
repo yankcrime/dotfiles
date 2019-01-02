@@ -1,4 +1,5 @@
-(setq gc-cons-threshold 100000000)
+;; Startup speed tweaks
+(setq gc-cons-threshold (* 5 1000 1000))
 
 (setq user-mail-address "nick@dischord.org")
 
@@ -27,8 +28,20 @@
                     :height 140
                     :weight 'regular)
 
-;; Kill the welcome buffer
+;; Minimal startup
 (setq inhibit-startup-message t)
+(setq inhibit-splash-screen t)
+(setq initial-scratch-message nil)
+
+;; Buffer switching
+(winner-mode t)
+
+;; Better scrolling
+(pixel-scroll-mode)
+
+;; Titlebar on macOS
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist '(ns-appearance . light))
 
 ;; Highlight matching parens
 (show-paren-mode)
@@ -106,12 +119,20 @@
   :config (setq minions-direct '(cider-mode
                                  overwrite-mode)))
 
+;; Dim inactive buffers
+(use-package auto-dim-other-buffers
+  :ensure t
+  :config
+  (add-hook 'after-init-hook (lambda ()
+  (when (fboundp 'auto-dim-other-buffers-mode)
+    (auto-dim-other-buffers-mode t)))))
+
 ;; Completion framework
 (use-package counsel
   :ensure t)
 
 (use-package counsel-projectile
-  :defer t)
+  :ensure t)
 
 ;; Completion frontend
 (use-package ivy
@@ -293,6 +314,12 @@
   (setq org-adapt-indentation nil)
   (setq org-startup-indented 'true)
   (setq org-src-tab-acts-natively t)
+  (setq org-startup-with-inline-images t)
+  (add-hook
+   'org-babel-after-execute-hook
+   (lambda ()
+     (when org-inline-image-overlays
+       (org-redisplay-inline-images))))
   (setq org-refile-targets '((org-agenda-files :maxlevel . 2)))
   (setq org-capture-templates
         '(("a" "New TODO:" entry
@@ -437,7 +464,7 @@ SCHEDULED: %t
 
 ;; Projectile
 (use-package projectile
-  :defer t
+  :ensure t
   :config
   (projectile-global-mode +1)
   (setq projectile-completion-system 'ivy)
@@ -686,6 +713,7 @@ SCHEDULED: %t
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(auto-dim-other-buffers-face ((t (:background "#ececec"))))
  '(magit-mode-line-process ((t (:foreground "spring green"))))
  '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
 
@@ -707,6 +735,7 @@ SCHEDULED: %t
 (global-set-key [(kbd "M-w")]
                 (lambda () (interactive) (delete-window)))
 (global-set-key (kbd "M-z") 'undo)
+(global-set-key (kbd "M-N") 'make-frame-command)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -715,4 +744,7 @@ SCHEDULED: %t
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (org-bullets org-plus-contrib counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions hide-mode-line use-package))))
+    (counsel-projectile projectile yaml-mode org-bullets org-plus-contrib counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions hide-mode-line use-package))))
+
+;; Lower GC values post-initialisation
+(setq gc-cons-threshold (* 5 1000 1000))
