@@ -694,16 +694,22 @@ SCHEDULED: %t
 
 (add-hook 'org-mode-hook 'my/org-mode-hook)
 
+;; Mode-line colouring
+(defvar active-modeline-bg "#f9f9f9")
+(defvar active-modeline-fg "#110011")
+(defvar inactive-modeline-fg "#777777")
+(defvar inactive-modeline-bg "#c6c6c6")
+
 (set-face-attribute 'mode-line nil
-                    :background "#e9e9e9"
-                    :foreground "#332233"
+                    :background active-modeline-bg
+                    :foreground active-modeline-fg
                     :box '(:line-width 1 :color "#cccccc")
                     :overline nil
                     :underline nil)
 
 (set-face-attribute 'mode-line-inactive nil
-                    :background "#fdfdfd"
-                    :foreground "#aaaaaa"
+                    :background inactive-modeline-bg
+                    :foreground inactive-modeline-fg
                     :box '(:line-width 1 :color "#cccccc")
                     :overline nil
                     :underline nil)
