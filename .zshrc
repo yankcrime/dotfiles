@@ -1,6 +1,9 @@
 # .zshrc
 # nick@dischord.org
 
+# don't do anything if its emacs tramp mode
+[[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
+
 # usual suspects
 #
 export EDITOR="vim"
