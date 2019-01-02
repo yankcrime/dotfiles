@@ -11,8 +11,12 @@
                     :family "Triplicate T4c"
                     :height 140
                     :width 'normal)
-;; Light
-(set-background-color "#F4F4F4")
+
+;; Hide some menu junk
+(define-key global-map [menu-bar tools gnus] nil)
+(define-key global-map [menu-bar tools rmail] nil)
+(define-key global-map [menu-bar tools compose-mail] nil)
+(define-key global-map [menu-bar tools games] nil)
 
 (setq initial-scratch-message "")
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -102,6 +106,14 @@
   :config (setq minions-direct '(cider-mode
                                  overwrite-mode)))
 
+;; Completion framework
+(use-package counsel
+  :ensure t)
+
+(use-package counsel-projectile
+  :defer t)
+
+;; Completion frontend
 (use-package ivy
   :ensure t
   :config
@@ -123,12 +135,6 @@
   (add-hook 'minibuffer-setup-hook
             (lambda ()
               (setq show-trailing-whitespace nil))))
-
-(use-package counsel
-  :defer t)
-
-(use-package counsel-projectile
-  :defer t)
 
 (use-package eyebrowse
   :defer t
@@ -189,6 +195,9 @@
   :config
   (doom-themes-org-config)
   (load-theme 'doom-one-light t))
+
+;; Override and set a light background
+(set-background-color "#F4F4F4")
 
 ; Evil mode and related
 (use-package evil
@@ -417,21 +426,6 @@ SCHEDULED: %t
 (use-package poly-markdown
   :ensure t)
 
-;; MultiTerm
-(use-package multi-term
-  :defer t
-  :config
-  (setq multi-term-program "/bin/bash")
-  (set-face-attribute 'term nil :background 'unspecified)
-  (add-hook 'term-mode-hook
-            (lambda ()
-              (setq show-trailing-whitespace nil))))
-
-;; Handy function to rename MultiTerm buffers
-(defun rename-term (name)
-  (interactive "s")
-  (rename-buffer (concat "*term* " name)))
-
 ;; Magit
 (use-package magit
   :defer t
@@ -537,9 +531,6 @@ SCHEDULED: %t
   :ensure t
   :config
   (which-key-mode))
-
-(use-package company
-  :defer t)
 
 ;; Modes
 
@@ -656,11 +647,6 @@ SCHEDULED: %t
 ;; use Marked.app to preview Markdown
 (setq markdown-open-command "~/bin/mark")
 
-;; Hide some menu junk
-(define-key global-map [menu-bar tools gnus] nil)
-(define-key global-map [menu-bar tools rmail] nil)
-(define-key global-map [menu-bar tools compose-mail] nil)
-(define-key global-map [menu-bar tools games] nil)
 
 ; Always wrap text in compilation windows
 (add-hook 'compilation-mode-hook
@@ -668,38 +654,6 @@ SCHEDULED: %t
 
 (add-hook 'compilation-minor-mode-hook
           (lambda () (visual-line-mode 1)))
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["black" "red3" "ForestGreen" "yellow3" "blue" "magenta3" "DeepSkyBlue" "gray50"])
- '(column-number-mode t)
- '(custom-safe-themes
-   (quote
-    ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" default)))
- '(fci-rule-color "#222222")
- '(hl-sexp-background-color "#efebe9")
- '(ivy-mode t)
- '(package-selected-packages
-   (quote
-    (company-go flycheck eyebrowse go-autocomplete auto-complete-rst doom-modeline terraform-mode hide-mode-line slime ranger all-the-icons-ivy vagrant-tramp company yasnippet-snippets yasnippet tramp-theme doom-themes ein popwin spaceline jinja2-mode mmm-mode color-the e-modern company-emoji org-download ansible mmm-jinja2 counsel-projectile ivy-rich counsel ivy github-modern-theme go-projectile json-mode evil-surround yaoddmuse evil-mu4e evil escape worf material-theme git-gutter-fringe git-gutter telephone-line which-key fzf toml-mode dockerfile-mode flymake-yaml yaml-mode markdown-mode puppet-mode go-mode exec-path from-shell deft shackle dim projectile multi-term org-bullets evil-org evil-visual-mark-mode evil-magit evil-leader evil leuven-theme use-package)))
- '(pdf-view-midnight-colors (quote ("#ffffff" . "#222222")))
- '(pyenv-mode t)
- '(tramp-default-method "ssh" nil (tramp))
- '(vc-annotate-background "#222222"))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(magit-mode-line-process ((t (:foreground "spring green"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
 
 ;; Appeareance-related overrides
 (defun my/org-mode-hook ()
@@ -727,7 +681,15 @@ SCHEDULED: %t
                     :overline nil
                     :underline nil)
 
-;; Global keybindings, some mirroring macOS behaviour
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(magit-mode-line-process ((t (:foreground "spring green"))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
+
+;; Global keybinding overrides, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
 (global-set-key (kbd "M-w") 'kill-this-buffer)
@@ -745,3 +707,12 @@ SCHEDULED: %t
 (global-set-key [(kbd "M-w")]
                 (lambda () (interactive) (delete-window)))
 (global-set-key (kbd "M-z") 'undo)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (org-bullets org-plus-contrib counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions hide-mode-line use-package))))
