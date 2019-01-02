@@ -477,7 +477,7 @@ SCHEDULED: %t
   (global-set-key (kbd "<f1>") 'projectile-switch-project)
   (global-set-key (kbd "<f2>") 'projectile-find-file))
 
-;; Tame window arrangement for consistency's sake
+;; Attempt to tame layout consistency of various windows which popup
 (use-package shackle
   :ensure t
   :config
@@ -695,24 +695,19 @@ SCHEDULED: %t
 (add-hook 'org-mode-hook 'my/org-mode-hook)
 
 ;; Mode-line colouring
-(defvar active-modeline-bg "#f9f9f9")
-(defvar active-modeline-fg "#110011")
+(defvar active-modeline-bg "#e9e9e9")
+(defvar active-modeline-fg "#332233")
 (defvar inactive-modeline-fg "#777777")
 (defvar inactive-modeline-bg "#c6c6c6")
 
 (set-face-attribute 'mode-line nil
                     :background active-modeline-bg
                     :foreground active-modeline-fg
-                    :box '(:line-width 1 :color "#cccccc")
-                    :overline nil
-                    :underline nil)
+                    :overline "#cccccc")
 
 (set-face-attribute 'mode-line-inactive nil
                     :background inactive-modeline-bg
-                    :foreground inactive-modeline-fg
-                    :box '(:line-width 1 :color "#cccccc")
-                    :overline nil
-                    :underline nil)
+                    :foreground inactive-modeline-fg)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -720,7 +715,7 @@ SCHEDULED: %t
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(auto-dim-other-buffers-face ((t (:background "#ececec"))))
- '(magit-mode-line-process ((t (:foreground "spring green"))))
+ '(magit-mode-line-process ((t (:foreground "MediumBlue"))))
  '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
 
 ;; Global keybinding overrides, some mirroring macOS behaviour
