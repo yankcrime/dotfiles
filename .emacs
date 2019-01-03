@@ -145,14 +145,8 @@
   (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
-  (define-key ivy-minibuffer-map (kbd "C-.")
-    (lambda ()
-      (interactive)
-      (insert (format "%s" (with-ivy-window (thing-at-point 'symbol))))))
-  (define-key ivy-minibuffer-map (kbd "M-.")
-    (lambda ()
-      (interactive)
-      (insert (format "%s" (with-ivy-window (thing-at-point 'word))))))
+  (with-eval-after-load 'ivy
+    (define-key ivy-minibuffer-map (kbd "M-v") 'yank))
   (add-hook 'minibuffer-setup-hook
             (lambda ()
               (setq show-trailing-whitespace nil))))
