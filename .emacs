@@ -454,6 +454,9 @@ SCHEDULED: %t
   (setq magit-completing-read-function 'ivy-completing-read)
   (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
   :config
+  (add-hook 'magit-popup-mode-hook
+            (lambda ()
+              (setq show-trailing-whitespace nil)))
   (global-set-key (kbd "<f10>") 'magit-status))
 
 ;; Projectile
