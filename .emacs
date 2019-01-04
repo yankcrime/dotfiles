@@ -73,7 +73,6 @@
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
-(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -444,8 +443,18 @@ SCHEDULED: %t
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
 
-(use-package poly-markdown
+(use-package polymode
   :ensure t)
+
+(use-package poly-markdown
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode)))
+
+(use-package poly-ansible
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.j2" . poly-ansible-mode)))
 
 ;; Magit
 (use-package magit
@@ -548,7 +557,10 @@ SCHEDULED: %t
   (add-hook 'deft-mode-hook 'deft-enter-insert-mode))
 
 (use-package exec-path-from-shell
-  :ensure t)
+  :ensure t
+  :config
+  (when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize)))
 
 ;; Which-key - command previews
 (use-package which-key
@@ -637,11 +649,6 @@ SCHEDULED: %t
   :config
   (add-hook 'yaml-mode-hook '(lambda () (ansible 1))))
 
-(use-package jinja2-mode
-  :defer t
-  :config
-  (add-hook 'jinja2-mode-hook 'jinja2-mode))
-
 (use-package json-mode
   :defer t)
 
@@ -727,22 +734,32 @@ SCHEDULED: %t
 (global-set-key (kbd "M-o") 'counsel-find-file)
 (global-set-key (kbd "C-s") 'counsel-projectile-ag)
 (global-set-key (kbd "C-,") 'counsel-imenu)
-(global-set-key (kbd "M-v") 'yank)
-(global-set-key (kbd "M-c") 'kill-ring-save)
 (global-set-key (kbd "M-a") 'mark-whole-buffer)
 (global-set-key [(kbd "M-w")]
                 (lambda () (interactive) (delete-window)))
 (global-set-key (kbd "M-z") 'undo)
 (global-set-key (kbd "M-N") 'make-frame-command)
+(global-set-key (kbd "M-W") 'delete-frame)
+(global-set-key (kbd "M-v") 'yank)
+(global-set-key (kbd "M-c") 'kill-ring-save)
+(global-set-key (kbd "M-h") 'ns-do-hide-emacs)
+(global-set-key (kbd "M-`") 'ns-next-frame)
+
+;; Ensure we're using ⌘ as Meta
+(setq mac-option-modifier nil
+      mac-command-modifier 'meta)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(max-specpdl-size 10000)
  '(package-selected-packages
    (quote
-    (counsel-projectile projectile yaml-mode org-bullets org-plus-contrib counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions hide-mode-line use-package))))
+    (nyan-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets org-plus-contrib counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions hide-mode-line use-package))))
+
+(server-start)
 
 ;; Lower GC values post-initialisation
 (setq gc-cons-threshold (* 5 1000 1000))
