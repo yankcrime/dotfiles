@@ -57,7 +57,7 @@
 (set-default 'truncate-lines t)
 
 ;; Show trailing whitespace
-(setq-default show-trailing-whitespace t)
+;; (setq-default show-trailing-whitespace t)
 
 ;; Window title
 (setq frame-title-format '(buffer-file-name "%f" ("%b")))
@@ -88,6 +88,9 @@
 (eval-when-compile
   (require 'use-package))
 
+;; Always ensure packages are installed
+(customize-set-variable 'use-package-always-ensure t)
+
 ;; Mode-line
 (setq mode-line-percent-position '(-3 "%o"))
 
@@ -116,14 +119,12 @@
 
 
 (use-package minions
-  :ensure t
   :init (minions-mode)
   :config (setq minions-direct '(cider-mode
                                  overwrite-mode)))
 
 ;; Dim inactive buffers
 (use-package auto-dim-other-buffers
-  :ensure t
   :config
   (add-hook 'after-init-hook (lambda ()
                                (when (fboundp 'auto-dim-other-buffers-mode)
@@ -155,7 +156,6 @@
               (setq show-trailing-whitespace nil))))
 
 (use-package eyebrowse
-  :ensure t
   :config
   (setq eyebrowse-mode 1))
 
@@ -204,7 +204,6 @@
   (require 'git-gutter-fringe))
 
 (use-package doom-themes
-  :ensure t
   :init
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
@@ -217,11 +216,9 @@
 
 ; Evil mode and related
 (use-package evil
-  :ensure t
   :init
   (use-package evil-leader
     :init (global-evil-leader-mode)
-    :ensure t
     :config
     (setq evil-leader/in-all-states t)
     (evil-leader/set-leader "<SPC>")
@@ -261,11 +258,9 @@
   (setq evil-want-C-u-scroll t)
   (setq evil-symbol-word-search t)
 
-  (use-package evil-magit
-    :ensure t)
+  (use-package evil-magit)
 
   (use-package evil-escape
-    :ensure t
     :commands
     (evil-escape-pre-command-hook)
     :hook (pre-command . evil-escape-pre-command-hook))
@@ -274,8 +269,7 @@
             (lambda ()
               (setq show-trailing-whitespace nil)))
 
-  (use-package evil-visual-mark-mode
-    :ensure t)))
+  (use-package evil-visual-mark-mode)))
 
 (use-package yasnippet
   :defer t
@@ -326,7 +320,7 @@ SCHEDULED: %t
 :END:")))
 
   (use-package org-journal
-    :defer t
+    :after org
     :config
     (setq org-journal-dir "~/Dropbox/org/journal/"))
 
@@ -448,16 +442,13 @@ SCHEDULED: %t
     :defer t
     :hook (org-mode . org-bullets-mode)))
 
-(use-package polymode
-  :ensure t)
+(use-package polymode)
 
 (use-package poly-markdown
-  :defer t
   :config
   (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode)))
 
 (use-package poly-ansible
-  :ensure t
   :config
   (add-to-list 'auto-mode-alist '("\\.j2" . poly-ansible-mode)))
 
@@ -494,7 +485,6 @@ SCHEDULED: %t
 
 ;; Attempt to tame layout consistency of various windows which popup
 (use-package shackle
-  :ensure t
   :config
   (shackle-mode 1)
   (setq shackle-rules
@@ -521,7 +511,6 @@ SCHEDULED: %t
 
 ;; Do something about popups as well
 (use-package popwin
-  :ensure t
   :config
   (popwin-mode 1))
 
@@ -566,14 +555,12 @@ SCHEDULED: %t
   (add-hook 'deft-mode-hook 'deft-enter-insert-mode))
 
 (use-package exec-path-from-shell
-  :ensure t
   :config
   (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize)))
 
 ;; Which-key - command previews
 (use-package which-key
-  :ensure t
   :config
   (which-key-mode))
 
