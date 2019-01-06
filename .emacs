@@ -9,8 +9,8 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "Triplicate T4c"
-                    :height 140
+                    :family "IBM Plex Mono"
+                    :height 130
                     :width 'normal)
 
 ;; Hide some menu junk
@@ -33,15 +33,22 @@
 (setq inhibit-splash-screen t)
 (setq initial-scratch-message nil)
 
+;; Shut up
+(setq ring-bell-function 'ignore)
+
 ;; Buffer switching
 (winner-mode t)
 
 ;; Better scrolling
 (pixel-scroll-mode)
 
+;; Hack
+(setq max-lisp-eval-depth 10000)
+(setq max-specpdl-size 1000)
+
 ;; Titlebar on macOS
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-(add-to-list 'default-frame-alist '(ns-appearance . light))
+;;(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+;;(add-to-list 'default-frame-alist '(ns-appearance . light))
 
 ;; Highlight matching parens
 (show-paren-mode)
@@ -82,11 +89,6 @@
   (require 'use-package))
 
 ;; Mode-line
-(use-package hide-mode-line
-  :ensure t
-  :config
-  (add-hook 'completion-list-mode-hook #'hide-mode-line-mode))
-
 (setq mode-line-percent-position '(-3 "%o"))
 
 (defun simple-mode-line-render (left right)
@@ -112,6 +114,7 @@
                               (format-mode-line (list
                                                  "ℓ %l:%c %p%%")))))
 
+
 (use-package minions
   :ensure t
   :init (minions-mode)
@@ -123,19 +126,20 @@
   :ensure t
   :config
   (add-hook 'after-init-hook (lambda ()
-  (when (fboundp 'auto-dim-other-buffers-mode)
-    (auto-dim-other-buffers-mode t)))))
+                               (when (fboundp 'auto-dim-other-buffers-mode)
+                                 (auto-dim-other-buffers-mode t)))))
 
 ;; Completion framework
 (use-package counsel
-  :ensure t)
+  :after ivy
+  :demand t)
 
 (use-package counsel-projectile
-  :ensure t)
+  :defer t)
 
 ;; Completion frontend
 (use-package ivy
-  :ensure t
+  :demand t
   :config
   (ivy-mode 1)
   (setq ivy-height 20
@@ -151,7 +155,7 @@
               (setq show-trailing-whitespace nil))))
 
 (use-package eyebrowse
-  :defer t
+  :ensure t
   :config
   (setq eyebrowse-mode 1))
 
@@ -161,15 +165,13 @@
   (setq org-download-method 'attach))
 
 (use-package tramp
-  :ensure nil
+  :defer t
   :init
   (use-package tramp-theme
     :defer t)
   (use-package vagrant-tramp
     :defer t)
   :config
-  (add-to-list 'tramp-default-proxies-alist
-               '("stack@dev-director" nil "/ssh:ilab-gate:"))
   (setq tramp-default-method "ssh"))
 
 (use-package ein
@@ -186,7 +188,7 @@
     (delete 'elpy-module-highlight-indentation elpy-modules)))
 
 (use-package ranger
-  :ensure t
+  :defer t
   :config
   (define-key ranger-mode-map (kbd "-") 'ranger-up-directory)
   (ranger-override-dired-mode t))
@@ -215,6 +217,7 @@
 
 ; Evil mode and related
 (use-package evil
+  :ensure t
   :init
   (use-package evil-leader
     :init (global-evil-leader-mode)
@@ -237,14 +240,13 @@
       "ol" 'org-todo-list
       "oa" 'org-agenda
       "oc" 'org-task-capture
-      "tm" 'hide-mode-line-mode
+      "oj" 'org-journal-new-entry
       "ts" 'flyspell-mode
       "wo" 'delete-other-windows
       "q" 'evil-quit
       "x" 'evil-save-and-close
       "ws" 'evil-window-split
       "f" 'counsel-fzf)
-  :ensure t
   :config
   (evil-mode 1)
   (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
@@ -266,8 +268,7 @@
     :ensure t
     :commands
     (evil-escape-pre-command-hook)
-    :init
-    (add-hook 'pre-command-hook 'evil-escape-pre-command-hook))
+    :hook (pre-command . evil-escape-pre-command-hook))
 
   (add-hook 'evil-command-window-hook
             (lambda ()
@@ -285,7 +286,7 @@
   :defer t))
 
 (use-package fzf
-  :ensure t)
+  :defer t)
 
 ;; org-mode
 (use-package org
@@ -308,6 +309,7 @@
   (setq org-startup-indented 'true)
   (setq org-src-tab-acts-natively t)
   (setq org-startup-with-inline-images t)
+  (setq org-image-actual-width nil)
   (add-hook
    'org-babel-after-execute-hook
    (lambda ()
@@ -323,23 +325,13 @@ SCHEDULED: %t
 :CREATED: %U\n
 :END:")))
 
+  (use-package org-journal
+    :defer t
+    :config
+    (setq org-journal-dir "~/Dropbox/org/journal/"))
+
   (use-package ob-async
     :defer t)
-
-  (use-package ob-python
-    :defer t
-    :ensure org-plus-contrib
-    :commands (org-babel-execute:python))
-
-  (use-package ob-shell
-    :defer t
-    :ensure org-plus-contrib
-    :commands
-    (org-babel-execute:sh
-     org-babel-expand-body:sh
-
-     org-babel-execute:bash
-     org-babel-expand-body:bash))
 
   (eval-after-load 'org-agenda
     '(progn
@@ -435,19 +427,32 @@ SCHEDULED: %t
 
   (add-hook 'org-mode-hook 'turn-on-flyspell)
 
+  (use-package org-download
+    :defer t
+    :config
+    (setq-default org-download-method 'attach)
+    (setq-default org-download-image-dir "~/Dropbox/org/files")
+    (add-hook 'dired-mode-hook 'org-download-enable))
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t)
+     (python . t)
+     (emacs-lisp . t)
+     ))
+
   ;; Appearance stuff
   (setq org-ellipsis "•••")
 
   (use-package org-bullets
-    :ensure t
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))))
+    :defer t
+    :hook (org-mode . org-bullets-mode)))
 
 (use-package polymode
   :ensure t)
 
 (use-package poly-markdown
-  :ensure t
+  :defer t
   :config
   (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode)))
 
@@ -468,9 +473,13 @@ SCHEDULED: %t
               (setq show-trailing-whitespace nil)))
   (global-set-key (kbd "<f10>") 'magit-status))
 
+(add-hook 'calendar-initial-window-hook
+(lambda ()
+  (setq show-trailing-whitespace nil)))
+
 ;; Projectile
 (use-package projectile
-  :ensure t
+  :defer t
   :config
   (projectile-global-mode +1)
   (setq projectile-completion-system 'ivy)
@@ -574,7 +583,6 @@ SCHEDULED: %t
 (use-package go-mode
   :defer t
   :init
-  (add-hook 'before-save-hook 'gofmt-before-save)
   (set (make-local-variable 'compile-command)
        "go build -v && go test -v && go vet")
   :config
@@ -597,26 +605,18 @@ SCHEDULED: %t
   (local-set-key (kbd "M-]") 'next-error)         ; Go to next error (or msg)
   (local-set-key (kbd "M-[") 'previous-error)     ; Go to previous error or msg
 
-  ;; Misc go stuff
-  (auto-complete-mode 1))                         ; Enable auto-complete mode
+  ;; Ensure the go specific autocomplete is active in go-mode.
+  (with-eval-after-load 'go-mode
+    (require 'go-autocomplete)))
 
-  (add-hook 'go-mode-hook
-      (lambda ()
-        (set (make-local-variable 'company-backends) '(company-go))
-        (company-mode)))
+  (use-package go-autocomplete
+    :defer t)
 
-;; Connect go-mode-hook with the function we just defined
-(add-hook 'go-mode-hook 'my-go-mode-hook)
+  (use-package go-projectile
+    :defer t)
 
-;; Ensure the go specific autocomplete is active in go-mode.
-(with-eval-after-load 'go-mode
-   (require 'go-autocomplete)))
-
-(use-package go-autocomplete
-  :defer t)
-
-(use-package go-projectile
-  :defer t)
+  (use-package go-guru
+    :defer t))
 
 (use-package slime
   :defer t
@@ -678,7 +678,6 @@ SCHEDULED: %t
 ;; use Marked.app to preview Markdown
 (setq markdown-open-command "~/bin/mark")
 
-
 ; Always wrap text in compilation windows
 (add-hook 'compilation-mode-hook
           (lambda () (visual-line-mode 1)))
@@ -720,7 +719,7 @@ SCHEDULED: %t
  ;; If there is more than one, they won't work right.
  '(auto-dim-other-buffers-face ((t (:background "#ececec"))))
  '(magit-mode-line-process ((t (:foreground "MediumBlue"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "IBM Plex Mono")))))
 
 ;; Global keybinding overrides, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
@@ -757,7 +756,7 @@ SCHEDULED: %t
  '(max-specpdl-size 10000)
  '(package-selected-packages
    (quote
-    (nyan-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets org-plus-contrib counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions hide-mode-line use-package))))
+    (htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode nyan-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package))))
 
 (server-start)
 
