@@ -9,8 +9,8 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "IBM Plex Mono"
-                    :height 130
+                    :family "Hack"
+                    :height 120
                     :width 'normal)
 
 ;; Hide some menu junk
@@ -42,19 +42,13 @@
 ;; Better scrolling
 (pixel-scroll-mode)
 
-;; Hack
-(setq max-lisp-eval-depth 10000)
-(setq max-specpdl-size 1000)
-
-;; Titlebar on macOS
-;;(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-;;(add-to-list 'default-frame-alist '(ns-appearance . light))
-
 ;; Highlight matching parens
 (show-paren-mode)
 
 ;; Do something sensible with long lines
 (set-default 'truncate-lines t)
+
+(setq mode-require-final-newline t)
 
 ;; Show trailing whitespace
 ;; (setq-default show-trailing-whitespace t)
@@ -91,6 +85,9 @@
 ;; Always ensure packages are installed
 (customize-set-variable 'use-package-always-ensure t)
 
+(setq use-package-compute-statistics t)
+
+
 ;; Mode-line
 (setq mode-line-percent-position '(-3 "%o"))
 
@@ -123,12 +120,12 @@
   :config (setq minions-direct '(cider-mode
                                  overwrite-mode)))
 
-;; Dim inactive buffers
-(use-package auto-dim-other-buffers
-  :config
-  (add-hook 'after-init-hook (lambda ()
-                               (when (fboundp 'auto-dim-other-buffers-mode)
-                                 (auto-dim-other-buffers-mode t)))))
+ ;; Dim inactive buffers
+ (use-package auto-dim-other-buffers
+   :config
+   (add-hook 'after-init-hook (lambda ()
+                                (when (fboundp 'auto-dim-other-buffers-mode)
+                                  (auto-dim-other-buffers-mode t)))))
 
 ;; Completion framework
 (use-package counsel
@@ -150,10 +147,7 @@
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
   (with-eval-after-load 'ivy
-    (define-key ivy-minibuffer-map (kbd "M-v") 'yank))
-  (add-hook 'minibuffer-setup-hook
-            (lambda ()
-              (setq show-trailing-whitespace nil))))
+    (define-key ivy-minibuffer-map (kbd "M-v") 'yank)))
 
 (use-package eyebrowse
   :config
@@ -188,7 +182,6 @@
     (delete 'elpy-module-highlight-indentation elpy-modules)))
 
 (use-package ranger
-  :defer t
   :config
   (define-key ranger-mode-map (kbd "-") 'ranger-up-directory)
   (ranger-override-dired-mode t))
@@ -216,9 +209,24 @@
 
 ; Evil mode and related
 (use-package evil
+  :ensure t
+  :defer .1 ;; don't block emacs when starting, load evil immediately after startup
   :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-search-module 'evil-search)
+  (setq evil-ex-complete-emacs-commands nil)
+  (setq evil-vsplit-window-right t)
+  (setq evil-split-window-below t)
+  (setq evil-shift-round nil)
+  (setq evil-want-C-u-scroll t)
+  :config
+  (evil-mode)
+  (kill-buffer "*Messages*")
+
   (use-package evil-leader
-    :init (global-evil-leader-mode)
+    :init
+    (global-evil-leader-mode)
     :config
     (setq evil-leader/in-all-states t)
     (evil-leader/set-leader "<SPC>")
@@ -238,38 +246,79 @@
       "oa" 'org-agenda
       "oc" 'org-task-capture
       "oj" 'org-journal-new-entry
+      "oe" 'org-export-dispatch
       "ts" 'flyspell-mode
       "wo" 'delete-other-windows
       "q" 'evil-quit
       "x" 'evil-save-and-close
       "ws" 'evil-window-split
-      "f" 'counsel-fzf)
-  :config
-  (evil-mode 1)
-  (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
-  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-  (define-key evil-normal-state-map (kbd "Q") 'fill-paragraph)
-  (define-key evil-motion-state-map ";" 'evil-ex)
-  (global-set-key (kbd "M-s") 'evil-write)
-  (global-set-key (kbd "M-f") 'evil-search-forward)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-symbol-word-search t)
+      "wg" 'golden-ratio
+      "f" 'counsel-fzf))
 
+  ;; vim-like keybindings everywhere in emacs
+  (use-package evil-collection
+    :after evil
+    :ensure t
+    :config
+    (evil-collection-init))
+
+  ;; and in magit
   (use-package evil-magit)
 
-  (use-package evil-escape
+  ;; gl and gL operators, like vim-lion
+  (use-package evil-lion
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("g l " . evil-lion-left)
+                ("g L " . evil-lion-right)
+                :map evil-visual-state-map
+                ("g l " . evil-lion-left)
+                ("g L " . evil-lion-right)))
+
+  ;; gc operator, like vim-commentary
+  (use-package evil-commentary
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("gc" . evil-commentary)))
+
+  ;; gr operator, like vim's ReplaceWithRegister
+  (use-package evil-replace-with-register
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("gr" . evil-replace-with-register)
+                :map evil-visual-state-map
+                ("gr" . evil-replace-with-register)))
+
+  (use-package evil-visualstar
+    :ensure t
+    :bind (:map evil-visual-state-map
+                ("*" . evil-visualstar/begin-search-forward)
+                ("#" . evil-visualstar/begin-search-backward)))
+
+  (use-package evil-expat
+    :ensure t
+    :defer t)
+
+  ;; visual hints while editing
+  (use-package evil-goggles
+    :ensure t
+    :config
+    (evil-goggles-use-diff-faces)
+    (evil-goggles-mode))
+
+  ;; like vim-surround
+  (use-package evil-surround
+    :ensure t
     :commands
-    (evil-escape-pre-command-hook)
-    :hook (pre-command . evil-escape-pre-command-hook))
-
-  (add-hook 'evil-command-window-hook
-            (lambda ()
-              (setq show-trailing-whitespace nil)))
-
-  (use-package evil-visual-mark-mode)))
+    (evil-surround-edit
+     evil-Surround-edit
+     evil-surround-region
+     evil-Surround-region)
+    :init
+    (evil-define-key 'operator global-map "s" 'evil-surround-edit)
+    (evil-define-key 'operator global-map "S" 'evil-Surround-edit)
+    (evil-define-key 'visual global-map "S" 'evil-surround-region)
+    (evil-define-key 'visual global-map "gS" 'evil-Surround-region)))
 
 (use-package yasnippet
   :defer t
@@ -319,14 +368,6 @@ SCHEDULED: %t
 :CREATED: %U\n
 :END:")))
 
-  (use-package org-journal
-    :after org
-    :config
-    (setq org-journal-dir "~/Dropbox/org/journal/"))
-
-  (use-package ob-async
-    :defer t)
-
   (eval-after-load 'org-agenda
     '(progn
        (evil-set-initial-state 'org-agenda-mode 'normal)
@@ -336,75 +377,16 @@ SCHEDULED: %t
          (kbd "\t") 'org-agenda-goto
          "\C-n" 'org-agenda-next-line
          "\C-p" 'org-agenda-previous-line
-         "\C-r" 'org-agenda-redo
-         "a" 'org-agenda-archive-default-with-confirmation
-         "c" 'org-agenda-goto-calendar
-         "d" 'org-agenda-day-view
-         "e" 'org-agenda-set-effort
-         "g " 'org-agenda-show-and-scroll-up
-         "gG" 'org-agenda-toggle-time-grid
-         "gh" 'org-agenda-holidays
-         "gj" 'org-agenda-goto-date
-         "gJ" 'org-agenda-clock-goto
-         "gk" 'org-agenda-action
-         "gm" 'org-agenda-bulk-mark
-         "go" 'org-agenda-open-link
-         "gO" 'delete-other-windows
-         "gr" 'org-agenda-redo
-         "gv" 'org-agenda-view-mode-dispatch
-         "gw" 'org-agenda-week-view
-         "g/" 'org-agenda-filter-by-tag
-         "h"  'org-agenda-earlier
-         "i"  'org-agenda-diary-entry
-         "j"  'org-agenda-next-line
-         "k"  'org-agenda-previous-line
-         "l"  'org-agenda-later
-         "m" 'org-agenda-bulk-mark
-         "n" nil
-         "o" 'delete-other-windows
-         "q" 'org-agenda-quit
-         "r" 'org-agenda-redo
-         "s" 'org-save-all-org-buffers
-         "t" 'org-agenda-todo
-         "u" 'org-agenda-bulk-unmark
-         "x" 'org-agenda-exit
-         "y" 'org-agenda-year-view
-         "z" 'org-agenda-add-note
-         "{" 'org-agenda-manipulate-query-add-re
-         "}" 'org-agenda-manipulate-query-subtract-re
-         "$" 'org-agenda-archive
-         "%" 'org-agenda-bulk-mark-regexp
-         "+" 'org-agenda-priority-up
-         "," 'org-agenda-priority
-         "-" 'org-agenda-priority-down
-         "." 'org-agenda-goto-today
-         "0" 'evil-digit-argument-or-evil-beginning-of-line
-         ":" 'org-agenda-set-tags
-         ";" 'org-timer-set-timer
-         "<" 'org-agenda-filter-by-category
-         ">" 'org-agenda-date-prompt
-         "?" 'org-agenda-show-the-flagging-note
-         "A" 'org-agenda-append-agenda
-         "B" 'org-agenda-bulk-action
-         "C" 'org-agenda-convert-date
-         "D" 'org-agenda-toggle-diary
-         "E" 'org-agenda-entry-text-mode
-         "F" 'org-agenda-follow-mode
-         "H" 'org-agenda-holidays
-         "I" 'org-agenda-clock-in
-         "J" 'org-agenda-next-date-line
-         "K" 'org-agenda-previous-date-line
-         "L" 'org-agenda-recenter
-         "M" 'org-agenda-phases-of-moon
-         "O" 'org-agenda-clock-out
-         "P" 'org-agenda-show-priority
-         "R" 'org-agenda-clockreport-mode
-         "S" 'org-agenda-sunrise-sunset
-         "T" 'org-agenda-show-tags
-         "X" 'org-agenda-clock-cancel
-         "[" 'org-agenda-manipulate-query-add
-         "g\\" 'org-agenda-filter-by-tag-refine
-         "]" 'org-agenda-manipulate-query-subtract)))
+         "\C-r" 'org-agenda-redo)))
+
+  (use-package org-journal
+    :disabled
+    :after org
+    :config
+    (setq org-journal-dir "~/Dropbox/org/journal/"))
+
+  (use-package ob-async
+    :defer t)
 
   (defun org-task-capture ()
     (interactive)
@@ -459,14 +441,7 @@ SCHEDULED: %t
   (setq magit-completing-read-function 'ivy-completing-read)
   (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
   :config
-  (add-hook 'magit-popup-mode-hook
-            (lambda ()
-              (setq show-trailing-whitespace nil)))
   (global-set-key (kbd "<f10>") 'magit-status))
-
-(add-hook 'calendar-initial-window-hook
-(lambda ()
-  (setq show-trailing-whitespace nil)))
 
 ;; Projectile
 (use-package projectile
@@ -475,11 +450,6 @@ SCHEDULED: %t
   (projectile-global-mode +1)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching t)
-  (setq projectile-mode-line
-      '(:eval
-        (if (file-remote-p default-directory)
-            " Projectile[*remote*]"
-          (format " Projectile[%s]" (projectile-project-name)))))
   (global-set-key (kbd "<f1>") 'projectile-switch-project)
   (global-set-key (kbd "<f2>") 'projectile-find-file))
 
@@ -513,6 +483,14 @@ SCHEDULED: %t
 (use-package popwin
   :config
   (popwin-mode 1))
+
+;; Easily swap around buffers
+(use-package transpose-frame)
+
+;; Resize active frame according to 'golden ratio' principles
+(use-package golden-ratio
+  :config
+  (golden-ratio-mode nil))
 
 ;; Which modes are active?
 (defun which-active-modes ()
@@ -555,14 +533,19 @@ SCHEDULED: %t
   (add-hook 'deft-mode-hook 'deft-enter-insert-mode))
 
 (use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
+  :ensure t
   :config
-  (when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize)))
+  (exec-path-from-shell-initialize))
 
 ;; Which-key - command previews
 (use-package which-key
   :config
   (which-key-mode))
+
+;; Flycheck
+(use-package flycheck
+  :defer t)
 
 ;; Modes
 
@@ -684,7 +667,7 @@ SCHEDULED: %t
 
 (add-hook 'org-mode-hook 'my/org-mode-hook)
 
-;; Mode-line colouring
+;; Mode-line appearance overrides
 (defvar active-modeline-bg "#e9e9e9")
 (defvar active-modeline-fg "#332233")
 (defvar inactive-modeline-fg "#777777")
@@ -705,8 +688,15 @@ SCHEDULED: %t
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(auto-dim-other-buffers-face ((t (:background "#ececec"))))
+ '(evil-goggles-change-face ((t (:inherit diff-removed))))
+ '(evil-goggles-delete-face ((t (:inherit diff-removed))))
+ '(evil-goggles-paste-face ((t (:inherit diff-added))))
+ '(evil-goggles-undo-redo-add-face ((t (:inherit diff-added))))
+ '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
+ '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
+ '(evil-goggles-yank-face ((t (:inherit diff-changed))))
  '(magit-mode-line-process ((t (:foreground "MediumBlue"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "IBM Plex Mono")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Hack")))))
 
 ;; Global keybinding overrides, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
@@ -743,7 +733,8 @@ SCHEDULED: %t
  '(max-specpdl-size 10000)
  '(package-selected-packages
    (quote
-    (htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode nyan-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package))))
+    (golden-ratio transpose-frame evil-surround evil-goggles evil-expat evil-visualstar evil-replace-with-register evil-exchange evil-commentary evil-lion evil-collection htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package)))
+ '(use-package-always-ensure t))
 
 (server-start)
 
