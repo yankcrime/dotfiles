@@ -9,8 +9,8 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (set-face-attribute 'default nil
-                    :family "Hack"
-                    :height 120
+                    :family "IBM Plex Mono"
+                    :height 130
                     :width 'normal)
 
 ;; Hide some menu junk
@@ -114,18 +114,17 @@
                               (format-mode-line (list
                                                  "ℓ %l:%c %p%%")))))
 
-
 (use-package minions
   :init (minions-mode)
   :config (setq minions-direct '(cider-mode
                                  overwrite-mode)))
 
- ;; Dim inactive buffers
- (use-package auto-dim-other-buffers
-   :config
-   (add-hook 'after-init-hook (lambda ()
-                                (when (fboundp 'auto-dim-other-buffers-mode)
-                                  (auto-dim-other-buffers-mode t)))))
+;; Dim inactive buffers
+(use-package auto-dim-other-buffers
+  :config
+  (add-hook 'after-init-hook (lambda ()
+                               (when (fboundp 'auto-dim-other-buffers-mode)
+                                 (auto-dim-other-buffers-mode t)))))
 
 ;; Completion framework
 (use-package counsel
@@ -245,8 +244,11 @@
       "ol" 'org-todo-list
       "oa" 'org-agenda
       "oc" 'org-task-capture
-      "oj" 'org-journal-new-entry
       "oe" 'org-export-dispatch
+      "ofa" 'org-attach
+      "off" 'org-attach-attach
+      "ofo" 'org-attach-open
+      "oj" 'org-journal-new-entry
       "ts" 'flyspell-mode
       "wo" 'delete-other-windows
       "q" 'evil-quit
@@ -696,7 +698,7 @@ SCHEDULED: %t
  '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
  '(evil-goggles-yank-face ((t (:inherit diff-changed))))
  '(magit-mode-line-process ((t (:foreground "MediumBlue"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Hack")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "IBM Plex Mono")))))
 
 ;; Global keybinding overrides, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
