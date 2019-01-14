@@ -251,6 +251,9 @@
       "oc" 'org-task-capture
       "oj" 'org-journal-new-entry
       "oe" 'org-export-dispatch
+      "ofa" 'org-attach
+      "off" 'org-attach-attach
+      "ofo" 'org-attach-open
       "ts" 'flyspell-mode
       "wo" 'delete-other-windows
       "q" 'evil-quit
@@ -494,7 +497,18 @@ SCHEDULED: %t
 ;; Resize active frame according to 'golden ratio' principles
 (use-package golden-ratio
   :config
-  (golden-ratio-mode nil))
+  (golden-ratio-mode t)
+  (setq golden-ratio-extra-commands
+      (append golden-ratio-extra-commands
+              '(evil-window-left
+                evil-window-right
+                evil-window-up
+                evil-window-down
+                select-window-1
+                select-window-2
+                select-window-3
+                select-window-4
+                select-window-5))))
 
 ;; Which modes are active?
 (defun which-active-modes ()
@@ -705,7 +719,7 @@ SCHEDULED: %t
  '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
  '(evil-goggles-yank-face ((t (:inherit diff-changed))))
  '(magit-mode-line-process ((t (:foreground "MediumBlue"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Hack")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "PragmataPro")))))
 
 ;; Global keybinding overrides, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
