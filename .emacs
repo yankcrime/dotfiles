@@ -535,9 +535,11 @@ SCHEDULED: %t
   (add-hook 'deft-mode-hook 'deft-enter-insert-mode))
 
 (use-package exec-path-from-shell
-  :if (memq window-system '(mac ns))
   :ensure t
+  :defer 2
   :config
+  (dolist (var '("GOPATH"  "NVM_BIN"))
+    (add-to-list 'exec-path-from-shell-variables var))
   (exec-path-from-shell-initialize))
 
 ;; Which-key - command previews
