@@ -492,7 +492,18 @@ SCHEDULED: %t
 ;; Resize active frame according to 'golden ratio' principles
 (use-package golden-ratio
   :config
-  (golden-ratio-mode nil))
+  (golden-ratio-mode t)
+  (setq golden-ratio-extra-commands
+        (append golden-ratio-extra-commands
+                '(evil-window-left
+                  evil-window-right
+                  evil-window-up
+                  evil-window-down
+                  select-window-1
+                  select-window-2
+                  select-window-3
+                  select-window-4
+                  select-window-5))))
 
 ;; Which modes are active?
 (defun which-active-modes ()
