@@ -2,6 +2,7 @@
 # nick@dischord.org
 
 # don't do anything if its emacs tramp mode
+#
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
 
 # usual suspects
@@ -68,7 +69,7 @@ alias gitsup='git submodule sync ; git submodule update --init'
 
 # emacs
 #
-alias emacs='emacsclient -n'
+alias emacs='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient -n'
 
 # stuff that makes zsh worthwhile
 #

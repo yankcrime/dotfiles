@@ -10,7 +10,7 @@
 (column-number-mode 1)
 (set-face-attribute 'default nil
                     :family "IBM Plex Mono"
-                    :height 130
+                    :height 140
                     :width 'normal)
 
 ;; Hide some menu junk
@@ -38,6 +38,23 @@
 
 ;; Buffer switching
 (winner-mode t)
+
+;; Activate line numbers on programming modes
+(add-hook 'prog-mode-hook
+          'display-line-numbers-mode)
+
+(setq-default mode-line-format
+              '("%e"
+                " "
+                mode-line-mule-info
+                mode-line-client
+                mode-line-modified
+                mode-line-remote
+                mode-line-frame-identification
+                mode-line-buffer-identification " " mode-line-position
+                (vc-mode vc-mode)
+                " " mode-line-modes
+                mode-line-end-spaces))
 
 ;; Better scrolling
 (pixel-scroll-mode)
@@ -86,45 +103,6 @@
 (customize-set-variable 'use-package-always-ensure t)
 
 (setq use-package-compute-statistics t)
-
-
-;; Mode-line
-(setq mode-line-percent-position '(-3 "%o"))
-
-(defun simple-mode-line-render (left right)
-  "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
-  (let* ((available-width (- (window-width) (length left) -0)))
-    (format (format " %%s %%%ds " available-width) left right)))
-
-(setq-default mode-line-buffer-identification
-              (list (propertize "%12b" 'face
-                                (list :weight 'bold))))
-
-(setq-default mode-line-format
-                     '(:eval (simple-mode-line-render
-                              ;; left
-                              (format-mode-line (list
-                                                 mode-line-modified
-                                                 " "
-                                                 "%10b"
-                                                 " "
-                                                 mode-line-modes
-                                                 vc-mode))
-                              ;; right
-                              (format-mode-line (list
-                                                 "ℓ %l:%c %p%%")))))
-
-(use-package minions
-  :init (minions-mode)
-  :config (setq minions-direct '(cider-mode
-                                 overwrite-mode)))
-
-;; Dim inactive buffers
-(use-package auto-dim-other-buffers
-  :config
-  (add-hook 'after-init-hook (lambda ()
-                               (when (fboundp 'auto-dim-other-buffers-mode)
-                                 (auto-dim-other-buffers-mode t)))))
 
 ;; Completion framework
 (use-package counsel
@@ -201,10 +179,33 @@
         doom-themes-enable-italic t)
   :config
   (doom-themes-org-config)
-  (load-theme 'doom-one-light t))
+  (load-theme 'doom-one-light t)
+  (defvar active-modeline-bg "#e9e9e9")
+  (defvar active-modeline-fg "#332233")
+  (defvar inactive-modeline-fg "#777777")
+  (defvar inactive-modeline-bg "#c6c6c6")
 
-;; Override and set a light background
+  (set-face-attribute 'mode-line nil
+                      :background active-modeline-bg
+                      :foreground active-modeline-fg
+                      :overline "#cccccc")
+
+  (set-face-attribute 'mode-line-inactive nil
+                      :background inactive-modeline-bg
+                      :foreground inactive-modeline-fg))
+
+(use-package minions
+  :init (minions-mode)
+  :config (setq minions-direct '(cider-mode
+                                 flycheck-mode
+                                 overwrite-mode)))
+
+;; Override theme background
+;; Light
 (set-background-color "#F4F4F4")
+
+;; Dark
+;; (set-background-color "#0C0C0C")
 
 ; Evil mode and related
 (use-package evil
@@ -219,6 +220,13 @@
   (setq evil-split-window-below t)
   (setq evil-shift-round nil)
   (setq evil-want-C-u-scroll t)
+  (setq evil-mode-line-format '(before . mode-line-mule-info))
+  (setq evil-normal-state-tag "N ")
+  (setq evil-insert-state-tag "I ")
+  (setq evil-visual-state-tag "V ")
+  (setq evil-motion-state-tag "M ")
+  (setq evil-operator-state-tag "O ")
+
   :config
   (evil-mode)
   (kill-buffer "*Messages*")
@@ -681,21 +689,6 @@ SCHEDULED: %t
     (set-face-attribute face nil :height 1.0)))
 
 (add-hook 'org-mode-hook 'my/org-mode-hook)
-
-;; Mode-line appearance overrides
-(defvar active-modeline-bg "#e9e9e9")
-(defvar active-modeline-fg "#332233")
-(defvar inactive-modeline-fg "#777777")
-(defvar inactive-modeline-bg "#c6c6c6")
-
-(set-face-attribute 'mode-line nil
-                    :background active-modeline-bg
-                    :foreground active-modeline-fg
-                    :overline "#cccccc")
-
-(set-face-attribute 'mode-line-inactive nil
-                    :background inactive-modeline-bg
-                    :foreground inactive-modeline-fg)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

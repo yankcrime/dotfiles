@@ -59,7 +59,8 @@ syntax on
 set t_Co=256
 set termguicolors
 set background=light
-colorscheme off
+colorscheme nofrils-light
+
 
 hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
 hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
