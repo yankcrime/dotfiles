@@ -90,36 +90,41 @@
 
 
 ;; Mode-line
-(setq mode-line-percent-position '(-3 "%o"))
 
-(defun simple-mode-line-render (left right)
-  "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
-  (let* ((available-width (- (window-width) (length left) -0)))
-    (format (format " %%s %%%ds " available-width) left right)))
-
-(setq-default mode-line-buffer-identification
-              (list (propertize "%12b" 'face
-                                (list :weight 'bold))))
+;; Activate line numbers on programming modes
+(add-hook 'prog-mode-hook
+          'display-line-numbers-mode)
 
 (setq-default mode-line-format
-                     '(:eval (simple-mode-line-render
-                              ;; left
-                              (format-mode-line (list
-                                                 mode-line-modified
-                                                 " "
-                                                 "%10b"
-                                                 " "
-                                                 mode-line-modes
-                                                 vc-mode))
-                              ;; right
-                              (format-mode-line (list
-                                                 "ℓ %l:%c %p%%")))))
-
+              '("%e"
+                " "
+                mode-line-mule-info
+                mode-line-client
+                mode-line-modified
+                mode-line-remote
+                mode-line-frame-identification
+                mode-line-buffer-identification " " mode-line-position
+                (vc-mode vc-mode)
+                " " mode-line-modes
+                mode-line-end-spaces))
 
 (use-package minions
   :init (minions-mode)
   :config (setq minions-direct '(cider-mode
                                  overwrite-mode)))
+
+;; (use-package doom-modeline
+;;       :ensure t
+;;       :hook (after-init . doom-modeline-init)
+;;       :config
+;;       (setq evil-normal-state-tag   (propertize " N" 'face '((:background "green" :foreground "black")))
+;;             evil-emacs-state-tag    (propertize " E" 'face '((:background "orange" :foreground "black")))
+;;             evil-insert-state-tag   (propertize " I" 'face '((:background "red") :foreground "white"))
+;;             evil-motion-state-tag   (propertize " M" 'face '((:background "blue") :foreground "white"))
+;;             evil-visual-state-tag   (propertize " V" 'face '((:background "grey80" :foreground "black")))
+;;             evil-operator-state-tag (propertize " O" 'face '((:background "purple"))))
+;;       (setq doom-modeline-icon nil)
+;;       (setq doom-modeline-height 25))
 
 ;; Dim inactive buffers
 ;;  (use-package auto-dim-other-buffers
@@ -224,6 +229,12 @@
   (setq evil-split-window-below t)
   (setq evil-shift-round nil)
   (setq evil-want-C-u-scroll t)
+  (setq evil-mode-line-format '(before . mode-line-mule-info))
+  (setq evil-normal-state-tag "N ")
+  (setq evil-insert-state-tag "I ")
+  (setq evil-visual-state-tag "V ")
+  (setq evil-motion-state-tag "M ")
+  (setq evil-operator-state-tag "O ")
   :config
   (evil-mode)
   (kill-buffer "*Messages*")
