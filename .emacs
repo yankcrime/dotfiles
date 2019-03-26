@@ -10,7 +10,7 @@
 (column-number-mode 1)
 (set-face-attribute 'default nil
                     :family "IBM Plex Mono"
-                    :height 140
+                    :height 130
                     :width 'normal)
 
 ;; Hide some menu junk
@@ -131,7 +131,7 @@
   (setq eyebrowse-mode 1))
 
 (use-package org-download
-  :defer t
+  :ensure t
   :config
   (setq org-download-method 'attach))
 
@@ -202,7 +202,7 @@
 
 ;; Override theme background
 ;; Light
-(set-background-color "#F4F4F4")
+;;(set-background-color "#F4F4F4")
 
 ;; Dark
 ;; (set-background-color "#0C0C0C")
@@ -361,8 +361,11 @@
   (setq org-adapt-indentation nil)
   (setq org-startup-indented 'true)
   (setq org-src-tab-acts-natively t)
+  (setq org-src-window-setup 'other-window)
   (setq org-startup-with-inline-images t)
   (setq org-image-actual-width nil)
+  (setq org-export-backends (quote(
+                                   md)))
   (add-hook
    'org-babel-after-execute-hook
    (lambda ()
@@ -483,10 +486,11 @@ SCHEDULED: %t
           (compilation-mode    :align below :size 15  :noselect t)
           (eww-mode            :align below :size 30  :select t)
           ("*command-log*"     :align right :size 28  :noselect t)
-          ("*magit*"            :align below :size 50 :select t)
+          ("*magit*"           :align below :size 50 :select t)
           ("*evil*"            :align below :size 50 :select t)
           ("*vc-diff*"         :align below :size 15  :noselect t)
           ("*vc-change-log*"   :align below :size 15  :select t)
+          ("^\\*Org Agenda.*"  :align right :regexp t :select t)
           (vc-annotate-mode    :same t))))
 
 ;; Do something about popups as well
@@ -568,7 +572,10 @@ SCHEDULED: %t
 
 ;; Flycheck
 (use-package flycheck
-  :defer t)
+  :defer t
+  :init
+  (add-hook 'json-mode-hook 'flycheck-mode)
+  (add-hook 'yaml-mode-hook 'flycheck-mode))
 
 ;; Modes
 
@@ -627,6 +634,13 @@ SCHEDULED: %t
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
+
+(defun markdown-preview-file ()
+  "run Marked on the current file and revert the buffer"
+  (interactive)
+  (shell-command
+   (format "open -a /Applications/Marked\\ 2.app %s"
+       (shell-quote-argument (buffer-file-name)))))
 
 (use-package dockerfile-mode
   :defer t)
@@ -722,6 +736,7 @@ SCHEDULED: %t
 (global-set-key [(kbd "M-w")]
                 (lambda () (interactive) (delete-window)))
 (global-set-key (kbd "M-z") 'undo)
+(global-set-key (kbd "M-n") 'evil-buffer-new)
 (global-set-key (kbd "M-N") 'make-frame-command)
 (global-set-key (kbd "M-W") 'delete-frame)
 (global-set-key (kbd "M-v") 'yank)
@@ -741,7 +756,7 @@ SCHEDULED: %t
  '(max-specpdl-size 10000)
  '(package-selected-packages
    (quote
-    (golden-ratio transpose-frame evil-surround evil-goggles evil-expat evil-visualstar evil-replace-with-register evil-exchange evil-commentary evil-lion evil-collection htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package)))
+    (nyan-mode go-projectile golden-ratio transpose-frame evil-surround evil-goggles evil-expat evil-visualstar evil-replace-with-register evil-exchange evil-commentary evil-lion evil-collection htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package)))
  '(use-package-always-ensure t))
 
 (server-start)
