@@ -126,6 +126,14 @@
   (with-eval-after-load 'ivy
     (define-key ivy-minibuffer-map (kbd "M-v") 'yank)))
 
+(use-package ivy-posframe
+  :demand t
+  :config
+  (setq ivy-display-function #'ivy-posframe-display)
+  (setq ivy-display-function #'ivy-posframe-display-at-frame-center)
+  (setq ivy-display-function #'ivy-posframe-display-at-window-center)
+  (ivy-posframe-enable))
+
 (use-package eyebrowse
   :config
   (setq eyebrowse-mode 1))
@@ -205,7 +213,7 @@
 ;;(set-background-color "#F4F4F4")
 
 ;; Dark
-;; (set-background-color "#0C0C0C")
+;;(set-background-color "#0C0C0C")
 
 ; Evil mode and related
 (use-package evil
