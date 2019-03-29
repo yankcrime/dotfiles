@@ -11,6 +11,7 @@ export EDITOR="vim"
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
 export PURE_PROMPT_SYMBOL="$"
 export PURE_PROMPT_SYMBOL_COLOR="black"
+export GPG_TTY=$(tty)
 
 # history and general options
 #
@@ -69,7 +70,7 @@ alias gitsup='git submodule sync ; git submodule update --init'
 
 # emacs
 #
-alias emacs='/Applications/Emacs.app/Contents/MacOS/bin/emacsclient -n'
+alias emacs='/usr/local/Cellar/emacs-mac/HEAD-a605292/bin/emacsclient -n'
 
 # stuff that makes zsh worthwhile
 #
@@ -95,7 +96,7 @@ setopt PROMPT_SUBST
 #
 precmd() { print -Pn "\e]0;%n@%m:%~\a" }
 
-if [[ $(hostname -s) == deadline ]]; then
+if [[ $(hostname -s) == hoover ]]; then
     print_osc() {
         if [[ $TERM == tmux* ]] ; then
             printf "\033Ptmux;\033\033]"
@@ -121,9 +122,9 @@ if [[ $(hostname -s) == deadline ]]; then
             print_st
         fi
     }
-    PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.>) '
+    PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.>) %(1j.%F{green}·%j%f .)'
  else
-    PS1='%n@%m:%25<..<%~%(!.#.>) '
+    PS1='%n@%m:%25<..<%~%(!.#.>) %(1j.%F{green}·%j%f .)'
 fi
 
 # make it work like vim
@@ -173,6 +174,15 @@ fi
 if which pyenv-virtualenv-init > /dev/null; then
   eval "$(pyenv virtualenv-init -)"
 fi
+
+# GnuPG
+#if test -f ~/.gnupg/.gpg-agent-info -a -n "$(pgrep gpg-agent)"; then
+#  source ~/.gnupg/.gpg-agent-info
+#  export GPG_AGENT_INFO
+#  export GPG_TTY=$(tty)
+#else
+#  eval $(gpg-agent --daemon)
+#fi
 
 # load zgen and plugins
 # https://github.com/tarjoilija/zgen
