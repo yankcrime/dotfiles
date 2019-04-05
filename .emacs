@@ -132,7 +132,20 @@
   (setq ivy-display-function #'ivy-posframe-display)
   (setq ivy-display-function #'ivy-posframe-display-at-frame-center)
   (setq ivy-display-function #'ivy-posframe-display-at-window-center)
+  (setq ivy-posframe-parameters
+      '((left-fringe . 8)
+        (right-fringe . 8)))
   (ivy-posframe-enable))
+
+(use-package company
+  :defer t
+  :bind (("C-<tab>" . company-complete))
+  :init
+  (add-hook 'terraform-mode-hook 'company-mode)
+  (add-hook 'terraform-mode-hook 'company-terraform-init))
+
+(use-package company-terraform
+  :defer t)
 
 (use-package eyebrowse
   :config
@@ -764,7 +777,7 @@ SCHEDULED: %t
  '(max-specpdl-size 10000)
  '(package-selected-packages
    (quote
-    (nyan-mode go-projectile golden-ratio transpose-frame evil-surround evil-goggles evil-expat evil-visualstar evil-replace-with-register evil-exchange evil-commentary evil-lion evil-collection htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package)))
+    (company-terraform company nyan-mode go-projectile golden-ratio transpose-frame evil-surround evil-goggles evil-expat evil-visualstar evil-replace-with-register evil-exchange evil-commentary evil-lion evil-collection htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package)))
  '(use-package-always-ensure t))
 
 (server-start)
