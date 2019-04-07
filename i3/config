@@ -4,10 +4,9 @@ exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-screensaver
 exec --no-startup-id gnome-flashback
-# exec --no-startup-id imwheel
+exec --no-startup-id imwheel
 exec --no-startup-id compton --config ~/.config/compton/compton.conf -b
 
-# :wq
 # output DP-3 scale 1.5
 
 #i3 gaps
