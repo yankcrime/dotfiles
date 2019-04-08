@@ -131,12 +131,14 @@
 
 (use-package ivy-posframe
   :demand t
+  :after (ivy)
   :config
-  (setq ivy-display-function #'ivy-posframe-display)
   (setq ivy-display-function #'ivy-posframe-display-at-frame-center)
   (setq ivy-posframe-parameters
       '((left-fringe . 8)
         (right-fringe . 8)))
+  (push '(swiper . ivy-posframe-display-at-window-bottom-left)
+        ivy-display-functions-alist)
   (ivy-posframe-enable))
 
 (use-package company
@@ -556,7 +558,18 @@ SCHEDULED: %t
                   select-window-2
                   select-window-3
                   select-window-4
-                  select-window-5))))
+                  select-window-5
+                  winum-select-window-0-or-10
+                  winum-select-window-1
+                  winum-select-window-2
+                  winum-select-window-3
+                  winum-select-window-4
+                  winum-select-window-5
+                  winum-select-window-6
+                  winum-select-window-7
+                  winum-select-window-8
+                  winum-select-window-9
+                  ))))
 
 ;; Which modes are active?
 (defun which-active-modes ()
@@ -766,7 +779,7 @@ SCHEDULED: %t
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
 (global-set-key (kbd "M-w") 'kill-this-buffer)
 (global-set-key (kbd "M-s") 'evil-write)
-(global-set-key (kbd "M-f") 'evil-search-forward)
+(global-set-key (kbd "M-f") 'swiper)
 (global-set-key (kbd "M-F") 'query-replace)
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
