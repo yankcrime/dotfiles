@@ -139,6 +139,8 @@ bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-pattern-search-backward
 export KEYTIMEOUT=1
 
+bindkey '^[[Z' reverse-menu-complete # make shift-tab work in reverse
+
 # change cursor shape based on which vi mode we're in
 # via https://emily.st/2013/05/03/zsh-vi-cursor/
 #
