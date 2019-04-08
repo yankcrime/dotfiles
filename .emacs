@@ -22,6 +22,9 @@
 (setq initial-scratch-message "")
 (fset 'yes-or-no-p 'y-or-n-p)
 
+;; Be able to mash Esc instead of Ctrl-G to get out of trouble
+(define-key key-translation-map (kbd "ESC") (kbd "C-g"))
+
 ;; Tooltips etc.
 (set-face-attribute 'variable-pitch nil
                     :family "Helvetica Neue"
@@ -131,7 +134,6 @@
   :config
   (setq ivy-display-function #'ivy-posframe-display)
   (setq ivy-display-function #'ivy-posframe-display-at-frame-center)
-  (setq ivy-display-function #'ivy-posframe-display-at-window-center)
   (setq ivy-posframe-parameters
       '((left-fringe . 8)
         (right-fringe . 8)))
@@ -165,6 +167,14 @@
     :defer t)
   :config
   (setq tramp-default-method "ssh"))
+
+(use-package winum
+  :ensure t
+  :config
+  (setq winum-mode-line-position   7
+        winum-format "⌘ %s "
+        winum-auto-setup-mode-line t)
+  (winum-mode))
 
 (use-package ein
   :defer t
@@ -284,6 +294,16 @@
       "x" 'evil-save-and-close
       "ws" 'evil-window-split
       "wg" 'golden-ratio
+      "w1" 'winum-select-window-1
+      "w2" 'winum-select-window-2
+      "w3" 'winum-select-window-3
+      "w4" 'winum-select-window-4
+      "w5" 'winum-select-window-5
+      "w6" 'winum-select-window-6
+      "w7" 'winum-select-window-7
+      "w8" 'winum-select-window-8
+      "w9" 'winum-select-window-9
+      "ww" 'winum-select-window-by-number
       "f" 'counsel-fzf))
 
   ;; vim-like keybindings everywhere in emacs
@@ -763,6 +783,11 @@ SCHEDULED: %t
 (global-set-key (kbd "M-v") 'yank)
 (global-set-key (kbd "M-c") 'kill-ring-save)
 (global-set-key (kbd "M-h") 'ns-do-hide-emacs)
+(global-set-key (kbd "M-1") 'winum-select-window-1)
+(global-set-key (kbd "M-2") 'winum-select-window-2)
+(global-set-key (kbd "M-3") 'winum-select-window-3)
+(global-set-key (kbd "M-4") 'winum-select-window-4)
+(global-set-key (kbd "M-5") 'winum-select-window-5)
 (global-set-key (kbd "M-`") 'ns-next-frame)
 
 ;; Ensure we're using ⌘ as Meta
