@@ -107,13 +107,47 @@
 
 (setq use-package-compute-statistics t)
 
-;; Completion framework
-(use-package counsel
-  :after ivy
-  :demand t)
+(use-package general
+  :config
+  (setq general-override-states '(normal visual motion))
+  (general-override-mode)
+  (declare-function 'general-define-key "general")
+  (defmacro my-leader (&rest args)
+    "Bind ARGS as leader bindings."
+    (declare (indent 0))
+    `(progn
+       (require 'general)
+       ,@(cl-loop for (key func doc) in args
+                  collect
+                  `(progn
+                     (when ,doc
+                       (which-key-add-key-based-replacements ,(concat "SPC " key) ,doc))
+                     (general-define-key :prefix "SPC" :states '(normal motion) :keymaps 'override ,key ,func))))))
 
-(use-package counsel-projectile
-  :defer t)
+(my-leader
+ ("b" 'ivy-switch-buffer "Switch buffer")
+ ("pp" 'counsel-projectile-switch-project "Project - switch project")
+ ("pf" 'counsel-projectile-find-file "Project - find file")
+ ("ps" 'counsel-projectile-ag "Project - search in files")
+ ("d" 'deft "Deft")
+ ("gs" 'magit-status "Git - status")
+ ("ga" 'magit-stage-file "Git - stage file")
+ ("gc" 'magit-commit "Git - commit")
+ ("gp" 'magit-push "Git - push")
+ ("ol" 'org-todo-list "Org - todo list")
+ ("oa" 'org-agenda "Org - agenda")
+ ("oc" 'org-task-capture " Org - capture task")
+ ("ts" 'flyspell-mode "Toggle - Flyspell")
+ ("w1" 'winum-select-window-1 "Window - select 1")
+ ("w2" 'winum-select-window-2 "Window - select 2")
+ ("w3" 'winum-select-window-3 "Window - select 3")
+ ("w4" 'winum-select-window-4 "Window - select 4")
+ ("w5" 'winum-select-window-5 "Window - select 5")
+ ("w6" 'winum-select-window-6 "Window - select 6")
+ ("w7" 'winum-select-window-7 "Window - select 7")
+ ("w8" 'winum-select-window-8 "Window - select 8")
+ ("w9" 'winum-select-window-9 "Window - select 9")
+ ("ww" 'winum-select-window-by-number "Window - select by number"))
 
 ;; Completion frontend
 (use-package ivy
@@ -133,23 +167,45 @@
   :demand t
   :after (ivy)
   :config
-  (setq ivy-display-function #'ivy-posframe-display-at-frame-center)
   (setq ivy-posframe-parameters
       '((left-fringe . 8)
         (right-fringe . 8)))
-  (push '(swiper . ivy-posframe-display-at-window-bottom-left)
-        ivy-display-functions-alist)
+  (setq ivy-display-function #'ivy-posframe-display-at-frame-center)
   (ivy-posframe-enable))
+
+(use-package ivy-rich
+  :demand t
+  :after (ivy)
+  :config
+  (setq ivy-rich-mode 1)
+  (setq ivy-format-function #'ivy-format-function-line))
+
+;; Completion framework
+(use-package counsel
+  :after ivy
+  :demand t)
+
+(use-package counsel-projectile
+  :defer t)
+
 
 (use-package company
   :defer t
   :bind (("C-<tab>" . company-complete))
   :init
   (add-hook 'terraform-mode-hook 'company-mode)
-  (add-hook 'terraform-mode-hook 'company-terraform-init))
+  (add-hook 'terraform-mode-hook 'company-terraform-init)
+  :config
+  (setq company-idle-delay 0))
 
 (use-package company-terraform
   :defer t)
+
+(use-package avy
+  :config
+  (global-set-key (kbd "C-:") 'avy-goto-char)
+  (global-set-key (kbd "C-\"") 'avy-goto-char-2)
+  (global-set-key (kbd "M-g g") 'avy-goto-line))
 
 (use-package eyebrowse
   :config
@@ -264,59 +320,22 @@
   (evil-mode)
   (kill-buffer "*Messages*")
 
-  (use-package evil-leader
-    :init
-    (global-evil-leader-mode)
-    :config
-    (setq evil-leader/in-all-states t)
-    (evil-leader/set-leader "<SPC>")
-    (evil-leader/set-key
-      "<SPC>" 'evil-buffer
-      "b" 'ivy-switch-buffer
-      "pp" 'counsel-projectile-switch-project
-      "pf" 'counsel-projectile-find-file
-      "ps" 'counsel-projectile-ag
-      "m" 'magit-file-popup
-      "d" 'deft
-      "gs" 'magit-status
-      "ga" 'magit-stage-file
-      "gc" 'magit-commit
-      "gp" 'magit-push
-      "ol" 'org-todo-list
-      "oa" 'org-agenda
-      "oc" 'org-task-capture
-      "oe" 'org-export-dispatch
-      "ofa" 'org-attach
-      "off" 'org-attach-attach
-      "ofo" 'org-attach-open
-      "oj" 'org-journal-new-entry
-      "ts" 'flyspell-mode
-      "wo" 'delete-other-windows
-      "q" 'evil-quit
-      "x" 'evil-save-and-close
-      "ws" 'evil-window-split
-      "wg" 'golden-ratio
-      "w1" 'winum-select-window-1
-      "w2" 'winum-select-window-2
-      "w3" 'winum-select-window-3
-      "w4" 'winum-select-window-4
-      "w5" 'winum-select-window-5
-      "w6" 'winum-select-window-6
-      "w7" 'winum-select-window-7
-      "w8" 'winum-select-window-8
-      "w9" 'winum-select-window-9
-      "ww" 'winum-select-window-by-number
-      "f" 'counsel-fzf))
-
   ;; vim-like keybindings everywhere in emacs
   (use-package evil-collection
     :after evil
     :ensure t
     :config
+    (setq evil-collection-mode-list
+          '(ediff
+            elisp-mode
+            flycheck
+            magit
+            magit-todos))
     (evil-collection-init))
 
   ;; and in magit
-  (use-package evil-magit)
+  (use-package evil-magit
+    :after magit)
 
   ;; gl and gL operators, like vim-lion
   (use-package evil-lion
@@ -483,10 +502,12 @@ SCHEDULED: %t
 (use-package polymode)
 
 (use-package poly-markdown
+  :defer t
   :config
   (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode)))
 
 (use-package poly-ansible
+  :defer t
   :config
   (add-to-list 'auto-mode-alist '("\\.j2" . poly-ansible-mode)))
 
@@ -781,22 +802,23 @@ SCHEDULED: %t
 (global-set-key (kbd "M-3") 'winum-select-window-3)
 (global-set-key (kbd "M-4") 'winum-select-window-4)
 (global-set-key (kbd "M-5") 'winum-select-window-5)
+(global-set-key (kbd "M-6") 'winum-select-window-6)
+(global-set-key (kbd "M-7") 'winum-select-window-7)
+(global-set-key (kbd "M-8") 'winum-select-window-8)
+(global-set-key (kbd "M-9") 'winum-select-window-9)
 (global-set-key (kbd "M-`") 'ns-next-frame)
 
 ;; Ensure we're using ⌘ as Meta
 (setq mac-option-modifier nil
       mac-command-modifier 'meta)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(max-specpdl-size 10000)
- '(package-selected-packages
-   (quote
-    (company-terraform company nyan-mode go-projectile golden-ratio transpose-frame evil-surround evil-goggles evil-expat evil-visualstar evil-replace-with-register evil-exchange evil-commentary evil-lion evil-collection htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package)))
- '(use-package-always-ensure t))
+;; Keep custom junk that Emacs generates in a seperate file
+(setq custom-file "~/.emacs.d/custom.el")
+(unless (file-exists-p custom-file)
+  (write-region "" nil custom-file))
+(load custom-file)
+
+(setq create-lockfiles nil)
 
 (server-start)
 
