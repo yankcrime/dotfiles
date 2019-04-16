@@ -526,36 +526,7 @@ SCHEDULED: %t
   :config
   (projectile-global-mode +1)
   (setq projectile-completion-system 'ivy)
-  (setq projectile-enable-caching t)
-  (global-set-key (kbd "<f1>") 'projectile-switch-project)
-  (global-set-key (kbd "<f2>") 'projectile-find-file))
-
-;; Attempt to tame layout consistency of various windows which popup
-(use-package shackle
-  :config
-  (shackle-mode 1)
-  (setq shackle-rules
-        `(;; Util
-          ("*esup*"            :align below :size 0.4 :noselect t)
-          ("*minor-modes*"     :align below :size 0.5 :noselect t)
-          ("*eval*"            :align below :size 16  :noselect t)
-          ;; Emacs
-          ("*Pp Eval Output*"  :align below :size 0.3)
-          ("*Apropos*"         :align below :size 0.3)
-          ("*Backtrace*"       :align below :size 25  :noselect t)
-          ("*Help*"            :align below :size 16  :select t)
-          ("*Messages*"        :align below :size 15  :select t)
-          ("*Warnings*"        :align below :size 10  :noselect t)
-          ("*compilation*"     :align below :size 15  :noselect t)
-          (compilation-mode    :align below :size 15  :noselect t)
-          (eww-mode            :align below :size 30  :select t)
-          ("*command-log*"     :align right :size 28  :noselect t)
-          ("*magit*"           :align below :size 50 :select t)
-          ("*evil*"            :align below :size 50 :select t)
-          ("*vc-diff*"         :align below :size 15  :noselect t)
-          ("*vc-change-log*"   :align below :size 15  :select t)
-          ("^\\*Org Agenda.*"  :align right :regexp t :select t)
-          (vc-annotate-mode    :same t))))
+  (setq projectile-enable-caching t))
 
 ;; Do something about popups as well
 (use-package popwin
