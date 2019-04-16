@@ -545,31 +545,11 @@ SCHEDULED: %t
 (use-package transpose-frame)
 
 ;; Resize active frame according to 'golden ratio' principles
-(use-package golden-ratio
+(use-package zoom
+  :ensure t
   :config
-  (golden-ratio-mode t)
-  (setq golden-ratio-extra-commands
-        (append golden-ratio-extra-commands
-                '(evil-window-left
-                  evil-window-right
-                  evil-window-up
-                  evil-window-down
-                  select-window-1
-                  select-window-2
-                  select-window-3
-                  select-window-4
-                  select-window-5
-                  winum-select-window-0-or-10
-                  winum-select-window-1
-                  winum-select-window-2
-                  winum-select-window-3
-                  winum-select-window-4
-                  winum-select-window-5
-                  winum-select-window-6
-                  winum-select-window-7
-                  winum-select-window-8
-                  winum-select-window-9
-                  ))))
+  (setq zoom-size '(0.618 . 0.618))
+  (zoom-mode t))
 
 ;; Which modes are active?
 (defun which-active-modes ()
