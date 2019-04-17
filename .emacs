@@ -229,8 +229,8 @@
 (use-package winum
   :ensure t
   :config
-  (setq winum-mode-line-position   7
-        winum-format "⌘ %s "
+  (setq winum-mode-line-position   3
+        winum-format " %s "
         winum-auto-setup-mode-line t)
   (winum-mode))
 
@@ -273,21 +273,29 @@
   (defvar active-modeline-fg "#332233")
   (defvar inactive-modeline-fg "#777777")
   (defvar inactive-modeline-bg "#c6c6c6")
-
-  (set-face-attribute 'mode-line nil
-                      :background active-modeline-bg
-                      :foreground active-modeline-fg
-                      :overline "#cccccc")
-
-  (set-face-attribute 'mode-line-inactive nil
-                      :background inactive-modeline-bg
-                      :foreground inactive-modeline-fg))
+  (let ((line (face-attribute 'mode-line :underline)))
+    (set-face-attribute 'mode-line          nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :underline  line)
+    (set-face-attribute 'mode-line-inactive nil :foreground inactive-modeline-fg)
+    (set-face-attribute 'mode-line          nil :box        nil)
+    (set-face-attribute 'mode-line-inactive nil :box        nil)
+    (set-face-attribute 'mode-line-inactive nil :background inactive-modeline-bg)))
 
 (use-package minions
   :init (minions-mode)
-  :config (setq minions-direct '(cider-mode
+  :config
+  (setq minions-mode-line-lighter "#")
+  (setq minions-direct '(cider-mode
                                  flycheck-mode
                                  overwrite-mode)))
+
+(use-package moody
+  :config
+  (setq moody-mode-line-height 20)
+  (setq x-underline-at-descent-line t)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 
 ;; Override theme background
 ;; Light
@@ -602,6 +610,9 @@ SCHEDULED: %t
   :init
   (add-hook 'json-mode-hook 'flycheck-mode)
   (add-hook 'yaml-mode-hook 'flycheck-mode))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Modes
 
