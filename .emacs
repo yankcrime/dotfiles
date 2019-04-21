@@ -8,10 +8,16 @@
 (scroll-bar-mode 0)
 (tool-bar-mode -1)
 (column-number-mode 1)
+(menu-bar-mode -1)
 (set-face-attribute 'default nil
-                    :family "IBM Plex Mono"
-                    :height 130
+                    :family "Menlo"
+                    :height 140
                     :width 'normal)
+
+;; macOS-specific
+(when (memq window-system '(mac ns))
+  (add-to-list 'default-frame-alist '(ns-appearance . light)) ;; {light, dark}
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
 
 ;; Hide some menu junk
 (define-key global-map [menu-bar tools gnus] nil)
@@ -134,9 +140,9 @@
  ("ga" 'magit-stage-file "Git - stage file")
  ("gc" 'magit-commit "Git - commit")
  ("gp" 'magit-push "Git - push")
- ("ol" 'org-todo-list "Org - todo list")
- ("oa" 'org-agenda "Org - agenda")
- ("oc" 'org-task-capture " Org - capture task")
+ ("aol" 'org-todo-list "Org - todo list")
+ ("aoa" 'org-agenda "Org - agenda")
+ ("aoc" 'org-task-capture " Org - capture task")
  ("ts" 'flyspell-mode "Toggle - Flyspell")
  ("w1" 'winum-select-window-1 "Window - select 1")
  ("w2" 'winum-select-window-2 "Window - select 2")
@@ -148,6 +154,24 @@
  ("w8" 'winum-select-window-8 "Window - select 8")
  ("w9" 'winum-select-window-9 "Window - select 9")
  ("ww" 'winum-select-window-by-number "Window - select by number"))
+
+(which-key-add-key-based-replacements
+  "SPC a" "Apps"
+  "SPC ao" "Orgmode"
+  "SPC b" "Buffers"
+  "SPC c" "Compile"
+  "SPC e" "Errors"
+  "SPC f" "Files"
+  "SPC g" "Git"
+  "SPC h" "Help"
+  "SPC hd" "Describe"
+  "SPC j" "Jump"
+  "SPC p" "Project"
+  "SPC q" "Quit"
+  "SPC s" "Search"
+  "SPC t" "Toggle"
+  "SPC w" "Windows"
+  "SPC v" "Venvs")
 
 ;; Completion frontend
 (use-package ivy
@@ -173,12 +197,7 @@
   (setq ivy-display-function #'ivy-posframe-display-at-frame-center)
   (ivy-posframe-enable))
 
-(use-package ivy-rich
-  :demand t
-  :after (ivy)
-  :config
-  (setq ivy-rich-mode 1)
-  (setq ivy-format-function #'ivy-format-function-line))
+(use-package all-the-icons)
 
 ;; Completion framework
 (use-package counsel
@@ -188,7 +207,6 @@
 (use-package counsel-projectile
   :defer t)
 
-
 (use-package company
   :defer t
   :bind (("C-<tab>" . company-complete))
@@ -196,7 +214,7 @@
   (add-hook 'terraform-mode-hook 'company-mode)
   (add-hook 'terraform-mode-hook 'company-terraform-init)
   :config
-  (setq company-idle-delay 0))
+  (setq company-idle-delay 0.2))
 
 (use-package company-terraform
   :defer t)
@@ -262,6 +280,9 @@
   (require 'git-gutter)
   (require 'git-gutter-fringe))
 
+;;(use-package greymatters-theme
+;;  :ensure t)
+
 (use-package doom-themes
   :init
   (setq doom-themes-enable-bold t
@@ -286,9 +307,10 @@
   :init (minions-mode)
   :config
   (setq minions-mode-line-lighter "#")
-  (setq minions-direct '(cider-mode
-                                 flycheck-mode
-                                 overwrite-mode)))
+  (setq minions-direct '(flyspell-mode
+                         projectile-mode
+                         flycheck-mode
+                         overwrite-mode)))
 
 (use-package moody
   :config
@@ -338,14 +360,15 @@
             elisp-mode
             flycheck
             magit
-            magit-todos))
+            magit-todos
+            company))
     (evil-collection-init))
 
   ;; and in magit
   (use-package evil-magit
     :after magit)
 
-  ;; gl and gL operators, like vim-lion
+  ;; gl and gL operators, like vim-lion (alignment operators)
   (use-package evil-lion
     :ensure t
     :bind (:map evil-normal-state-map
@@ -532,9 +555,12 @@ SCHEDULED: %t
 (use-package projectile
   :defer t
   :config
-  (projectile-global-mode +1)
+  (defun projectile-short-mode-line ()
+    (format " [%s]" (projectile-project-name)))
+  (setq projectile-mode-line-function 'projectile-short-mode-line)
   (setq projectile-completion-system 'ivy)
-  (setq projectile-enable-caching t))
+  (setq projectile-enable-caching nil)
+  (projectile-global-mode +1))
 
 ;; Do something about popups as well
 (use-package popwin
@@ -548,6 +574,8 @@ SCHEDULED: %t
 (use-package zoom
   :ensure t
   :config
+  (custom-set-variables
+   '(zoom-ignored-buffer-name-regexps '("^*magit" "^*magit-diff" "^*COMMIT_EDITMSG")))
   (setq zoom-size '(0.618 . 0.618))
   (zoom-mode t))
 
@@ -696,8 +724,13 @@ SCHEDULED: %t
 (use-package json-mode
   :defer t)
 
-(use-package terraform-mode
+(use-package hcl-mode
   :defer t)
+
+(use-package terraform-mode
+  :defer t
+  :config
+  (add-hook 'terraform-mode-hook 'terraform-format-on-save-mode))
 
 ;; Rename current buffer and file
 (defun rename-current-buffer-file ()
@@ -754,8 +787,8 @@ SCHEDULED: %t
  '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
  '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
  '(evil-goggles-yank-face ((t (:inherit diff-changed))))
- '(magit-mode-line-process ((t (:foreground "MediumBlue"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "IBM Plex Mono")))))
+;; '(magit-mode-line-process ((t (:foreground "MediumBlue"))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Menlo")))))
 
 ;; Global keybinding overrides, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
