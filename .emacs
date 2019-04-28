@@ -345,6 +345,7 @@
   (setq evil-visual-state-tag "V ")
   (setq evil-motion-state-tag "M ")
   (setq evil-operator-state-tag "O ")
+  (setq evil-emacs-state-tag "E ")
 
   :config
   (evil-mode)
