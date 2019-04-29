@@ -221,9 +221,9 @@
 
 (use-package avy
   :config
-  (global-set-key (kbd "C-:") 'avy-goto-char)
-  (global-set-key (kbd "C-\"") 'avy-goto-char-2)
-  (global-set-key (kbd "M-g g") 'avy-goto-line))
+  :bind
+  ("M-c" . avy-goto-char)
+  ("M-C" . avy-goto-char-2))
 
 (use-package eyebrowse
   :config
