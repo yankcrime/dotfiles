@@ -8,7 +8,7 @@ shopt -s checkwinsize
 PATH=/usr/local/bin:$PATH:~/bin:~/.rvm/bin:/Applications/VMware\ Fusion.app/Contents/Library:/usr/local/sbin:/usr/texbin/
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 
-export PATH 
+export PATH
 
 # source some useful stuff
 source ~/bin/prompt.sh

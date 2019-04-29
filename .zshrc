@@ -1,11 +1,17 @@
 # .zshrc
 # nick@dischord.org
 
+# don't do anything if its emacs tramp mode
+#
+[[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
+
 # usual suspects
 #
 export EDITOR="vim"
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
 export PURE_PROMPT_SYMBOL="$"
+export PURE_PROMPT_SYMBOL_COLOR="black"
+export GPG_TTY=$(tty)
 
 # history and general options
 #
@@ -42,7 +48,7 @@ alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
-alias vim='/usr/local/bin/vim'
+# alias vim='/usr/local/bin/nvim'
 
 # <3 vagrant
 #
@@ -64,7 +70,7 @@ alias gitsup='git submodule sync ; git submodule update --init'
 
 # emacs
 #
-alias emacs='open -a /Applications/Emacs.app $1'
+alias emacs='/usr/local/opt/emacs-mac/bin/emacsclient -n'
 
 # stuff that makes zsh worthwhile
 #
@@ -116,9 +122,9 @@ if [[ $(hostname -s) == deadline ]]; then
             print_st
         fi
     }
-    PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.>) '
+    PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.>) %(1j.%F{green}·%j%f .)'
  else
-    PS1='%n@%m:%25<..<%~%(!.#.>) '
+    PS1='%n@%m:%25<..<%~%(!.#.>) %(1j.%F{green}·%j%f .)'
 fi
 
 # make it work like vim
@@ -132,6 +138,8 @@ bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-pattern-search-backward
 export KEYTIMEOUT=1
+
+bindkey '^[[Z' reverse-menu-complete # make shift-tab work in reverse
 
 # change cursor shape based on which vi mode we're in
 # via https://emily.st/2013/05/03/zsh-vi-cursor/
@@ -159,11 +167,24 @@ zle -N zle-keymap-select
 # pyenv and rbenv junk
 #
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+
 if which pyenv > /dev/null; then
-    export PYENV_ROOT="$HOME/.pyenv"
-    export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init -)"
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
 fi
+if which pyenv-virtualenv-init > /dev/null; then
+  eval "$(pyenv virtualenv-init -)"
+fi
+
+# GnuPG
+#if test -f ~/.gnupg/.gpg-agent-info -a -n "$(pgrep gpg-agent)"; then
+#  source ~/.gnupg/.gpg-agent-info
+#  export GPG_AGENT_INFO
+#  export GPG_TTY=$(tty)
+#else
+#  eval $(gpg-agent --daemon)
+#fi
 
 # load zgen and plugins
 # https://github.com/tarjoilija/zgen
