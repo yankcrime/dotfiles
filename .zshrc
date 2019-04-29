@@ -70,7 +70,7 @@ alias gitsup='git submodule sync ; git submodule update --init'
 
 # emacs
 #
-alias emacs='/usr/local/Cellar/emacs-mac/HEAD-a605292/bin/emacsclient -n'
+alias emacs='/usr/local/opt/emacs-mac/bin/emacsclient -n'
 
 # stuff that makes zsh worthwhile
 #
@@ -96,7 +96,7 @@ setopt PROMPT_SUBST
 #
 precmd() { print -Pn "\e]0;%n@%m:%~\a" }
 
-if [[ $(hostname -s) == hoover ]]; then
+if [[ $(hostname -s) == deadline ]]; then
     print_osc() {
         if [[ $TERM == tmux* ]] ; then
             printf "\033Ptmux;\033\033]"
