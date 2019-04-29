@@ -10,7 +10,7 @@
 (column-number-mode 1)
 (menu-bar-mode -1)
 (set-face-attribute 'default nil
-                    :family "Menlo"
+                    :family "Triplicate T4c"
                     :height 140
                     :width 'normal)
 
@@ -789,7 +789,7 @@ SCHEDULED: %t
  '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
  '(evil-goggles-yank-face ((t (:inherit diff-changed))))
 ;; '(magit-mode-line-process ((t (:foreground "MediumBlue"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Menlo")))))
+ '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
 
 ;; Global keybinding overrides, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
