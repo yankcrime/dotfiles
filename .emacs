@@ -144,6 +144,7 @@
  ("aoa" 'org-agenda "Org - agenda")
  ("aoc" 'org-task-capture " Org - capture task")
  ("ts" 'flyspell-mode "Toggle - Flyspell")
+ ("tc" 'counsel-mode "Toggle - Counsel")
  ("w1" 'winum-select-window-1 "Window - select 1")
  ("w2" 'winum-select-window-2 "Window - select 2")
  ("w3" 'winum-select-window-3 "Window - select 3")
@@ -202,7 +203,10 @@
 ;; Completion framework
 (use-package counsel
   :after ivy
-  :demand t)
+  :demand t
+  :config
+  (setq ivy-height 20)
+  (add-to-list 'ivy-height-alist '(counsel-evil-registers . 10)))
 
 (use-package counsel-projectile
   :defer t)
@@ -230,7 +234,6 @@
   (setq eyebrowse-mode 1))
 
 (use-package org-download
-  :ensure t
   :config
   (setq org-download-method 'attach))
 
@@ -245,16 +248,11 @@
   (setq tramp-default-method "ssh"))
 
 (use-package winum
-  :ensure t
   :config
-  (setq winum-mode-line-position   3
+  (setq winum-mode-line-position   7
         winum-format " %s "
         winum-auto-setup-mode-line t)
   (winum-mode))
-
-(use-package ein
-  :defer t
-  :commands (ein:notebooklist-open))
 
 (use-package elpy
   :defer t
@@ -280,9 +278,6 @@
   (require 'git-gutter)
   (require 'git-gutter-fringe))
 
-;;(use-package greymatters-theme
-;;  :ensure t)
-
 (use-package doom-themes
   :init
   (setq doom-themes-enable-bold t
@@ -294,14 +289,13 @@
   (defvar active-modeline-fg "#332233")
   (defvar inactive-modeline-fg "#777777")
   (defvar inactive-modeline-bg "#c6c6c6")
-  (let ((line (face-attribute 'mode-line :underline)))
-    (set-face-attribute 'mode-line          nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :underline  line)
-    (set-face-attribute 'mode-line-inactive nil :foreground inactive-modeline-fg)
-    (set-face-attribute 'mode-line          nil :box        nil)
-    (set-face-attribute 'mode-line-inactive nil :box        nil)
-    (set-face-attribute 'mode-line-inactive nil :background inactive-modeline-bg)))
+  (set-face-attribute 'mode-line nil
+                      :background active-modeline-bg
+                      :foreground active-modeline-fg
+                      :overline "#cccccc")
+  (set-face-attribute 'mode-line-inactive nil
+                      :background inactive-modeline-bg
+                      :foreground inactive-modeline-fg))
 
 (use-package minions
   :init (minions-mode)
@@ -310,14 +304,8 @@
   (setq minions-direct '(flyspell-mode
                          projectile-mode
                          flycheck-mode
-                         overwrite-mode)))
-
-(use-package moody
-  :config
-  (setq moody-mode-line-height 20)
-  (setq x-underline-at-descent-line t)
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
+                         overwrite-mode
+                         counsel-mode)))
 
 ;; Override theme background
 ;; Light
@@ -328,7 +316,6 @@
 
 ; Evil mode and related
 (use-package evil
-  :ensure t
   :defer .1 ;; don't block emacs when starting, load evil immediately after startup
   :init
   (setq evil-want-integration t)
@@ -349,12 +336,19 @@
 
   :config
   (evil-mode)
-  (kill-buffer "*Messages*")
+
+  (defun my-exit-evil-command-window ()
+    "Exit evil command window."
+    (interactive)
+    (other-window -1)
+    (other-window 1)
+    (kill-this-buffer)
+    (evil-window-delete))
+  (evil-define-key 'normal evil-command-window-mode-map [escape] 'my-exit-evil-command-window)
 
   ;; vim-like keybindings everywhere in emacs
   (use-package evil-collection
     :after evil
-    :ensure t
     :config
     (setq evil-collection-mode-list
           '(ediff
@@ -371,7 +365,6 @@
 
   ;; gl and gL operators, like vim-lion (alignment operators)
   (use-package evil-lion
-    :ensure t
     :bind (:map evil-normal-state-map
                 ("g l " . evil-lion-left)
                 ("g L " . evil-lion-right)
@@ -381,38 +374,32 @@
 
   ;; gc operator, like vim-commentary
   (use-package evil-commentary
-    :ensure t
     :bind (:map evil-normal-state-map
                 ("gc" . evil-commentary)))
 
   ;; gr operator, like vim's ReplaceWithRegister
   (use-package evil-replace-with-register
-    :ensure t
     :bind (:map evil-normal-state-map
                 ("gr" . evil-replace-with-register)
                 :map evil-visual-state-map
                 ("gr" . evil-replace-with-register)))
 
   (use-package evil-visualstar
-    :ensure t
     :bind (:map evil-visual-state-map
                 ("*" . evil-visualstar/begin-search-forward)
                 ("#" . evil-visualstar/begin-search-backward)))
 
   (use-package evil-expat
-    :ensure t
     :defer t)
 
   ;; visual hints while editing
   (use-package evil-goggles
-    :ensure t
     :config
     (evil-goggles-use-diff-faces)
     (evil-goggles-mode))
 
   ;; like vim-surround
   (use-package evil-surround
-    :ensure t
     :commands
     (evil-surround-edit
      evil-Surround-edit
@@ -531,17 +518,13 @@ SCHEDULED: %t
     :defer t
     :hook (org-mode . org-bullets-mode)))
 
-(use-package polymode)
+(use-package polymode
+  :defer t)
 
 (use-package poly-markdown
   :defer t
   :config
   (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode)))
-
-(use-package poly-ansible
-  :defer t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.j2" . poly-ansible-mode)))
 
 ;; Magit
 (use-package magit
@@ -573,7 +556,6 @@ SCHEDULED: %t
 
 ;; Resize active frame according to 'golden ratio' principles
 (use-package zoom
-  :ensure t
   :config
   (custom-set-variables
    '(zoom-ignored-buffer-name-regexps '("^*magit" "^*magit-diff" "^*COMMIT_EDITMSG")))
@@ -621,7 +603,6 @@ SCHEDULED: %t
   (add-hook 'deft-mode-hook 'deft-enter-insert-mode))
 
 (use-package exec-path-from-shell
-  :ensure t
   :defer 2
   :config
   (dolist (var '("GOPATH"  "NVM_BIN"))
@@ -718,9 +699,7 @@ SCHEDULED: %t
   :defer t)
 
 (use-package ansible
-  :defer t
-  :config
-  (add-hook 'yaml-mode-hook '(lambda () (ansible 1))))
+  :defer t)
 
 (use-package json-mode
   :defer t)
@@ -774,22 +753,6 @@ SCHEDULED: %t
     (set-face-attribute face nil :height 1.0)))
 
 (add-hook 'org-mode-hook 'my/org-mode-hook)
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(auto-dim-other-buffers-face ((t (:background "#ececec"))))
- '(evil-goggles-change-face ((t (:inherit diff-removed))))
- '(evil-goggles-delete-face ((t (:inherit diff-removed))))
- '(evil-goggles-paste-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-add-face ((t (:inherit diff-added))))
- '(evil-goggles-undo-redo-change-face ((t (:inherit diff-changed))))
- '(evil-goggles-undo-redo-remove-face ((t (:inherit diff-removed))))
- '(evil-goggles-yank-face ((t (:inherit diff-changed))))
-;; '(magit-mode-line-process ((t (:foreground "MediumBlue"))))
- '(org-document-title ((t (:weight bold :height 1.0 :family "Triplicate T4c")))))
 
 ;; Global keybinding overrides, some mirroring macOS behaviour
 (global-set-key (kbd "C--") 'split-window-vertically)
