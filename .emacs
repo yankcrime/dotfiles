@@ -9,15 +9,6 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (menu-bar-mode -1)
-(set-face-attribute 'default nil
-                    :family "Triplicate T4c"
-                    :height 140
-                    :width 'normal)
-
-;; macOS-specific
-(when (memq window-system '(mac ns))
-  (add-to-list 'default-frame-alist '(ns-appearance . light)) ;; {light, dark}
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
 
 ;; Hide some menu junk
 (define-key global-map [menu-bar tools gnus] nil)
@@ -25,17 +16,12 @@
 (define-key global-map [menu-bar tools compose-mail] nil)
 (define-key global-map [menu-bar tools games] nil)
 
-(setq initial-scratch-message "")
+(setq initial-scratch-message nil
+      initial-major-mode 'fundamental-mode)
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Be able to mash Esc instead of Ctrl-G to get out of trouble
 (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
-
-;; Tooltips etc.
-(set-face-attribute 'variable-pitch nil
-                    :family "Helvetica Neue"
-                    :height 140
-                    :weight 'regular)
 
 ;; Minimal startup
 (setq inhibit-startup-message t)
@@ -132,7 +118,8 @@
 ;; (setq-default show-trailing-whitespace t)
 
 ;; Window title
-(setq frame-title-format '(buffer-file-name "%f" ("%b")))
+(setq frame-title-format '(buffer-file-name "%f" ("%b - GNU Emacs")))
+(setq icon-title-format frame-title-format)
 
 ;; Disable auto-save and auto-backup
 (setq auto-save-default nil
@@ -146,7 +133,6 @@
 
 ;; Package management
 (require 'package)
-(setq package-enable-at-startup nil)
 (package-initialize)
 
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
@@ -162,8 +148,50 @@
 
 ;; Always ensure packages are installed
 (customize-set-variable 'use-package-always-ensure t)
+(use-package diminish
+  :ensure t)
 
 (setq use-package-compute-statistics t)
+
+(use-package mixed-pitch
+  :diminish
+  :commands mixed-pitch-mode
+  :hook (text-mode . mixed-pitch-mode))
+
+(set-face-font 'default           "Triplicate T4c 14")
+(set-face-font 'fixed-pitch       "Triplicate T4c 14")
+(set-face-font 'fixed-pitch-serif "Triplicate T4s 14")
+(set-face-font 'variable-pitch    "Triplicate T4s 14")
+
+(use-package smart-mode-line
+  :config
+  (setq sml/mode-width 'right
+        sml/pre-modes-separator "  "
+        sml/theme nil)
+  ;; Override this function to get better spacing once we rearrange.
+  (defun sml/fill-for-buffer-identification () "  ")
+  (column-number-mode) ;; Show column number next to the line number.
+  (sml/setup)
+  ;; Rearrange mode-line to put position and line number on the right.
+  (setq-default
+   mode-line-format
+   '("%e"
+     mode-line-mule-info
+     mode-line-client
+     mode-line-modified
+     mode-line-remote
+     "  "
+     mode-line-frame-identification
+     mode-line-buffer-identification
+     sml/pos-id-separator
+     (vc-mode vc-mode)
+     sml/pre-modes-separator
+     mode-line-modes
+     mode-line-misc-info
+     mode-line-front-space
+     mode-line-position
+     mode-line-end-spaces
+     " ")))
 
 (use-package general
   :config
@@ -229,6 +257,7 @@
 ;; Completion frontend
 (use-package ivy
   :demand t
+  :diminish
   :config
   (ivy-mode 1)
   (setq ivy-height 20
@@ -286,8 +315,10 @@
   (setq eyebrowse-mode 1))
 
 (use-package org-download
+  :after org
   :config
-  (setq org-download-method 'attach))
+  (setq org-download-method 'attach)
+  (org-download-enable))
 
 (use-package tramp
   :defer t
@@ -330,46 +361,15 @@
   (require 'git-gutter)
   (require 'git-gutter-fringe))
 
-(use-package doom-themes
-  :init
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  :config
-  (doom-themes-org-config)
-  (load-theme 'doom-one-light t)
-  (defvar active-modeline-bg "#e9e9e9")
-  (defvar active-modeline-fg "#332233")
-  (defvar inactive-modeline-fg "#777777")
-  (defvar inactive-modeline-bg "#c6c6c6")
-  (set-face-attribute 'mode-line nil
-                      :background active-modeline-bg
-                      :foreground active-modeline-fg
-                      :overline "#cccccc")
-  (set-face-attribute 'mode-line-inactive nil
-                      :background inactive-modeline-bg
-                      :foreground inactive-modeline-fg))
-
-(use-package minions
-  :init (minions-mode)
-  :config
-  (setq minions-mode-line-lighter "#")
-  (setq minions-direct '(flyspell-mode
-                         projectile-mode
-                         flycheck-mode
-                         overwrite-mode
-                         counsel-mode)))
-
-;; Override theme background
-;; Light
-;;(set-background-color "#F4F4F4")
-
-;; Dark
-;;(set-background-color "#0C0C0C")
+(use-package parchment-theme)
 
 ; Evil mode and related
 (use-package evil
   :defer .1 ;; don't block emacs when starting, load evil immediately after startup
+  :diminish undo-tree-mode
   :init
+  (setq evil-normal-state-cursor '(box "#000000")
+      evil-emacs-state-cursor  '(box "#7F5AB6"))
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   (setq evil-search-module 'evil-search)
@@ -379,12 +379,12 @@
   (setq evil-shift-round nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-mode-line-format '(before . mode-line-mule-info))
-  (setq evil-normal-state-tag "N ")
-  (setq evil-insert-state-tag "I ")
-  (setq evil-visual-state-tag "V ")
-  (setq evil-motion-state-tag "M ")
-  (setq evil-operator-state-tag "O ")
-  (setq evil-emacs-state-tag "E ")
+  (setq evil-normal-state-tag " N")
+  (setq evil-insert-state-tag " I")
+  (setq evil-visual-state-tag " V")
+  (setq evil-motion-state-tag " M")
+  (setq evil-operator-state-tag " O")
+  (setq evil-emacs-state-tag " E")
 
   :config
   (evil-mode)
@@ -446,6 +446,7 @@
 
   ;; visual hints while editing
   (use-package evil-goggles
+    :diminish
     :config
     (evil-goggles-use-diff-faces)
     (evil-goggles-mode))
@@ -480,11 +481,6 @@
   :config
   (setq org-directory "~/Dropbox/org")
   (setq org-agenda-files '("~/Dropbox/org/"))
-  (defun pop-to-org-agenda (split)
-    (interactive "P")
-    (org-agenda-list)
-    (when (not split)
-      (delete-other-windows)))
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (define-key global-map (kbd "C-c c") 'org-capture)
   (define-key global-map (kbd "C-c l") 'org-store-link)
@@ -497,8 +493,6 @@
   (setq org-src-window-setup 'other-window)
   (setq org-startup-with-inline-images t)
   (setq org-image-actual-width nil)
-  (setq org-export-backends (quote(
-                                   md)))
   (add-hook
    'org-babel-after-execute-hook
    (lambda ()
@@ -549,13 +543,6 @@ SCHEDULED: %t
 
   (add-hook 'org-mode-hook 'turn-on-flyspell)
 
-  (use-package org-download
-    :defer t
-    :config
-    (setq-default org-download-method 'attach)
-    (setq-default org-download-image-dir "~/Dropbox/org/files")
-    (add-hook 'dired-mode-hook 'org-download-enable))
-
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((shell . t)
@@ -563,24 +550,16 @@ SCHEDULED: %t
      (emacs-lisp . t)
      ))
 
-  ;; Appearance stuff
-  (setq org-ellipsis "•••")
-
   (use-package org-bullets
     :defer t
     :hook (org-mode . org-bullets-mode)))
 
-(use-package polymode
-  :defer t)
-
-(use-package poly-markdown
-  :defer t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.md" . poly-markdown-mode)))
+(eval-after-load "eldoc" '(diminish 'eldoc-mode))
 
 ;; Magit
 (use-package magit
   :defer t
+  :diminish
   :init
   (setq magit-completing-read-function 'ivy-completing-read)
   (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
@@ -590,6 +569,7 @@ SCHEDULED: %t
 ;; Projectile
 (use-package projectile
   :defer t
+  :diminish
   :config
   (defun projectile-short-mode-line ()
     (format " [%s]" (projectile-project-name)))
@@ -608,6 +588,7 @@ SCHEDULED: %t
 
 ;; Resize active frame according to 'golden ratio' principles
 (use-package zoom
+  :diminish
   :config
   (custom-set-variables
    '(zoom-ignored-buffer-name-regexps '("^*magit" "^*magit-diff" "^*COMMIT_EDITMSG")))
@@ -663,6 +644,7 @@ SCHEDULED: %t
 
 ;; Which-key - command previews
 (use-package which-key
+  :diminish
   :config
   (which-key-mode))
 
@@ -675,6 +657,8 @@ SCHEDULED: %t
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package rainbow-mode)
 
 ;; Modes
 
@@ -726,11 +710,13 @@ SCHEDULED: %t
 (use-package yaml-mode
   :defer t)
 
+(use-package jinja2-mode
+  :defer t)
+
 (use-package markdown-mode
   :defer t
   :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
+  :mode (("\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 
@@ -751,7 +737,9 @@ SCHEDULED: %t
   :defer t)
 
 (use-package ansible
-  :defer t)
+  :defer t
+  :config
+  (add-hook 'yaml-mode-hook '(lambda () (ansible 1))))
 
 (use-package json-mode
   :defer t)
