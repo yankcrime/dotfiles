@@ -113,26 +113,6 @@
   :config (setq minions-direct '(cider-mode
                                  overwrite-mode)))
 
-;; (use-package doom-modeline
-;;       :ensure t
-;;       :hook (after-init . doom-modeline-init)
-;;       :config
-;;       (setq evil-normal-state-tag   (propertize " N" 'face '((:background "green" :foreground "black")))
-;;             evil-emacs-state-tag    (propertize " E" 'face '((:background "orange" :foreground "black")))
-;;             evil-insert-state-tag   (propertize " I" 'face '((:background "red") :foreground "white"))
-;;             evil-motion-state-tag   (propertize " M" 'face '((:background "blue") :foreground "white"))
-;;             evil-visual-state-tag   (propertize " V" 'face '((:background "grey80" :foreground "black")))
-;;             evil-operator-state-tag (propertize " O" 'face '((:background "purple"))))
-;;       (setq doom-modeline-icon nil)
-;;       (setq doom-modeline-height 25))
-
-;; Dim inactive buffers
-;;  (use-package auto-dim-other-buffers
-;;    :config
-;;    (add-hook 'after-init-hook (lambda ()
-;;                                 (when (fboundp 'auto-dim-other-buffers-mode)
-;;                                   (auto-dim-other-buffers-mode t)))))
-
 ;; Completion framework
 (use-package counsel
   :after ivy
@@ -154,6 +134,26 @@
   (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
   (with-eval-after-load 'ivy
     (define-key ivy-minibuffer-map (kbd "M-v") 'yank)))
+
+(use-package ivy-posframe
+  :after ivy
+  :demand t
+  :config
+  (setq ivy-display-function #'ivy-posframe-display-at-frame-center)
+  (setq ivy-posframe-parameters
+      '((left-fringe . 8)
+        (right-fringe . 8)))
+  (ivy-posframe-enable))
+
+(use-package company
+  :defer t
+  :bind (("C-<tab>" . company-complete))
+  :init
+  (add-hook 'terraform-mode-hook 'company-mode)
+  (add-hook 'terraform-mode-hook 'company-terraform-init))
+
+(use-package company-terraform
+  :defer t)
 
 (use-package eyebrowse
   :config
@@ -737,7 +737,7 @@ SCHEDULED: %t
 (global-set-key (kbd "C-\\") 'split-window-horizontally)
 (global-set-key (kbd "M-w") 'kill-this-buffer)
 (global-set-key (kbd "M-s") 'evil-write)
-(global-set-key (kbd "M-f") 'evil-search-forward)
+(global-set-key (kbd "M-f") 'swiper)
 (global-set-key (kbd "M-F") 'query-replace)
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
@@ -767,7 +767,7 @@ SCHEDULED: %t
  '(max-specpdl-size 10000)
  '(package-selected-packages
    (quote
-    (pdf-tools go-projectile golden-ratio transpose-frame evil-surround evil-goggles evil-expat evil-visualstar evil-replace-with-register evil-exchange evil-commentary evil-lion evil-collection htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package)))
+    (company-terraform company pdf-tools go-projectile golden-ratio transpose-frame evil-surround evil-goggles evil-expat evil-visualstar evil-replace-with-register evil-exchange evil-commentary evil-lion evil-collection htmlize ob-async ob-shell org-journal org-download go-guru flycheck go-autocomplete go-mode mac-key-mode poly-ansible git-gutter-fringe counsel-projectile projectile yaml-mode org-bullets counsel which-key exec-path-from-shell popwin shackle poly-markdown fzf evil-visual-mark-mode evil-escape evil-magit evil-leader doom-themes ranger ivy minions use-package)))
  '(use-package-always-ensure t))
 
 (server-start)
