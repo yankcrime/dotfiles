@@ -10,6 +10,8 @@
 (column-number-mode 1)
 (menu-bar-mode -1)
 
+(setq ns-use-thin-smoothing t)
+
 ;; Hide some menu junk
 (define-key global-map [menu-bar tools gnus] nil)
 (define-key global-map [menu-bar tools rmail] nil)
@@ -148,13 +150,10 @@
 
 ;; Always ensure packages are installed
 (customize-set-variable 'use-package-always-ensure t)
-(use-package diminish
-  :ensure t)
 
 (setq use-package-compute-statistics t)
 
 (use-package mixed-pitch
-  :diminish
   :commands mixed-pitch-mode
   :hook (text-mode . mixed-pitch-mode))
 
@@ -163,36 +162,37 @@
 (set-face-font 'fixed-pitch-serif "Triplicate T4s 14")
 (set-face-font 'variable-pitch    "Triplicate T4s 14")
 
-(use-package smart-mode-line
-  :config
-  (setq sml/mode-width 'right
-        sml/pre-modes-separator "  "
-        sml/theme nil)
-  ;; Override this function to get better spacing once we rearrange.
-  (defun sml/fill-for-buffer-identification () "  ")
-  (column-number-mode) ;; Show column number next to the line number.
-  (sml/setup)
-  ;; Rearrange mode-line to put position and line number on the right.
-  (setq-default
-   mode-line-format
-   '("%e"
-     mode-line-mule-info
-     mode-line-client
-     mode-line-modified
-     mode-line-remote
-     "  "
-     mode-line-frame-identification
-     mode-line-buffer-identification
-     sml/pos-id-separator
-     (vc-mode vc-mode)
-     sml/pre-modes-separator
-     mode-line-modes
-     mode-line-misc-info
-     mode-line-front-space
-     mode-line-position
-     mode-line-end-spaces
-     " ")))
+(use-package doom-themes
+   :init
+   (setq doom-themes-enable-bold t
+         doom-themes-enable-italic t)
+   :config
+   (doom-themes-org-config)
+   (load-theme 'doom-one-light t)
+   (defvar active-modeline-bg "#e9e9e9")
+   (defvar active-modeline-fg "#332233")
+   (defvar inactive-modeline-fg "#777777")
+   (defvar inactive-modeline-bg "#c6c6c6")
+   (set-face-attribute 'mode-line nil
+                       :background active-modeline-bg
+                       :foreground active-modeline-fg
+                       :overline "#cccccc")
+   (set-face-attribute 'mode-line-inactive nil
+                       :background inactive-modeline-bg
+                       :foreground inactive-modeline-fg))
 
+
+(use-package minions
+  :init (minions-mode)
+  :config
+  (setq minions-mode-line-lighter "#")
+  (setq minions-direct '(cider-mode
+                         projectile-mode
+                         visual-line-mode
+                         flyspell-mode
+                         flycheck-mode
+                         company-mode
+                         overwrite-mode)))
 (use-package general
   :config
   (setq general-override-states '(normal visual motion))
@@ -257,7 +257,6 @@
 ;; Completion frontend
 (use-package ivy
   :demand t
-  :diminish
   :config
   (ivy-mode 1)
   (setq ivy-height 20
@@ -298,10 +297,14 @@
   :init
   (add-hook 'terraform-mode-hook 'company-mode)
   (add-hook 'terraform-mode-hook 'company-terraform-init)
+  (add-hook 'go-mode-hook 'company-mode)
   :config
   (setq company-idle-delay 0.2))
 
 (use-package company-terraform
+  :defer t)
+
+(use-package company-go
   :defer t)
 
 (use-package avy
@@ -361,14 +364,11 @@
   (require 'git-gutter)
   (require 'git-gutter-fringe))
 
-(use-package parchment-theme)
-
 ; Evil mode and related
 (use-package evil
   :defer .1 ;; don't block emacs when starting, load evil immediately after startup
-  :diminish undo-tree-mode
   :init
-  (setq evil-normal-state-cursor '(box "#000000")
+  (setq evil-normal-state-cursor '(box "#4078f2")
       evil-emacs-state-cursor  '(box "#7F5AB6"))
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
@@ -379,12 +379,12 @@
   (setq evil-shift-round nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-mode-line-format '(before . mode-line-mule-info))
-  (setq evil-normal-state-tag " N")
-  (setq evil-insert-state-tag " I")
-  (setq evil-visual-state-tag " V")
-  (setq evil-motion-state-tag " M")
-  (setq evil-operator-state-tag " O")
-  (setq evil-emacs-state-tag " E")
+  (setq evil-normal-state-tag "N ")
+  (setq evil-insert-state-tag "I ")
+  (setq evil-visual-state-tag "V ")
+  (setq evil-motion-state-tag "M ")
+  (setq evil-operator-state-tag "O ")
+  (setq evil-emacs-state-tag "E ")
 
   :config
   (evil-mode)
@@ -446,7 +446,6 @@
 
   ;; visual hints while editing
   (use-package evil-goggles
-    :diminish
     :config
     (evil-goggles-use-diff-faces)
     (evil-goggles-mode))
@@ -486,13 +485,14 @@
   (define-key global-map (kbd "C-c l") 'org-store-link)
   (define-key global-map (kbd "C-c t a") 'pop-to-org-agenda)
   (define-key global-map (kbd "C-c t l") 'org-todo-list)
-  (setq org-log-done 'time)
-  (setq org-adapt-indentation nil)
-  (setq org-startup-indented 'true)
-  (setq org-src-tab-acts-natively t)
-  (setq org-src-window-setup 'other-window)
-  (setq org-startup-with-inline-images t)
-  (setq org-image-actual-width nil)
+  (setq org-log-done 'time
+        org-adapt-indentation nil
+        org-startup-indented 'true
+        org-src-tab-acts-natively t
+        org-src-window-setup 'other-window
+        org-startup-with-inline-images t
+        org-image-actual-width nil)
+
   (add-hook
    'org-babel-after-execute-hook
    (lambda ()
@@ -552,14 +552,13 @@ SCHEDULED: %t
 
   (use-package org-bullets
     :defer t
-    :hook (org-mode . org-bullets-mode)))
-
-(eval-after-load "eldoc" '(diminish 'eldoc-mode))
+    :hook (org-mode . org-bullets-mode)
+    :config
+    (setq org-bullets-bullet-list '("#"))))
 
 ;; Magit
 (use-package magit
   :defer t
-  :diminish
   :init
   (setq magit-completing-read-function 'ivy-completing-read)
   (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
@@ -569,7 +568,6 @@ SCHEDULED: %t
 ;; Projectile
 (use-package projectile
   :defer t
-  :diminish
   :config
   (defun projectile-short-mode-line ()
     (format " [%s]" (projectile-project-name)))
@@ -588,7 +586,6 @@ SCHEDULED: %t
 
 ;; Resize active frame according to 'golden ratio' principles
 (use-package zoom
-  :diminish
   :config
   (custom-set-variables
    '(zoom-ignored-buffer-name-regexps '("^*magit" "^*magit-diff" "^*COMMIT_EDITMSG")))
@@ -644,7 +641,6 @@ SCHEDULED: %t
 
 ;; Which-key - command previews
 (use-package which-key
-  :diminish
   :config
   (which-key-mode))
 
@@ -671,11 +667,14 @@ SCHEDULED: %t
   :config
   ;; Define function to call when go-mode loads
   (defun my-go-mode-hook ()
-  (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
-  (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
-  (if (not (string-match "go" compile-command))   ; set compile command default
-      (set (make-local-variable 'compile-command)
-           "go build -v && go test -v && go vet"))
+    (flycheck-mode)
+    (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
+    (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
+    (if (not (string-match "go" compile-command))   ; set compile command default
+        (set (make-local-variable 'compile-command)
+             "go build -v && go test -v && go vet")))
+
+  (add-hook 'go-mode-hook 'my-go-mode-hook)
 
   ;; guru settings
   (go-guru-hl-identifier-mode)                    ; highlight identifiers
@@ -690,7 +689,7 @@ SCHEDULED: %t
 
   ;; Ensure the go specific autocomplete is active in go-mode.
   (with-eval-after-load 'go-mode
-    (require 'go-autocomplete)))
+    (require 'go-autocomplete))
 
   (use-package go-autocomplete
     :defer t)
