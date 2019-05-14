@@ -225,6 +225,7 @@
  ("aoc" 'org-task-capture " Org - capture task")
  ("ts" 'flyspell-mode "Toggle - Flyspell")
  ("tc" 'counsel-mode "Toggle - Counsel")
+ ("tv" 'visual-line-mode "Toggle - Visual line mode")
  ("w1" 'winum-select-window-1 "Window - select 1")
  ("w2" 'winum-select-window-2 "Window - select 2")
  ("w3" 'winum-select-window-3 "Window - select 3")
