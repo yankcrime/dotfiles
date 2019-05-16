@@ -58,3 +58,9 @@
 [submodule ".vim/pack/default/fzf"]
 	path = .vim/pack/default/fzf
 	url = https://github.com/junegunn/fzf.git
+[submodule ".vim/pack/default/vim-monotone"]
+	path = .vim/pack/default/vim-monotone
+	url = https://github.com/Lokaltog/vim-monotone.git
+[submodule ".vim/pack/default/vim-tmux-navigator"]
+	path = .vim/pack/default/vim-tmux-navigator
+	url = https://github.com/christoomey/vim-tmux-navigator.git
