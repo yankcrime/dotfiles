@@ -1,7 +1,18 @@
 ;; Startup speed tweaks
-(setq gc-cons-threshold (* 5 1000 1000))
+(setq package-enable-at-startup nil
+      message-log-max 16384
+      gc-cons-threshold 402653184
+      gc-cons-percentage 0.6
+      auto-window-vscroll nil)
+
+(add-hook 'after-init-hook
+          `(lambda ()
+             (setq gc-cons-threshold 800000
+                   gc-cons-percentage 0.1)
+             (garbage-collect)) t)
 
 (setq user-mail-address "nick@dischord.org")
+(setq create-lockfiles nil)
 
 ;; User-interface stuff
 (add-to-list 'default-frame-alist '(width . 110))
@@ -9,8 +20,6 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (menu-bar-mode -1)
-
-(setq ns-use-thin-smoothing t)
 
 ;; Hide some menu junk
 (define-key global-map [menu-bar tools gnus] nil)
@@ -157,10 +166,10 @@
   :commands mixed-pitch-mode
   :hook (text-mode . mixed-pitch-mode))
 
-(set-face-font 'default           "Triplicate T4c 14")
-(set-face-font 'fixed-pitch       "Triplicate T4c 14")
-(set-face-font 'fixed-pitch-serif "Triplicate T4s 14")
-(set-face-font 'variable-pitch    "Triplicate T4s 14")
+(set-face-font 'default           "IBM Plex Mono 14")
+(set-face-font 'fixed-pitch       "IBM Plex Mono 14")
+(set-face-font 'fixed-pitch-serif "IBM Plex Mono 14")
+(set-face-font 'variable-pitch    "IBM Plex Mono 14")
 
 (use-package doom-themes
    :init
@@ -226,6 +235,7 @@
  ("ts" 'flyspell-mode "Toggle - Flyspell")
  ("tc" 'counsel-mode "Toggle - Counsel")
  ("tv" 'visual-line-mode "Toggle - Visual line mode")
+ ("tw" 'whitespace-mode "Toggle - Whitespace mode")
  ("w1" 'winum-select-window-1 "Window - select 1")
  ("w2" 'winum-select-window-2 "Window - select 2")
  ("w3" 'winum-select-window-3 "Window - select 3")
@@ -380,8 +390,8 @@
   (setq evil-shift-round nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-mode-line-format '(before . mode-line-mule-info))
-  (setq evil-normal-state-tag "N ")
-  (setq evil-insert-state-tag "I ")
+  (setq evil-normal-state-tag (propertize "N " 'face '((:foreground "#000000"))))
+  (setq evil-insert-state-tag (propertize "I " 'face '((:foreground "#000000"))))
   (setq evil-visual-state-tag "V ")
   (setq evil-motion-state-tag "M ")
   (setq evil-operator-state-tag "O ")
@@ -752,6 +762,10 @@ SCHEDULED: %t
   :config
   (add-hook 'terraform-mode-hook 'terraform-format-on-save-mode))
 
+(use-package vterm
+  :load-path "~/src/emacs-libvterm"
+  :commands (vterm))
+
 ;; Rename current buffer and file
 (defun rename-current-buffer-file ()
   "Renames current buffer and file it is visiting."
@@ -837,9 +851,4 @@ SCHEDULED: %t
   (write-region "" nil custom-file))
 (load custom-file)
 
-(setq create-lockfiles nil)
-
 (server-start)
-
-;; Lower GC values post-initialisation
-(setq gc-cons-threshold (* 5 1000 1000))
