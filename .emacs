@@ -45,6 +45,8 @@
 ;; Buffer switching
 (winner-mode t)
 
+(setq ispell-dictionary "english")
+
 ;; Fix window splitting now we all have widescreen monitors
 ;; See https://lists.gnu.org/archive/html/help-gnu-emacs/2015-08/msg00339.html
 (with-eval-after-load "window"
