@@ -112,7 +112,8 @@ if [[ $(hostname -s) == deadline ]]; then
         fi
     }
     git_status() {
-        if [ -d .git ]; then
+        local bname="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
+        if [ -n "$bname" ]; then
             print_osc
             printf "1337;SetKeyLabel=%s=%s" "status" "🌱 $(git rev-parse --abbrev-ref HEAD)"
             print_st
