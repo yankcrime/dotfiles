@@ -164,14 +164,7 @@
 
 (setq use-package-compute-statistics t)
 
-(use-package mixed-pitch
-  :commands mixed-pitch-mode
-  :hook (text-mode . mixed-pitch-mode))
-
-(set-face-font 'default           "IBM Plex Mono 14")
-(set-face-font 'fixed-pitch       "IBM Plex Mono 14")
-(set-face-font 'fixed-pitch-serif "IBM Plex Mono 14")
-(set-face-font 'variable-pitch    "IBM Plex Mono 14")
+(set-face-font 'default           "SF Mono 14")
 
 (use-package doom-themes
    :init
@@ -179,18 +172,19 @@
          doom-themes-enable-italic t)
    :config
    (doom-themes-org-config)
-   (load-theme 'doom-one-light t)
-   (defvar active-modeline-bg "#e9e9e9")
-   (defvar active-modeline-fg "#332233")
-   (defvar inactive-modeline-fg "#777777")
-   (defvar inactive-modeline-bg "#c6c6c6")
-   (set-face-attribute 'mode-line nil
-                       :background active-modeline-bg
-                       :foreground active-modeline-fg
-                       :overline "#cccccc")
-   (set-face-attribute 'mode-line-inactive nil
-                       :background inactive-modeline-bg
-                       :foreground inactive-modeline-fg))
+   (load-theme 'doom-one-light t))
+
+(defvar active-modeline-bg "#e9e9e9")
+(defvar active-modeline-fg "#332233")
+(defvar inactive-modeline-fg "#777777")
+(defvar inactive-modeline-bg "#c6c6c6")
+(set-face-attribute 'mode-line nil
+                    :background active-modeline-bg
+                    :foreground active-modeline-fg
+                    :overline "#cccccc")
+(set-face-attribute 'mode-line-inactive nil
+                    :background inactive-modeline-bg
+                    :foreground inactive-modeline-fg)
 
 
 (use-package minions
@@ -288,7 +282,7 @@
   (setq ivy-posframe-parameters
       '((left-fringe . 8)
         (right-fringe . 8)))
-  (setq ivy-display-function #'ivy-posframe-display-at-frame-center)
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
   (ivy-posframe-enable))
 
 (use-package all-the-icons)
@@ -563,11 +557,11 @@ SCHEDULED: %t
      (emacs-lisp . t)
      ))
 
+  (setq org-ellipsis "•••")
+
   (use-package org-bullets
     :defer t
-    :hook (org-mode . org-bullets-mode)
-    :config
-    (setq org-bullets-bullet-list '("#"))))
+    :hook (org-mode . org-bullets-mode)))
 
 ;; Magit
 (use-package magit
