@@ -277,11 +277,14 @@
 
 (use-package ivy-posframe
   :demand t
+  :custom-face
+  (internal-border ((t (:background "#cccccc"))))
   :after (ivy)
   :config
   (setq ivy-posframe-parameters
       '((left-fringe . 8)
         (right-fringe . 8)))
+  (setq ivy-posframe-border-width 1)
   (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
   (ivy-posframe-enable))
 
