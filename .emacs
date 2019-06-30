@@ -674,6 +674,13 @@ SCHEDULED: %t
   :init
   (set (make-local-variable 'compile-command)
        "go build -v && go test -v && go vet")
+  :bind
+  ("M-]" . godef-jump)         ; Go to definition
+  ("M-}" . pop-tag-mark)       ; Return from whence you came
+  ("M-p" . compile)            ; Invoke compiler
+  ("M-P" . recompile)          ; Redo most recent compile cmd
+  ("M->" . next-error)         ; Go to next error (or msg)
+  ("M-<" . previous-error)     ; Go to previous error or msg
   :config
   ;; Define function to call when go-mode loads
   (defun my-go-mode-hook ()
