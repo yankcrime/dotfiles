@@ -164,7 +164,7 @@
 
 (setq use-package-compute-statistics t)
 
-(set-face-font 'default           "SF Mono 14")
+(set-face-font 'default "SF Mono 14")
 
 (use-package doom-themes
    :init
@@ -198,6 +198,12 @@
                          flycheck-mode
                          company-mode
                          overwrite-mode)))
+
+;; Which-key - command previews
+(use-package which-key
+  :config
+  (which-key-mode))
+
 (use-package general
   :config
   (setq general-override-states '(normal visual motion))
@@ -220,7 +226,6 @@
  ("pp" 'counsel-projectile-switch-project "Project - switch project")
  ("pf" 'counsel-projectile-find-file "Project - find file")
  ("ps" 'counsel-projectile-ag "Project - search in files")
- ("d" 'deft "Deft")
  ("gs" 'magit-status "Git - status")
  ("ga" 'magit-stage-file "Git - stage file")
  ("gc" 'magit-commit "Git - commit")
@@ -284,9 +289,10 @@
   (setq ivy-posframe-parameters
       '((left-fringe . 8)
         (right-fringe . 8)))
-  (setq ivy-posframe-border-width 1)
   (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
-  (ivy-posframe-enable))
+  (setq ivy-posframe-border-width 1)
+  (setq ivy-posframe-hide-minibuffer t)
+  (ivy-posframe-mode 1))
 
 (use-package all-the-icons)
 
@@ -362,6 +368,7 @@
 (use-package ranger
   :config
   (define-key ranger-mode-map (kbd "-") 'ranger-up-directory)
+  (define-key evil-normal-state-map "-" 'deer)
   (ranger-override-dired-mode t))
 
 (use-package git-gutter-fringe
@@ -627,21 +634,6 @@ SCHEDULED: %t
          (let ((fn (dired-get-file-for-visit)))
            (start-process "default-app" nil "open" fn))))))
 
-;; Deft
-(use-package deft
-  :defer t
-  :config
-  (setq deft-extensions '("org" "txt"))
-  (setq deft-directory "~/Dropbox/org")
-  (setq deft-text-mode 'org-mode)
-  (setq deft-use-filename-as-title t)
-  (setq deft-use-filter-string-for-filename t)
-  (setq deft-default-extension "org")
-  (defun deft-enter-insert-mode ()
-    ;; delay seems necessary
-    (run-at-time "0.1 sec" nil 'evil-insert-state))
-  (add-hook 'deft-mode-hook 'deft-enter-insert-mode))
-
 (use-package exec-path-from-shell
   :defer 2
   :config
@@ -649,10 +641,6 @@ SCHEDULED: %t
     (add-to-list 'exec-path-from-shell-variables var))
   (exec-path-from-shell-initialize))
 
-;; Which-key - command previews
-(use-package which-key
-  :config
-  (which-key-mode))
 
 ;; Flycheck
 (use-package flycheck
@@ -694,15 +682,7 @@ SCHEDULED: %t
   (add-hook 'go-mode-hook 'my-go-mode-hook)
 
   ;; guru settings
-  (go-guru-hl-identifier-mode)                    ; highlight identifiers
-
-  ;; Key bindings specific to go-mode
-  (local-set-key (kbd "M-.") 'godef-jump)         ; Go to definition
-  (local-set-key (kbd "M-*") 'pop-tag-mark)       ; Return from whence you came
-  (local-set-key (kbd "M-p") 'compile)            ; Invoke compiler
-  (local-set-key (kbd "M-P") 'recompile)          ; Redo most recent compile cmd
-  (local-set-key (kbd "M-]") 'next-error)         ; Go to next error (or msg)
-  (local-set-key (kbd "M-[") 'previous-error)     ; Go to previous error or msg
+  ;;(go-guru-hl-identifier-mode)                    ; highlight identifiers
 
   ;; Ensure the go specific autocomplete is active in go-mode.
   (with-eval-after-load 'go-mode
@@ -791,6 +771,16 @@ SCHEDULED: %t
                    name (file-name-nondirectory new-name)))))))
 
 (global-set-key (kbd "C-x C-r") 'rename-current-buffer-file)
+
+(defun toggle-fold ()
+  "Toggle fold all lines larger than indentation on current line"
+  (interactive)
+  (let ((col 1))
+    (save-excursion
+      (back-to-indentation)
+      (setq col (+ 1 (current-column)))
+      (set-selective-display
+       (if selective-display nil (or col 1))))))
 
 ;; use Marked.app to preview Markdown
 (setq markdown-open-command "~/bin/mark")
