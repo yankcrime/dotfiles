@@ -366,9 +366,11 @@
     (delete 'elpy-module-highlight-indentation elpy-modules)))
 
 (use-package ranger
+  :after (evil)
+  :bind (:map evil-normal-state-map
+              ("-" . deer)
+              :map ranger-mode-map ("-" . ranger-up-directory))
   :config
-  (define-key ranger-mode-map (kbd "-") 'ranger-up-directory)
-  (define-key evil-normal-state-map "-" 'deer)
   (ranger-override-dired-mode t))
 
 (use-package git-gutter-fringe
