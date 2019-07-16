@@ -223,7 +223,7 @@
 
 (my-leader
  ("b" 'ivy-switch-buffer "Switch buffer")
- ("pp" 'counsel-projectile-switch-project "Project - switch project")
+ ("pp" 'projectile-switch-project "Project - switch project")
  ("pf" 'counsel-projectile-find-file "Project - find file")
  ("ps" 'counsel-projectile-ag "Project - search in files")
  ("gs" 'magit-status "Git - status")
@@ -352,7 +352,7 @@
 (use-package winum
   :config
   (setq winum-mode-line-position   7
-        winum-format " %s "
+        winum-format "%s "
         winum-auto-setup-mode-line t)
   (winum-mode))
 
@@ -366,6 +366,7 @@
     (delete 'elpy-module-highlight-indentation elpy-modules)))
 
 (use-package ranger
+  :ensure t
   :after (evil)
   :bind (:map evil-normal-state-map
               ("-" . deer)
@@ -593,6 +594,7 @@ SCHEDULED: %t
   (setq projectile-mode-line-function 'projectile-short-mode-line)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching nil)
+  (setq projectile-switch-project-action #'projectile-dired)
   (projectile-global-mode +1))
 
 ;; Do something about popups as well
@@ -643,7 +645,6 @@ SCHEDULED: %t
     (add-to-list 'exec-path-from-shell-variables var))
   (exec-path-from-shell-initialize))
 
-
 ;; Flycheck
 (use-package flycheck
   :defer t
@@ -684,7 +685,7 @@ SCHEDULED: %t
   (add-hook 'go-mode-hook 'my-go-mode-hook)
 
   ;; guru settings
-  ;;(go-guru-hl-identifier-mode)                    ; highlight identifiers
+  (go-guru-hl-identifier-mode)                    ; highlight identifiers
 
   ;; Ensure the go specific autocomplete is active in go-mode.
   (with-eval-after-load 'go-mode
