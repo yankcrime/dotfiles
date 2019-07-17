@@ -171,6 +171,7 @@
    (setq doom-themes-enable-bold t
          doom-themes-enable-italic t)
    :config
+   (doom-themes-visual-bell-config)
    (doom-themes-org-config)
    (load-theme 'doom-one-light t))
 
@@ -246,7 +247,10 @@
  ("w7" 'winum-select-window-7 "Window - select 7")
  ("w8" 'winum-select-window-8 "Window - select 8")
  ("w9" 'winum-select-window-9 "Window - select 9")
- ("ww" 'winum-select-window-by-number "Window - select by number"))
+ ("ww" 'winum-select-window-by-number "Window - select by number")
+ ("w\|" 'evil-window-vsplit "Window - split vertically")
+ ("w\-" 'evil-window-split "Window - split horizontally")
+ ("wd" 'evil-window-delete "Window - delete"))
 
 (which-key-add-key-based-replacements
   "SPC a" "Apps"
