@@ -234,8 +234,11 @@
  ("aol" 'org-todo-list "Org - todo list")
  ("aoa" 'org-agenda "Org - agenda")
  ("aoc" 'org-task-capture " Org - capture task")
+ ("afl" 'list-flycheck-errors " Flycheck - list errors")
+ ("asc" 'flyspell-correct-word-before-point " Flyspell - correct word")
  ("ts" 'flyspell-mode "Toggle - Flyspell")
  ("tc" 'counsel-mode "Toggle - Counsel")
+ ("tf" 'flycheck-mode "Toggle - Flycheck")
  ("tv" 'visual-line-mode "Toggle - Visual line mode")
  ("tw" 'whitespace-mode "Toggle - Whitespace mode")
  ("w1" 'winum-select-window-1 "Window - select 1")
@@ -255,6 +258,8 @@
 (which-key-add-key-based-replacements
   "SPC a" "Apps"
   "SPC ao" "Orgmode"
+  "SPC af" "Flycheck"
+  "SPC as" "Flyspell"
   "SPC b" "Buffers"
   "SPC c" "Compile"
   "SPC e" "Errors"
