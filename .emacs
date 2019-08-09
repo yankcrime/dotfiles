@@ -21,6 +21,7 @@
 (column-number-mode 1)
 (menu-bar-mode -1)
 
+
 ;; Hide some menu junk
 (define-key global-map [menu-bar tools gnus] nil)
 (define-key global-map [menu-bar tools rmail] nil)
@@ -38,6 +39,11 @@
 (setq inhibit-startup-message t)
 (setq inhibit-splash-screen t)
 (setq initial-scratch-message nil)
+(setq initial-frame-alist
+      (append initial-frame-alist
+              '((ns-appearance . light)
+                (ns-transparent-titlebar . t)
+                )))
 
 ;; Shut up
 (setq ring-bell-function 'ignore)
@@ -164,7 +170,7 @@
 
 (setq use-package-compute-statistics t)
 
-(set-face-font 'default "SF Mono 14")
+(set-face-font 'default "Triplicate T4c 14")
 
 (use-package doom-themes
    :init
@@ -173,20 +179,21 @@
    :config
    (doom-themes-visual-bell-config)
    (doom-themes-org-config)
-   (load-theme 'doom-one-light t))
+   (load-theme 'doom-one-light t)
+   (defvar active-modeline-bg "#e9e9e9")
+   (defvar active-modeline-fg "#332233")
+   (defvar inactive-modeline-fg "#777777")
+   (defvar inactive-modeline-bg "#c6c6c6")
+   (set-face-attribute 'mode-line nil
+                       :background active-modeline-bg
+                       :foreground active-modeline-fg
+                       :overline "#cccccc")
+   (set-face-attribute 'mode-line-inactive nil
+                       :background inactive-modeline-bg
+                       :foreground inactive-modeline-fg))
 
-(defvar active-modeline-bg "#e9e9e9")
-(defvar active-modeline-fg "#332233")
-(defvar inactive-modeline-fg "#777777")
-(defvar inactive-modeline-bg "#c6c6c6")
-(set-face-attribute 'mode-line nil
-                    :background active-modeline-bg
-                    :foreground active-modeline-fg
-                    :overline "#cccccc")
-(set-face-attribute 'mode-line-inactive nil
-                    :background inactive-modeline-bg
-                    :foreground inactive-modeline-fg)
-
+;;#(set-background-color "#0C0C0C")
+;;#(add-to-list 'default-frame-alist '(background-color . "#0C0C0C"))
 
 (use-package minions
   :init (minions-mode)
@@ -223,37 +230,39 @@
                      (general-define-key :prefix "SPC" :states '(normal motion) :keymaps 'override ,key ,func))))))
 
 (my-leader
- ("b" 'ivy-switch-buffer "Switch buffer")
- ("pp" 'projectile-switch-project "Project - switch project")
- ("pf" 'counsel-projectile-find-file "Project - find file")
- ("ps" 'counsel-projectile-ag "Project - search in files")
- ("gs" 'magit-status "Git - status")
- ("ga" 'magit-stage-file "Git - stage file")
- ("gc" 'magit-commit "Git - commit")
- ("gp" 'magit-push "Git - push")
- ("aol" 'org-todo-list "Org - todo list")
- ("aoa" 'org-agenda "Org - agenda")
- ("aoc" 'org-task-capture " Org - capture task")
- ("afl" 'list-flycheck-errors " Flycheck - list errors")
- ("asc" 'flyspell-correct-word-before-point " Flyspell - correct word")
- ("ts" 'flyspell-mode "Toggle - Flyspell")
- ("tc" 'counsel-mode "Toggle - Counsel")
- ("tf" 'flycheck-mode "Toggle - Flycheck")
- ("tv" 'visual-line-mode "Toggle - Visual line mode")
- ("tw" 'whitespace-mode "Toggle - Whitespace mode")
- ("w1" 'winum-select-window-1 "Window - select 1")
- ("w2" 'winum-select-window-2 "Window - select 2")
- ("w3" 'winum-select-window-3 "Window - select 3")
- ("w4" 'winum-select-window-4 "Window - select 4")
- ("w5" 'winum-select-window-5 "Window - select 5")
- ("w6" 'winum-select-window-6 "Window - select 6")
- ("w7" 'winum-select-window-7 "Window - select 7")
- ("w8" 'winum-select-window-8 "Window - select 8")
- ("w9" 'winum-select-window-9 "Window - select 9")
- ("ww" 'winum-select-window-by-number "Window - select by number")
- ("w\|" 'evil-window-vsplit "Window - split vertically")
- ("w\-" 'evil-window-split "Window - split horizontally")
- ("wd" 'evil-window-delete "Window - delete"))
+ ("bb" 'ivy-switch-buffer "Switch buffer")
+ ("bd" 'kill-this-buffer "Kill this buffer")
+ ("pp" 'projectile-switch-project "Switch project")
+ ("pf" 'counsel-projectile-find-file "Find file")
+ ("ps" 'counsel-projectile-ag "Search in files")
+ ("gs" 'magit-status "Status")
+ ("ga" 'magit-stage-file "stAge file")
+ ("gc" 'magit-commit "Commit")
+ ("gp" 'magit-push "Push")
+ ("aol" 'org-todo-list "Todo list")
+ ("aoa" 'org-agenda "Agenda")
+ ("aoc" 'org-task-capture "Capture task")
+ ("afl" 'list-flycheck-errors "List errors")
+ ("asc" 'flyspell-correct-word-before-point "Correct word")
+ ("ts" 'flyspell-mode "Flyspell")
+ ("tc" 'counsel-mode "Counsel")
+ ("tf" 'flycheck-mode "Flycheck")
+ ("tv" 'visual-line-mode "Visual line mode")
+ ("tw" 'whitespace-mode "Whitespace mode")
+ ("w1" 'winum-select-window-1 "Select 1")
+ ("w2" 'winum-select-window-2 "Select 2")
+ ("w3" 'winum-select-window-3 "Select 3")
+ ("w4" 'winum-select-window-4 "Select 4")
+ ("w5" 'winum-select-window-5 "Select 5")
+ ("w6" 'winum-select-window-6 "Select 6")
+ ("w7" 'winum-select-window-7 "Select 7")
+ ("w8" 'winum-select-window-8 "Select 8")
+ ("w9" 'winum-select-window-9 "Select 9")
+ ("ww" 'winum-select-window-by-number "Select by number")
+ ("w\|" 'evil-window-vsplit "Vertical split")
+ ("w\-" 'evil-window-split "Horizontal split")
+ ("wd" 'evil-window-delete "Delete")
+ ("wo" 'delete-other-windows "delete Other windows"))
 
 (which-key-add-key-based-replacements
   "SPC a" "Apps"
@@ -410,8 +419,8 @@
   (setq evil-shift-round nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-mode-line-format '(before . mode-line-mule-info))
-  (setq evil-normal-state-tag (propertize "N " 'face '((:foreground "#000000"))))
-  (setq evil-insert-state-tag (propertize "I " 'face '((:foreground "#000000"))))
+  (setq evil-normal-state-tag (propertize "N "))
+  (setq evil-insert-state-tag (propertize "I "))
   (setq evil-visual-state-tag "V ")
   (setq evil-motion-state-tag "M ")
   (setq evil-operator-state-tag "O ")
@@ -762,9 +771,49 @@ SCHEDULED: %t
   :config
   (add-hook 'terraform-mode-hook 'terraform-format-on-save-mode))
 
+(use-package highlight-indent-guides
+  :config
+  (setq highlight-indent-guides-method 'character)
+  ;; Indent character samples: | ┆ ┊
+  (setq highlight-indent-guides-character ?\┆)
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+
 (use-package vterm
   :load-path "~/src/emacs-libvterm"
-  :commands (vterm))
+  :commands (vterm)
+  :config
+  (add-hook 'vterm-mode-hook
+            (lambda ()
+              (evil-insert-state)))
+  (define-key vterm-mode-map [return]                      #'vterm-send-return)
+  (setq vterm-keymap-exceptions nil)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-e")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-f")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-a")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-v")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-b")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-w")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-u")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-n")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-m")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-p")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-j")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-k")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-r")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
+
+(use-package vterm-toggle
+  :defer t
+  :bind
+  ("C-`" . vterm-toggle))
 
 ;; Rename current buffer and file
 (defun rename-current-buffer-file ()
