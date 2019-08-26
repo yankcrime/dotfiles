@@ -259,10 +259,11 @@
  ("w8" 'winum-select-window-8 "Select 8")
  ("w9" 'winum-select-window-9 "Select 9")
  ("ww" 'winum-select-window-by-number "Select by number")
- ("w\|" 'evil-window-vsplit "Vertical split")
- ("w\-" 'evil-window-split "Horizontal split")
+ ("w|" 'evil-window-vsplit "Vertical split")
+ ("w-" 'evil-window-split "Horizontal split")
  ("wd" 'evil-window-delete "Delete")
- ("wo" 'delete-other-windows "delete Other windows"))
+ ("wo" 'delete-other-windows "delete Other windows")
+ ("wf" 'toggle-frame-fullscreen "make Frame Fullscreen"))
 
 (which-key-add-key-based-replacements
   "SPC a" "Apps"
@@ -776,7 +777,8 @@ SCHEDULED: %t
   (setq highlight-indent-guides-method 'character)
   ;; Indent character samples: | ┆ ┊
   (setq highlight-indent-guides-character ?\┆)
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
 
 (use-package vterm
   :load-path "~/src/emacs-libvterm"
