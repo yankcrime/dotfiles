@@ -738,7 +738,9 @@ SCHEDULED: %t
   :commands (markdown-mode gfm-mode)
   :mode (("\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
+  :init (setq markdown-command "multimarkdown")
+  :config
+  (setq markdown-spaces-after-code-fence 0))
 
 (defun markdown-preview-file ()
   "run Marked on the current file and revert the buffer"
