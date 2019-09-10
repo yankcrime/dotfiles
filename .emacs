@@ -192,8 +192,8 @@
                        :background inactive-modeline-bg
                        :foreground inactive-modeline-fg))
 
-;;#(set-background-color "#0C0C0C")
-;;#(add-to-list 'default-frame-alist '(background-color . "#0C0C0C"))
+;; (set-background-color "#0C0C0C")
+;; (add-to-list 'default-frame-alist '(background-color . "#0C0C0C"))
 
 (use-package minions
   :init (minions-mode)
@@ -816,6 +816,15 @@ SCHEDULED: %t
   :defer t
   :bind
   ("C-`" . vterm-toggle))
+
+(use-package writeroom-mode
+  :defer t
+  :commands (writeroom-mode)
+  :config
+  (add-to-list 'writeroom-global-effects 'visual-line-mode)
+  (add-to-list 'writeroom-global-effects 'text-scale-increase)
+  (setq writeroom-restore-window-config t
+        writeroom-width 100))
 
 ;; Rename current buffer and file
 (defun rename-current-buffer-file ()
