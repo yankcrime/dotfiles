@@ -825,6 +825,7 @@ SCHEDULED: %t
   :config
   (add-to-list 'writeroom-global-effects 'visual-line-mode)
   (add-to-list 'writeroom-global-effects 'text-scale-increase)
+  (delq 'writeroom-set-fullscreen writeroom-global-effects)
   (setq writeroom-restore-window-config t
         writeroom-width 100))
 
