@@ -50,6 +50,8 @@ au BufEnter *.sh if getline(1) == "" | :call setline(1, "#!/usr/bin/env bash") |
 au BufEnter *.py if getline(1) == "" | :call setline(1, "#!/usr/bin/env python") | endif
 au BufEnter *.rb if getline(1) == "" | :call setline(1, "#!/usr/bin/env ruby") | endif
 
+autocmd FileType json syntax match Comment +\/\/.\+$+
+
 set tags=./tags; " Tell vim to look upwards in the directory hierarchy for a tags file until it finds one
 
 cmap w!! w !sudo tee % >/dev/null
@@ -75,6 +77,31 @@ nnoremap <Space>%       :%s/\<<C-r>=expand("<cword>")<CR>\>/
 tnoremap <leader><Esc> <C-W>N
 
 " }}} End general settings
+" {{{ Folding
+augroup ft_vim
+    au!
+    au FileType vim setlocal foldmethod=marker keywordprg=:help
+    au BufWinEnter *.txt if &ft == 'help' | wincmd L | endif
+augroup END
+
+augroup ft_ruby
+    au!
+    au Filetype ruby setlocal foldmethod=syntax
+    au BufRead,BufNewFile Capfile setlocal filetype=ruby
+augroup END
+
+augroup ft_puppet
+    au!
+    au Filetype puppet setlocal foldmethod=marker
+    au Filetype puppet setlocal foldmarker={,}
+augroup END
+
+augroup ft_muttrc
+    au!
+    au BufRead,BufNewFile *.muttrc set ft=muttrc
+    au FileType muttrc setlocal foldmethod=marker foldmarker={{{,}}}
+augroup END
+" }}}
 " {{{ Statusline
 function! s:statusline_expr()
   let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
@@ -90,10 +117,11 @@ endfunction
 let &statusline = s:statusline_expr()
 
 " }}}
-" {{{ FZF
+" {{{ fzf (and Ripgrep)
 nnoremap <silent> <C-f> :Files <CR>
 nnoremap <silent> <C-b> :Buffers <CR>
 nnoremap <silent> <C-t> :call fzf#vim#tags(expand('<cword>'))<cr>
+nnoremap <silent> <C-s> :Rg <CR>
 
 let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
@@ -107,15 +135,34 @@ let g:fzf_layout = { 'window': '-tabnew' }
 let g:fzf_buffers_jump = 1
 let g:fzf_tags_command = 'ctags -R'
 
-" Workaround for https://github.com/junegunn/fzf/issues/809
-let $FZF_DEFAULT_OPTS .= ' --no-height'
-
 " Default fzf layout
 " - down / up / left / right
 let g:fzf_layout = { 'down': '~40%' }
 
 command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=never --smart-case '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
+
+" }}}
+" {{{ COC
+" use <tab> for trigger completion and navigate to the next complete item
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <S-Tab>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
+
+inoremap <expr> <Tab> pumvisible() ? "\<C-y>" : "\<C-g>u\<Tab>"
 
 " }}}
 " {{{ Golang
@@ -141,18 +188,6 @@ nnoremap <silent> <leader>bdm :Sbdm<CR>
 " }}}
 " {{{ Markdown
 nnoremap <leader>m :silent !open -a Marked 2.app '%:p'<cr>
-" }}}
-" {{{ Silver Searcher (Ag)
-if executable('ag')
-  let g:ackprg = 'ag --vimgrep'
-endif
-function! AGSearch() abort
-    call inputsave()
-    let searchterm = input('Search string: ')
-    call inputrestore()
-    execute 'Ack' searchterm
-endfunction
-nnoremap <C-s> :call AGSearch()<cr>
 " }}}
 " {{{ Ctags
 " Workaround explicitly top-scoped Puppet classes / identifiers, i.e those
