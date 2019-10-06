@@ -245,7 +245,7 @@
  ("afl" 'list-flycheck-errors "List errors")
  ("asc" 'flyspell-correct-word-before-point "Correct word")
  ("ts" 'flyspell-mode "Flyspell")
- ("tc" 'counsel-mode "Counsel")
+ ("tc" 'company-mode "Company")
  ("tf" 'flycheck-mode "Flycheck")
  ("tv" 'visual-line-mode "Visual line mode")
  ("tw" 'whitespace-mode "Whitespace mode")
@@ -327,6 +327,15 @@
 
 (use-package counsel-projectile
   :defer t)
+
+(use-package ivy-prescient
+  :after ivy
+  :config
+  (ivy-prescient-mode)
+  (prescient-persist-mode))
+
+(use-package company-prescient
+  :after company)
 
 (use-package company
   :defer t
@@ -828,6 +837,13 @@ SCHEDULED: %t
   (delq 'writeroom-set-fullscreen writeroom-global-effects)
   (setq writeroom-restore-window-config t
         writeroom-width 100))
+
+(add-hook 'python-mode-hook
+          (lambda ()
+            (flycheck-mode)
+            (company-mode)
+            (setq flycheck-python-pylint-executable "/Users/nick/.local/bin/pylint")
+            (setq flycheck-pylintrc "/Users/nick/.pylintrc")))
 
 ;; Rename current buffer and file
 (defun rename-current-buffer-file ()
