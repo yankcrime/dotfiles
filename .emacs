@@ -310,9 +310,9 @@
   (setq ivy-posframe-parameters
       '((left-fringe . 8)
         (right-fringe . 8)))
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
   (setq ivy-posframe-border-width 1)
   (setq ivy-posframe-hide-minibuffer t)
+  (setq ivy-posframe-style 'frame-center)
   (ivy-posframe-mode 1))
 
 (use-package all-the-icons)
