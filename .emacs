@@ -234,7 +234,7 @@
  ("bd" 'kill-this-buffer "Kill this buffer")
  ("pp" 'projectile-switch-project "Switch project")
  ("pf" 'counsel-projectile-find-file "Find file")
- ("ps" 'counsel-projectile-ag "Search in files")
+ ("ps" 'counsel-projectile-rg "Search in files")
  ("gs" 'magit-status "Status")
  ("ga" 'magit-stage-file "stAge file")
  ("gc" 'magit-commit "Commit")
@@ -907,7 +907,7 @@ SCHEDULED: %t
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
 (global-set-key (kbd "M-o") 'counsel-find-file)
-(global-set-key (kbd "C-s") 'counsel-projectile-ag)
+(global-set-key (kbd "C-s") 'counsel-rg)
 (global-set-key (kbd "C-,") 'counsel-imenu)
 (global-set-key (kbd "M-a") 'mark-whole-buffer)
 (global-set-key [(kbd "M-w")]
