@@ -36,9 +36,9 @@
 (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
 
 ;; Minimal startup
-(setq inhibit-startup-message t)
-(setq inhibit-splash-screen t)
-(setq initial-scratch-message nil)
+(setq inhibit-startup-message t
+      inhibit-splash-screen t
+      initial-scratch-message nil)
 (setq initial-frame-alist
       (append initial-frame-alist
               '((ns-appearance . light)
@@ -137,8 +137,8 @@
 ;; (setq-default show-trailing-whitespace t)
 
 ;; Window title
-(setq frame-title-format '(buffer-file-name "%f" ("%b - GNU Emacs")))
-(setq icon-title-format frame-title-format)
+(setq frame-title-format '(buffer-file-name "%f" ("%b - GNU Emacs"))
+      icon-title-format frame-title-format)
 
 ;; Disable auto-save and auto-backup
 (setq auto-save-default nil
@@ -198,8 +198,8 @@
 (use-package minions
   :init (minions-mode)
   :config
-  (setq minions-mode-line-lighter "#")
-  (setq minions-direct '(cider-mode
+  (setq minions-mode-line-lighter "#"
+        minions-direct '(cider-mode
                          projectile-mode
                          visual-line-mode
                          flyspell-mode
@@ -309,10 +309,10 @@
   :config
   (setq ivy-posframe-parameters
       '((left-fringe . 8)
-        (right-fringe . 8)))
-  (setq ivy-posframe-border-width 1)
-  (setq ivy-posframe-hide-minibuffer t)
-  (setq ivy-posframe-style 'frame-center)
+        (right-fringe . 8))
+      ivy-posframe-border-width 1
+      ivy-posframe-hide-minibuffer t
+      ivy-posframe-style 'frame-center)
   (ivy-posframe-mode 1))
 
 (use-package all-the-icons)
@@ -419,22 +419,22 @@
   :defer .1 ;; don't block emacs when starting, load evil immediately after startup
   :init
   (setq evil-normal-state-cursor '(box "#4078f2")
-      evil-emacs-state-cursor  '(box "#7F5AB6"))
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-search-module 'evil-search)
-  (setq evil-ex-complete-emacs-commands nil)
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
-  (setq evil-shift-round nil)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-mode-line-format '(before . mode-line-mule-info))
-  (setq evil-normal-state-tag (propertize "N "))
-  (setq evil-insert-state-tag (propertize "I "))
-  (setq evil-visual-state-tag "V ")
-  (setq evil-motion-state-tag "M ")
-  (setq evil-operator-state-tag "O ")
-  (setq evil-emacs-state-tag "E ")
+      evil-emacs-state-cursor  '(box "#7F5AB6")
+      evil-want-integration t
+      evil-want-keybinding nil
+      evil-search-module 'evil-search
+      evil-ex-complete-emacs-commands nil
+      evil-vsplit-window-right t
+      evil-split-window-below t
+      evil-shift-round nil
+      evil-want-C-u-scroll t
+      evil-mode-line-format '(before . mode-line-mule-info)
+      evil-normal-state-tag (propertize "N ")
+      evil-insert-state-tag (propertize "I ")
+      evil-visual-state-tag "V "
+      evil-motion-state-tag "M "
+      evil-operator-state-tag "O "
+      evil-emacs-state-tag "E ")
 
   :config
   (evil-mode)
