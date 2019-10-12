@@ -21,6 +21,7 @@
 (column-number-mode 1)
 (menu-bar-mode -1)
 
+
 ;; Hide some menu junk
 (define-key global-map [menu-bar tools gnus] nil)
 (define-key global-map [menu-bar tools rmail] nil)
@@ -35,9 +36,14 @@
 (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
 
 ;; Minimal startup
-(setq inhibit-startup-message t)
-(setq inhibit-splash-screen t)
-(setq initial-scratch-message nil)
+(setq inhibit-startup-message t
+      inhibit-splash-screen t
+      initial-scratch-message nil)
+(setq initial-frame-alist
+      (append initial-frame-alist
+              '((ns-appearance . light)
+                (ns-transparent-titlebar . t)
+                )))
 
 ;; Shut up
 (setq ring-bell-function 'ignore)
@@ -131,8 +137,8 @@
 ;; (setq-default show-trailing-whitespace t)
 
 ;; Window title
-(setq frame-title-format '(buffer-file-name "%f" ("%b - GNU Emacs")))
-(setq icon-title-format frame-title-format)
+(setq frame-title-format '(buffer-file-name "%f" ("%b - GNU Emacs"))
+      icon-title-format frame-title-format)
 
 ;; Disable auto-save and auto-backup
 (setq auto-save-default nil
@@ -164,34 +170,36 @@
 
 (setq use-package-compute-statistics t)
 
-(set-face-font 'default "SF Mono 14")
+(set-face-font 'default "Triplicate T4c 14")
 
 (use-package doom-themes
    :init
    (setq doom-themes-enable-bold t
          doom-themes-enable-italic t)
    :config
+   (doom-themes-visual-bell-config)
    (doom-themes-org-config)
-   (load-theme 'doom-one-light t))
+   (load-theme 'doom-one-light t)
+   (defvar active-modeline-bg "#e9e9e9")
+   (defvar active-modeline-fg "#332233")
+   (defvar inactive-modeline-fg "#777777")
+   (defvar inactive-modeline-bg "#c6c6c6")
+   (set-face-attribute 'mode-line nil
+                       :background active-modeline-bg
+                       :foreground active-modeline-fg
+                       :overline "#cccccc")
+   (set-face-attribute 'mode-line-inactive nil
+                       :background inactive-modeline-bg
+                       :foreground inactive-modeline-fg))
 
-(defvar active-modeline-bg "#e9e9e9")
-(defvar active-modeline-fg "#332233")
-(defvar inactive-modeline-fg "#777777")
-(defvar inactive-modeline-bg "#c6c6c6")
-(set-face-attribute 'mode-line nil
-                    :background active-modeline-bg
-                    :foreground active-modeline-fg
-                    :overline "#cccccc")
-(set-face-attribute 'mode-line-inactive nil
-                    :background inactive-modeline-bg
-                    :foreground inactive-modeline-fg)
-
+;; (set-background-color "#0C0C0C")
+;; (add-to-list 'default-frame-alist '(background-color . "#0C0C0C"))
 
 (use-package minions
   :init (minions-mode)
   :config
-  (setq minions-mode-line-lighter "#")
-  (setq minions-direct '(cider-mode
+  (setq minions-mode-line-lighter "#"
+        minions-direct '(cider-mode
                          projectile-mode
                          visual-line-mode
                          flyspell-mode
@@ -222,35 +230,46 @@
                      (general-define-key :prefix "SPC" :states '(normal motion) :keymaps 'override ,key ,func))))))
 
 (my-leader
- ("b" 'ivy-switch-buffer "Switch buffer")
- ("pp" 'counsel-projectile-switch-project "Project - switch project")
- ("pf" 'counsel-projectile-find-file "Project - find file")
- ("ps" 'counsel-projectile-ag "Project - search in files")
- ("gs" 'magit-status "Git - status")
- ("ga" 'magit-stage-file "Git - stage file")
- ("gc" 'magit-commit "Git - commit")
- ("gp" 'magit-push "Git - push")
- ("aol" 'org-todo-list "Org - todo list")
- ("aoa" 'org-agenda "Org - agenda")
- ("aoc" 'org-task-capture " Org - capture task")
- ("ts" 'flyspell-mode "Toggle - Flyspell")
- ("tc" 'counsel-mode "Toggle - Counsel")
- ("tv" 'visual-line-mode "Toggle - Visual line mode")
- ("tw" 'whitespace-mode "Toggle - Whitespace mode")
- ("w1" 'winum-select-window-1 "Window - select 1")
- ("w2" 'winum-select-window-2 "Window - select 2")
- ("w3" 'winum-select-window-3 "Window - select 3")
- ("w4" 'winum-select-window-4 "Window - select 4")
- ("w5" 'winum-select-window-5 "Window - select 5")
- ("w6" 'winum-select-window-6 "Window - select 6")
- ("w7" 'winum-select-window-7 "Window - select 7")
- ("w8" 'winum-select-window-8 "Window - select 8")
- ("w9" 'winum-select-window-9 "Window - select 9")
- ("ww" 'winum-select-window-by-number "Window - select by number"))
+ ("bb" 'ivy-switch-buffer "Switch buffer")
+ ("bd" 'kill-this-buffer "Kill this buffer")
+ ("pp" 'projectile-switch-project "Switch project")
+ ("pf" 'counsel-projectile-find-file "Find file")
+ ("ps" 'counsel-projectile-rg "Search in files")
+ ("gs" 'magit-status "Status")
+ ("ga" 'magit-stage-file "stAge file")
+ ("gc" 'magit-commit "Commit")
+ ("gp" 'magit-push "Push")
+ ("aol" 'org-todo-list "Todo list")
+ ("aoa" 'org-agenda "Agenda")
+ ("aoc" 'org-task-capture "Capture task")
+ ("afl" 'list-flycheck-errors "List errors")
+ ("asc" 'flyspell-correct-word-before-point "Correct word")
+ ("ts" 'flyspell-mode "Flyspell")
+ ("tc" 'company-mode "Company")
+ ("tf" 'flycheck-mode "Flycheck")
+ ("tv" 'visual-line-mode "Visual line mode")
+ ("tw" 'whitespace-mode "Whitespace mode")
+ ("w1" 'winum-select-window-1 "Select 1")
+ ("w2" 'winum-select-window-2 "Select 2")
+ ("w3" 'winum-select-window-3 "Select 3")
+ ("w4" 'winum-select-window-4 "Select 4")
+ ("w5" 'winum-select-window-5 "Select 5")
+ ("w6" 'winum-select-window-6 "Select 6")
+ ("w7" 'winum-select-window-7 "Select 7")
+ ("w8" 'winum-select-window-8 "Select 8")
+ ("w9" 'winum-select-window-9 "Select 9")
+ ("ww" 'winum-select-window-by-number "Select by number")
+ ("w|" 'evil-window-vsplit "Vertical split")
+ ("w-" 'evil-window-split "Horizontal split")
+ ("wd" 'evil-window-delete "Delete")
+ ("wo" 'delete-other-windows "delete Other windows")
+ ("wf" 'toggle-frame-fullscreen "make Frame Fullscreen"))
 
 (which-key-add-key-based-replacements
   "SPC a" "Apps"
   "SPC ao" "Orgmode"
+  "SPC af" "Flycheck"
+  "SPC as" "Flyspell"
   "SPC b" "Buffers"
   "SPC c" "Compile"
   "SPC e" "Errors"
@@ -274,9 +293,11 @@
   (setq ivy-height 20
         ivy-use-virtual-buffers t
         enable-recursive-minibuffers t)
+  (define-key ivy-switch-buffer-map (kbd "C-j") 'ivy-next-line)
+  (define-key ivy-switch-buffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
-  (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
+  (define-key ivy-switch-buffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
   (with-eval-after-load 'ivy
     (define-key ivy-minibuffer-map (kbd "M-v") 'yank)))
 
@@ -288,10 +309,10 @@
   :config
   (setq ivy-posframe-parameters
       '((left-fringe . 8)
-        (right-fringe . 8)))
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
-  (setq ivy-posframe-border-width 1)
-  (setq ivy-posframe-hide-minibuffer t)
+        (right-fringe . 8))
+      ivy-posframe-border-width 1
+      ivy-posframe-hide-minibuffer t
+      ivy-posframe-style 'frame-center)
   (ivy-posframe-mode 1))
 
 (use-package all-the-icons)
@@ -306,6 +327,15 @@
 
 (use-package counsel-projectile
   :defer t)
+
+(use-package ivy-prescient
+  :after ivy
+  :config
+  (ivy-prescient-mode)
+  (prescient-persist-mode))
+
+(use-package company-prescient
+  :after company)
 
 (use-package company
   :defer t
@@ -352,7 +382,7 @@
 (use-package winum
   :config
   (setq winum-mode-line-position   7
-        winum-format " %s "
+        winum-format "%s "
         winum-auto-setup-mode-line t)
   (winum-mode))
 
@@ -366,9 +396,12 @@
     (delete 'elpy-module-highlight-indentation elpy-modules)))
 
 (use-package ranger
+  :ensure t
+  :after (evil)
+  :bind (:map evil-normal-state-map
+              ("-" . deer)
+              :map ranger-mode-map ("-" . ranger-up-directory))
   :config
-  (define-key ranger-mode-map (kbd "-") 'ranger-up-directory)
-  (define-key evil-normal-state-map "-" 'deer)
   (ranger-override-dired-mode t))
 
 (use-package git-gutter-fringe
@@ -386,22 +419,22 @@
   :defer .1 ;; don't block emacs when starting, load evil immediately after startup
   :init
   (setq evil-normal-state-cursor '(box "#4078f2")
-      evil-emacs-state-cursor  '(box "#7F5AB6"))
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-search-module 'evil-search)
-  (setq evil-ex-complete-emacs-commands nil)
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
-  (setq evil-shift-round nil)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-mode-line-format '(before . mode-line-mule-info))
-  (setq evil-normal-state-tag (propertize "N " 'face '((:foreground "#000000"))))
-  (setq evil-insert-state-tag (propertize "I " 'face '((:foreground "#000000"))))
-  (setq evil-visual-state-tag "V ")
-  (setq evil-motion-state-tag "M ")
-  (setq evil-operator-state-tag "O ")
-  (setq evil-emacs-state-tag "E ")
+      evil-emacs-state-cursor  '(box "#7F5AB6")
+      evil-want-integration t
+      evil-want-keybinding nil
+      evil-search-module 'evil-search
+      evil-ex-complete-emacs-commands nil
+      evil-vsplit-window-right t
+      evil-split-window-below t
+      evil-shift-round nil
+      evil-want-C-u-scroll t
+      evil-mode-line-format '(before . mode-line-mule-info)
+      evil-normal-state-tag (propertize "N ")
+      evil-insert-state-tag (propertize "I ")
+      evil-visual-state-tag "V "
+      evil-motion-state-tag "M "
+      evil-operator-state-tag "O "
+      evil-emacs-state-tag "E ")
 
   :config
   (evil-mode)
@@ -495,9 +528,9 @@
 (use-package org
   :defer t
   :config
-  (setq org-directory "~/Dropbox/org")
-  (setq org-agenda-files '("~/Dropbox/org/"))
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (setq org-directory "~/Sync/org"
+        org-agenda-files '("~/Sync/org/")
+        org-default-notes-file (concat org-directory "/notes.org"))
   (define-key global-map (kbd "C-c c") 'org-capture)
   (define-key global-map (kbd "C-c l") 'org-store-link)
   (define-key global-map (kbd "C-c t a") 'pop-to-org-agenda)
@@ -540,7 +573,7 @@ SCHEDULED: %t
     :disabled
     :after org
     :config
-    (setq org-journal-dir "~/Dropbox/org/journal/"))
+    (setq org-journal-dir "~/Sync/org/journal/"))
 
   (use-package ob-async
     :defer t)
@@ -591,6 +624,7 @@ SCHEDULED: %t
   (setq projectile-mode-line-function 'projectile-short-mode-line)
   (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching nil)
+  (setq projectile-switch-project-action #'projectile-dired)
   (projectile-global-mode +1))
 
 ;; Do something about popups as well
@@ -641,7 +675,6 @@ SCHEDULED: %t
     (add-to-list 'exec-path-from-shell-variables var))
   (exec-path-from-shell-initialize))
 
-
 ;; Flycheck
 (use-package flycheck
   :defer t
@@ -682,7 +715,7 @@ SCHEDULED: %t
   (add-hook 'go-mode-hook 'my-go-mode-hook)
 
   ;; guru settings
-  ;;(go-guru-hl-identifier-mode)                    ; highlight identifiers
+  (go-guru-hl-identifier-mode)                    ; highlight identifiers
 
   ;; Ensure the go specific autocomplete is active in go-mode.
   (with-eval-after-load 'go-mode
@@ -714,7 +747,9 @@ SCHEDULED: %t
   :commands (markdown-mode gfm-mode)
   :mode (("\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
+  :init (setq markdown-command "multimarkdown")
+  :config
+  (setq markdown-spaces-after-code-fence 0))
 
 (defun markdown-preview-file ()
   "run Marked on the current file and revert the buffer"
@@ -748,9 +783,67 @@ SCHEDULED: %t
   :config
   (add-hook 'terraform-mode-hook 'terraform-format-on-save-mode))
 
+(use-package highlight-indent-guides
+  :config
+  (setq highlight-indent-guides-method 'character)
+  ;; Indent character samples: | ┆ ┊
+  (setq highlight-indent-guides-character ?\┆)
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
+
 (use-package vterm
   :load-path "~/src/emacs-libvterm"
-  :commands (vterm))
+  :commands (vterm)
+  :config
+  (add-hook 'vterm-mode-hook
+            (lambda ()
+              (evil-insert-state)))
+  (define-key vterm-mode-map [return]                      #'vterm-send-return)
+  (setq vterm-keymap-exceptions nil)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-e")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-f")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-a")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-v")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-b")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-w")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-u")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-n")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-m")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-p")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-j")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-k")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-r")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-t")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-g")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-c")      #'vterm--self-insert)
+  (evil-define-key 'insert vterm-mode-map (kbd "C-SPC")    #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd "C-d")      #'vterm--self-insert)
+  (evil-define-key 'normal vterm-mode-map (kbd "i")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "o")        #'evil-insert-resume)
+  (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
+
+(use-package vterm-toggle
+  :defer t
+  :bind
+  ("C-`" . vterm-toggle))
+
+(use-package writeroom-mode
+  :defer t
+  :commands (writeroom-mode)
+  :config
+  (add-to-list 'writeroom-global-effects 'visual-line-mode)
+  (add-to-list 'writeroom-global-effects 'text-scale-increase)
+  (delq 'writeroom-set-fullscreen writeroom-global-effects)
+  (setq writeroom-restore-window-config t
+        writeroom-width 100))
+
+(add-hook 'python-mode-hook
+          (lambda ()
+            (flycheck-mode)
+            (company-mode)
+            (setq flycheck-python-pylint-executable "/Users/nick/.local/bin/pylint")
+            (setq flycheck-pylintrc "/Users/nick/.pylintrc")))
 
 ;; Rename current buffer and file
 (defun rename-current-buffer-file ()
@@ -814,7 +907,7 @@ SCHEDULED: %t
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
 (global-set-key (kbd "M-o") 'counsel-find-file)
-(global-set-key (kbd "C-s") 'counsel-projectile-ag)
+(global-set-key (kbd "C-s") 'counsel-rg)
 (global-set-key (kbd "C-,") 'counsel-imenu)
 (global-set-key (kbd "M-a") 'mark-whole-buffer)
 (global-set-key [(kbd "M-w")]

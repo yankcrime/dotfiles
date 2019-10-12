@@ -7,7 +7,7 @@
 
 # usual suspects
 #
-export EDITOR="vim"
+export EDITOR="nvim"
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
 export PURE_PROMPT_SYMBOL="$"
 export PURE_PROMPT_SYMBOL_COLOR="black"
@@ -48,7 +48,7 @@ alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
-# alias vim='/usr/local/bin/nvim'
+alias vim='/usr/local/bin/nvim'
 
 # <3 vagrant
 #

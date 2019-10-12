@@ -49,9 +49,6 @@
 [submodule ".vim/pack/default/vim-yaml"]
 	path = .vim/pack/default/vim-yaml
 	url = https://git::@github.com/stephpy/vim-yaml.git
-[submodule ".vim/pack/default/ack.vim"]
-	path = .vim/pack/default/ack.vim
-	url = https://github.com/mileszs/ack.vim.git
 [submodule ".vim/pack/default/fzf.vim"]
 	path = .vim/pack/default/fzf.vim
 	url = https://github.com/junegunn/fzf.vim.git
