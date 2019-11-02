@@ -5,9 +5,33 @@
 #
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
 
+# set theme based on OS preference
+# do this early otherwise there's a noticable change
+#
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    sith() {
+        val=$(defaults read -g AppleInterfaceStyle 2>/dev/null)
+        if [[ $val == "Dark" ]]; then
+            i
+        fi
+    }
+
+    i() {
+        if [[ $ITERM_PROFILE == "Default" ]]; then
+            echo -ne "\033]50;SetProfile=Dark\a"
+            export ITERM_PROFILE="Dark"
+        else
+            echo -ne "\033]50;SetProfile=Terminal\a"
+            export ITERM_PROFILE="Default"
+        fi
+    }
+
+    sith
+fi
+
 # usual suspects
 #
-export EDITOR="nvim"
+export EDITOR="vim"
 export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
 export PURE_PROMPT_SYMBOL="$"
 export PURE_PROMPT_SYMBOL_COLOR="black"
@@ -48,7 +72,7 @@ alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
-alias vim='/usr/local/bin/nvim'
+alias vim='/usr/local/bin/vim'
 
 # <3 vagrant
 #
@@ -198,6 +222,7 @@ fi
 # Allow use of Ctrl-S in vim
 #
 stty -ixon
+
 
 # Last but definitely not least - FZF
 #
