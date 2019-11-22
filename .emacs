@@ -1,15 +1,24 @@
 ;; Startup speed tweaks
-(setq package-enable-at-startup nil
-      message-log-max 16384
-      gc-cons-threshold 402653184
-      gc-cons-percentage 0.6
-      auto-window-vscroll nil)
+(defvar file-name-handler-alist-old file-name-handler-alist)
+
+;; Only run this code once, even when reloading the file.
+(defvar pre-init-p t)
+(when pre-init-p
+  (setq file-name-handler-alist nil
+        pre-init-p nil
+        gc-cons-threshold 402653184
+        gc-cons-percentage 0.6
+        load-prefer-newer t
+        package-enable-at-startup nil
+        package--init-file-ensured t))
 
 (add-hook 'after-init-hook
           `(lambda ()
-             (setq gc-cons-threshold 800000
+             (setq file-name-handler-alist file-name-handler-alist-old
+                   gc-cons-threshold 800000
                    gc-cons-percentage 0.1)
-             (garbage-collect)) t)
+             (garbage-collect))
+          t)
 
 (setq user-mail-address "nick@dischord.org")
 (setq create-lockfiles nil)
@@ -20,7 +29,6 @@
 (tool-bar-mode -1)
 (column-number-mode 1)
 (menu-bar-mode -1)
-
 
 ;; Hide some menu junk
 (define-key global-map [menu-bar tools gnus] nil)
@@ -170,27 +178,17 @@
 
 (setq use-package-compute-statistics t)
 
-(set-face-font 'default "Triplicate T4c 14")
+(set-face-font 'default "Triplicate T4c 15")
 
 (use-package doom-themes
-   :init
-   (setq doom-themes-enable-bold t
-         doom-themes-enable-italic t)
-   :config
-   (doom-themes-visual-bell-config)
-   (doom-themes-org-config)
-   (load-theme 'doom-one-light t)
-   (defvar active-modeline-bg "#e9e9e9")
-   (defvar active-modeline-fg "#332233")
-   (defvar inactive-modeline-fg "#777777")
-   (defvar inactive-modeline-bg "#c6c6c6")
-   (set-face-attribute 'mode-line nil
-                       :background active-modeline-bg
-                       :foreground active-modeline-fg
-                       :overline "#cccccc")
-   (set-face-attribute 'mode-line-inactive nil
-                       :background inactive-modeline-bg
-                       :foreground inactive-modeline-fg))
+  :load-path "~/src/emacs-doom-themes"
+  :init
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  :config
+  (doom-themes-visual-bell-config)
+  (doom-themes-org-config)
+  (load-theme 'doom-one-light t))
 
 ;; (set-background-color "#0C0C0C")
 ;; (add-to-list 'default-frame-alist '(background-color . "#0C0C0C"))
@@ -237,6 +235,7 @@
  ("ps" 'counsel-projectile-rg "Search in files")
  ("gs" 'magit-status "Status")
  ("ga" 'magit-stage-file "stAge file")
+ ("gb" 'magit-blame "Blame")
  ("gc" 'magit-commit "Commit")
  ("gp" 'magit-push "Push")
  ("aol" 'org-todo-list "Todo list")
@@ -395,6 +394,10 @@
     (elpy-use-ipython)
     (delete 'elpy-module-highlight-indentation elpy-modules)))
 
+(use-package python-black
+  :demand t
+  :after python)
+
 (use-package ranger
   :ensure t
   :after (evil)
@@ -453,7 +456,8 @@
     :after evil
     :config
     (setq evil-collection-mode-list
-          '(ediff
+          '(dired
+            ediff
             elisp-mode
             flycheck
             magit
@@ -654,19 +658,6 @@ SCHEDULED: %t
                            (error nil) ))
           minor-mode-list)
     (message "Active modes are %s" active-modes)))
-
-;; Open files in dired mode using 'open'
-(eval-after-load "dired"
-  '(progn
-     ;; Make Dired a bit more like vim's dirvish
-     (define-key dired-mode-map "-"
-         (lambda ()
-           (interactive)
-           (find-alternate-file "..")))
-     (define-key dired-mode-map (kbd "z")
-       (lambda () (interactive)
-         (let ((fn (dired-get-file-for-visit)))
-           (start-process "default-app" nil "open" fn))))))
 
 (use-package exec-path-from-shell
   :defer 2
