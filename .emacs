@@ -178,20 +178,17 @@
 
 (setq use-package-compute-statistics t)
 
-(set-face-font 'default "Triplicate T4c 15")
+(set-face-font 'default "SF Mono 15")
 
 (use-package doom-themes
   :load-path "~/src/emacs-doom-themes"
   :init
   (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
+        doom-themes-enable-italic t
+        doom-themes-visual-bell-config t
+        doom-themes-org-config t)
   :config
-  (doom-themes-visual-bell-config)
-  (doom-themes-org-config)
   (load-theme 'doom-one-light t))
-
-;; (set-background-color "#0C0C0C")
-;; (add-to-list 'default-frame-alist '(background-color . "#0C0C0C"))
 
 (use-package minions
   :init (minions-mode)
@@ -316,6 +313,11 @@
 
 (use-package all-the-icons)
 
+(use-package ranger
+  :ensure t
+  :config
+  (ranger-override-dired-mode t))
+
 ;; Completion framework
 (use-package counsel
   :after ivy
@@ -398,15 +400,6 @@
   :demand t
   :after python)
 
-(use-package ranger
-  :ensure t
-  :after (evil)
-  :bind (:map evil-normal-state-map
-              ("-" . deer)
-              :map ranger-mode-map ("-" . ranger-up-directory))
-  :config
-  (ranger-override-dired-mode t))
-
 (use-package git-gutter-fringe
   :defer t
   :config
@@ -438,7 +431,9 @@
       evil-motion-state-tag "M "
       evil-operator-state-tag "O "
       evil-emacs-state-tag "E ")
-
+  :bind (:map evil-normal-state-map
+              ("-" . deer)
+              :map ranger-mode-map ("-" . ranger-up-directory))
   :config
   (evil-mode)
 
