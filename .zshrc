@@ -72,7 +72,8 @@ alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
-alias vim='/usr/local/bin/vim'
+alias vim='/usr/local/bin/nvim'
+alias k='kubectl'
 
 # <3 vagrant
 #
@@ -214,7 +215,7 @@ if ! zgen saved; then
   zgen load junegunn/fzf shell/completion.zsh
   zgen load junegunn/fzf shell/key-bindings.zsh
   zgen load rupa/z
-  zgen load supercrabtree/k
+  zgen load ~/src/k
 
   zgen save
 fi
