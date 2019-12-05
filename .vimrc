@@ -60,12 +60,21 @@ cmap w!! w !sudo tee % >/dev/null
 syntax on
 set t_Co=256
 set termguicolors
-set background=light
-colorscheme off
 
-hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
-hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
-hi Terminal ctermbg=none ctermfg=none
+let iterm_profile = $ITERM_PROFILE
+
+if iterm_profile == "Dark"
+    set background=dark
+    colorscheme monotone
+    hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
+else
+    set background=light        " Set solarized background color
+    colorscheme nofrils-light
+    hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
+    hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
+    hi Terminal ctermbg=none ctermfg=none
+endif
+
 hi clear SignColumn
 set laststatus=2
 
@@ -115,7 +124,6 @@ function! s:statusline_expr()
   return ' [%n] %.40F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
 endfunction
 let &statusline = s:statusline_expr()
-
 " }}}
 " {{{ fzf (and Ripgrep)
 nnoremap <silent> <C-f> :Files <CR>
@@ -150,21 +158,6 @@ command! -bang -nargs=* Rg
   \   <bang>0)
 
 " }}}
-" {{{ COC
-" use <tab> for trigger completion and navigate to the next complete item
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~ '\s'
-endfunction
-
-inoremap <silent><expr> <S-Tab>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<Tab>" :
-      \ coc#refresh()
-
-inoremap <expr> <Tab> pumvisible() ? "\<C-y>" : "\<C-g>u\<Tab>"
-
-" }}}
 " {{{ Golang
 au FileType go nnoremap <leader>r <Plug>(go-run)
 au FileType go nnoremap <leader>b <Plug>(go-build)
@@ -197,8 +190,8 @@ au FileType puppet nnoremap <c-]> :exe "tag " . substitute(expand("<cword>"), "^
 au FileType puppet nnoremap <c-w><c-]> :tab split<CR>:exe "tag " . substitute(expand("<cword>"), "^::", "", "")<CR>
 " }}}
 " {{{ ALE
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_enter = 0
+let g:ale_lint_on_enter = 1
+let g:ale_lint_on_insert_leave = 0
 let g:ale_set_loclist = 0
 let g:ale_set_quickfix = 1
 let g:ale_sign_warning='●'

@@ -25,7 +25,6 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'Lokaltog/vim-monotone'
 Plug 'Lokaltog/neoranger'
-Plug 'Lenovsky/nuake'
 Plug 'chriskempson/base16-vim'
 Plug 'romainl/vim-sweet16'
 Plug 'yankcrime/vim-colors-off'
@@ -122,11 +121,21 @@ nnoremap <S-Tab> <C-w>W
 " appearance
 set t_Co=256
 set termguicolors
-set background=light
-colorscheme nofrils-light
-hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
-hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
-hi Terminal ctermbg=none ctermfg=none
+
+let iterm_profile = $ITERM_PROFILE
+
+if iterm_profile == "Dark"
+    set background=dark
+    colorscheme monotone
+    hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
+else
+    set background=light        " Set solarized background color
+    colorscheme nofrils-light
+    hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
+    hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
+    hi Terminal ctermbg=none ctermfg=none
+endif
+
 hi clear SignColumn
 set laststatus=2
 
@@ -338,13 +347,6 @@ inoremap <silent><expr> <S-Tab>
 
 inoremap <expr> <Tab> pumvisible() ? "\<C-y>" : "\<C-g>u\<Tab>"
 
-" }}}
-" {{{ Nuake
-let g:nuake_position = 'top'
-
-nnoremap <leader>` :Nuake<CR>
-inoremap <leader>` <C-\><C-n>:Nuake<CR>
-tnoremap <leader>` <C-\><C-n>:Nuake<CR>
 " }}}
 
 " vim:ts=4:sw=4:ft=vimrc:et
