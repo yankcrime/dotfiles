@@ -178,7 +178,7 @@
 
 (setq use-package-compute-statistics t)
 
-(set-face-font 'default "SF Mono 15")
+(set-face-font 'default "Triplicate T4c 14")
 
 (use-package doom-themes
   :load-path "~/src/emacs-doom-themes"
@@ -298,20 +298,56 @@
     (define-key ivy-minibuffer-map (kbd "M-v") 'yank)))
 
 (use-package ivy-posframe
-  :demand t
   :custom-face
   (internal-border ((t (:background "#cccccc"))))
   :after (ivy)
   :config
-  (setq ivy-posframe-parameters
-      '((left-fringe . 8)
-        (right-fringe . 8))
-      ivy-posframe-border-width 1
-      ivy-posframe-hide-minibuffer t
-      ivy-posframe-style 'frame-center)
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
+        ivy-posframe-height-alist '((t . 20))
+        ivy-posframe-parameters '((internal-border-width . 10))
+        ivy-posframe-parameters
+        '((left-fringe . 8)
+          (right-fringe . 8))
+        ivy-posframe-border-width 1
+        ivy-posframe-hide-minibuffer t
+        ivy-posframe-width 70)
   (ivy-posframe-mode 1))
 
 (use-package all-the-icons)
+
+(use-package ivy-rich
+  :ensure t
+  :after (ivy)
+  :init
+    (setq ivy-rich-display-transformers-list ; max column width sum = (ivy-poframe-width - 1)
+        '(ivy-switch-buffer
+          (:columns
+           ((ivy-rich-candidate (:width 25))
+            (ivy-rich-switch-buffer-project (:width 15 :face success))
+            (ivy-rich-switch-buffer-major-mode (:width 20 :face warning)))
+           :predicate
+           (lambda (cand) (get-buffer cand)))
+          counsel-M-x
+          (:columns
+           ((counsel-M-x-transformer (:width 35))
+            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+          counsel-describe-function
+          (:columns
+           ((counsel-describe-function-transformer (:width 35))
+            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
+          counsel-describe-variable
+          (:columns
+           ((counsel-describe-variable-transformer (:width 35))
+            (ivy-rich-counsel-variable-docstring (:width 34 :face font-lock-doc-face))))
+          package-install
+          (:columns
+           ((ivy-rich-candidate (:width 35))
+            (ivy-rich-package-version (:width 22 :face font-lock-comment-face))
+            (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
+            (ivy-rich-package-install-summary (:width 33 :face font-lock-doc-face))))))
+  :config
+  (ivy-rich-mode +1)
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
 
 (use-package ranger
   :ensure t
@@ -322,6 +358,7 @@
 (use-package counsel
   :after ivy
   :demand t
+  :bind (("M-x" . counsel-M-x))
   :config
   (setq ivy-height 20)
   (add-to-list 'ivy-height-alist '(counsel-evil-registers . 10)))
@@ -700,9 +737,6 @@ SCHEDULED: %t
 
   (add-hook 'go-mode-hook 'my-go-mode-hook)
 
-  ;; guru settings
-  (go-guru-hl-identifier-mode)                    ; highlight identifiers
-
   ;; Ensure the go specific autocomplete is active in go-mode.
   (with-eval-after-load 'go-mode
     (require 'go-autocomplete))
@@ -714,7 +748,10 @@ SCHEDULED: %t
     :defer t)
 
   (use-package go-guru
-    :defer t))
+    :defer t
+    :config
+    (go-guru-hl-identifier-mode))
+)
 
 (use-package slime
   :defer t
