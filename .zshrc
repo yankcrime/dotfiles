@@ -214,7 +214,7 @@ if ! zgen saved; then
   zgen load junegunn/fzf
   zgen load junegunn/fzf shell/completion.zsh
   zgen load junegunn/fzf shell/key-bindings.zsh
-  zgen load rupa/z
+  zgen load skywind3000/z.lua
   zgen load ~/src/k
 
   zgen save
