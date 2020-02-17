@@ -870,9 +870,18 @@ SCHEDULED: %t
   (evil-define-key 'normal vterm-mode-map (kbd "<return>") #'evil-insert-resume))
 
 (use-package vterm-toggle
+  :after evil
+  :custom
+  (vterm-toggle-fullscreen-p nil)
   :defer t
   :bind
-  ("C-`" . vterm-toggle))
+  ("C-`" . vterm-toggle)
+  :config
+  (add-to-list 'display-buffer-alist
+               '("^v?term.*"
+                 (display-buffer-reuse-window display-buffer-at-bottom)
+                 (reusable-frames . visible)
+                 (window-height . 0.5))))
 
 (use-package writeroom-mode
   :defer t
