@@ -397,6 +397,29 @@
   ("M-c" . avy-goto-char)
   ("M-C" . avy-goto-char-2))
 
+
+(use-package shackle
+  :if (not (bound-and-true-p disable-pkg-shackle))
+  :config
+  (progn
+    (setq shackle-lighter "")
+    (setq shackle-select-reused-windows nil) ; default nil
+    (setq shackle-default-alignment 'below) ; default below
+    (setq shackle-default-size 0.4) ; default 0.5
+
+    (setq shackle-rules
+          ;; CONDITION(:regexp) :select :inhibit-window-quit :size+:align|:other :same|:popup
+          '((compilation-mode :select nil)
+            ("*undo-tree*" :size 0.25 :align right)
+            ("*Help*" :select t   :inhibit-window-quit t :other t)
+            ("*Completions*" :size 0.3 :align t)
+            ("*Messages*" :select nil :inhibit-window-quit t :other t)
+            ("*Calendar*" :select t :size 0.3 :align below)
+            ("*info*" :select t :inhibit-window-quit t :same t)
+            ))
+
+    (shackle-mode 1)))
+
 (use-package eyebrowse
   :config
   (setq eyebrowse-mode 1))
