@@ -251,10 +251,11 @@
  ("ts" 'flyspell-mode "Flyspell")
  ("tc" 'company-mode "Company")
  ("tf" 'flycheck-mode "Flycheck")
- ("lgd" 'lsp-goto-type-definition)
- ("lgi" 'lsp-goto-implementation)
- ("lfr" 'lsp-find-references)
- ("lfd" 'lsp-find-declaration)
+ ("ldt" 'lsp-describe-thing-at-point "LSP Describe Thing at point")
+ ("lgd" 'lsp-goto-type-definition "LSP Goto type Definition")
+ ("lgi" 'lsp-goto-implementation "LSP Goto Implentation")
+ ("lfr" 'lsp-find-references "LSP Find References")
+ ("lfd" 'lsp-find-declaration "LSP Find Declaration")
  ("tv" 'visual-line-mode "Visual line mode")
  ("tw" 'whitespace-mode "Whitespace mode")
  ("w1" 'winum-select-window-1 "Select 1")
@@ -287,6 +288,7 @@
   "SPC hd" "Describe"
   "SPC j" "Jump"
   "SPC l" "LSP"
+  "SPC ld" "LSP Describe"
   "SPC lf" "LSP Find"
   "SPC lg" "LSP Goto"
   "SPC p" "Project"
@@ -386,18 +388,18 @@
   (prescient-persist-mode))
 
 (use-package lsp-mode
-  :ensure t
   :init (setq lsp-keymap-prefix "C-SPC")
   :commands (lsp lsp-deferred))
 
 (use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode
   :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   (setq lsp-ui-sideline-enable nil
         lsp-ui-doc-enable nil
-        lsp-ui-flycheck-enable nil
-        lsp-ui-imenu-enable nil
+        lsp-signature-auto-activate nil
+        lsp-ui-flycheck-enable t
+        lsp-ui-imenu-enable t
         lsp-ui-sideline-ignore-duplicate t))
 
 (use-package company
@@ -873,7 +875,7 @@ SCHEDULED: %t
     :config
     (go-guru-hl-identifier-mode))
 
-  (add-hook 'go-mode-hook #'lsp-deferred))
+  (add-hook 'go-mode-hook 'lsp-deferred))
 
 (use-package slime
   :defer t
