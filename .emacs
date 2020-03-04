@@ -46,7 +46,9 @@
 ;; Minimal startup
 (setq inhibit-startup-message t
       inhibit-splash-screen t
-      initial-scratch-message nil)
+      initial-scratch-message nil
+      frame-inhibit-implied-resize t
+      initial-major-mode 'fundamental-mode)
 (setq initial-frame-alist
       (append initial-frame-alist
               '((ns-appearance . light)
@@ -125,6 +127,8 @@
       (if this-win-2nd (other-window 1))))))
 
 (global-set-key (kbd "C-x |") 'toggle-window-split)
+(global-set-key (kbd "C-SPC") nil)
+(global-unset-key (kbd "C-SPC"))
 
 ;; Activate line numbers on programming modes
 (add-hook 'prog-mode-hook
@@ -178,7 +182,7 @@
 
 (setq use-package-compute-statistics t)
 
-(set-face-font 'default "Triplicate T4c 14")
+(add-to-list 'default-frame-alist '(font . "SF Mono 13"))
 
 (use-package doom-themes
   :load-path "~/src/emacs-doom-themes"
@@ -201,6 +205,10 @@
                          flycheck-mode
                          company-mode
                          overwrite-mode)))
+
+(use-package all-the-icons
+  :custom
+  (all-the-icons-scale-factor 1.0))
 
 ;; Which-key - command previews
 (use-package which-key
@@ -243,6 +251,10 @@
  ("ts" 'flyspell-mode "Flyspell")
  ("tc" 'company-mode "Company")
  ("tf" 'flycheck-mode "Flycheck")
+ ("lgd" 'lsp-goto-type-definition)
+ ("lgi" 'lsp-goto-implementation)
+ ("lfr" 'lsp-find-references)
+ ("lfd" 'lsp-find-declaration)
  ("tv" 'visual-line-mode "Visual line mode")
  ("tw" 'whitespace-mode "Whitespace mode")
  ("w1" 'winum-select-window-1 "Select 1")
@@ -274,6 +286,9 @@
   "SPC h" "Help"
   "SPC hd" "Describe"
   "SPC j" "Jump"
+  "SPC l" "LSP"
+  "SPC lf" "LSP Find"
+  "SPC lg" "LSP Goto"
   "SPC p" "Project"
   "SPC q" "Quit"
   "SPC s" "Search"
@@ -310,10 +325,8 @@
           (right-fringe . 8))
         ivy-posframe-border-width 1
         ivy-posframe-hide-minibuffer t
-        ivy-posframe-width 70)
+        ivy-posframe-width 110)
   (ivy-posframe-mode 1))
-
-(use-package all-the-icons)
 
 (use-package ivy-rich
   :ensure t
@@ -372,8 +385,20 @@
   (ivy-prescient-mode)
   (prescient-persist-mode))
 
-(use-package company-prescient
-  :after company)
+(use-package lsp-mode
+  :ensure t
+  :init (setq lsp-keymap-prefix "C-SPC")
+  :commands (lsp lsp-deferred))
+
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode
+  :config
+  (setq lsp-ui-sideline-enable nil
+        lsp-ui-doc-enable nil
+        lsp-ui-flycheck-enable nil
+        lsp-ui-imenu-enable nil
+        lsp-ui-sideline-ignore-duplicate t))
 
 (use-package company
   :defer t
@@ -384,6 +409,9 @@
   (add-hook 'go-mode-hook 'company-mode)
   :config
   (setq company-idle-delay 0.2))
+
+(use-package company-prescient
+  :after company)
 
 (use-package company-terraform
   :defer t)
@@ -547,6 +575,7 @@
       evil-vsplit-window-right t
       evil-split-window-below t
       evil-shift-round nil
+      evil-echo-state nil
       evil-want-C-u-scroll t
       evil-mode-line-format '(before . mode-line-mule-info)
       evil-normal-state-tag (propertize "N ")
@@ -766,7 +795,7 @@ SCHEDULED: %t
   (setq zoom-size '(0.618 . 0.618))
   (zoom-mode t))
 
-;; Which modes are active?
+;;;; Which modes are active?
 (defun which-active-modes ()
   "Give a message of which minor modes are enabled in the current buffer."
   (interactive)
@@ -800,6 +829,11 @@ SCHEDULED: %t
 ;; Modes
 
 ;; Golang
+;; Need to install some Go tools seperately
+;; go get -u github.com/mdempsky/gocode
+;; go get -u github.com/rogpeppe/godef
+;; go get -u golang.org/x/tools/cmd/goimports
+;; go get -u github.com/jstemmer/gotags
 (use-package go-mode
   :defer t
   :init
@@ -838,7 +872,8 @@ SCHEDULED: %t
     :defer t
     :config
     (go-guru-hl-identifier-mode))
-)
+
+  (add-hook 'go-mode-hook #'lsp-deferred))
 
 (use-package slime
   :defer t
