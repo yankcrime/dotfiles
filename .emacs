@@ -683,7 +683,7 @@
   :defer t
   :config
   (setq org-directory "~/Sync/org"
-        org-agenda-files '("~/Sync/org/")
+        org-agenda-files (directory-files-recursively "~/Sync/org/" "\.org$")
         org-default-notes-file (concat org-directory "/notes.org"))
   (define-key global-map (kbd "C-c c") 'org-capture)
   (define-key global-map (kbd "C-c l") 'org-store-link)
@@ -724,10 +724,11 @@ SCHEDULED: %t
          "\C-r" 'org-agenda-redo)))
 
   (use-package org-journal
-    :disabled
     :after org
-    :config
-    (setq org-journal-dir "~/Sync/org/journal/"))
+    :custom
+    (org-journal-file-format "%Y-%m-%d.org")
+    (org-journal-date-format "%A, %d %B %Y")
+    (org-journal-dir "~/Sync/org/journal/"))
 
   (use-package ob-async
     :defer t)
