@@ -5,6 +5,7 @@ exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-screensaver
 #exec --no-startup-id gnome-flashback
 exec --no-startup-id compton --config ~/.config/compton/compton.conf -b
+exec --no-startup-id dunst -config ~/.config/i3/dunst
 
 #i3 gaps
 #
@@ -56,10 +57,10 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-bindsym $mod+minus split h
+bindsym $mod+minus split v
 
 # split in vertical orientation
-bindsym $mod+bar split v
+bindsym $mod+bar split h
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
