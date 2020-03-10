@@ -182,7 +182,7 @@
 
 (setq use-package-compute-statistics t)
 
-(add-to-list 'default-frame-alist '(font . "SF Mono 13"))
+(add-to-list 'default-frame-alist '(font . "SF Mono 11"))
 
 (use-package doom-themes
   :load-path "~/src/emacs-doom-themes"
@@ -212,8 +212,18 @@
 
 ;; Which-key - command previews
 (use-package which-key
+  :custom-face
+  (which-key-posframe ((t (:background "#f2f2f2"))))
+  (which-key-posframe-border ((t (:background "#cccccc"))))
+  :custom
+  (which-key-posframe-border-width 1)
   :config
   (which-key-mode))
+
+;;(use-package which-key-posframe
+;;  :config
+;;  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center)
+;;  (which-key-posframe-mode))
 
 (use-package general
   :config
@@ -255,7 +265,8 @@
  ("lgd" 'lsp-goto-type-definition "LSP Goto type Definition")
  ("lgi" 'lsp-goto-implementation "LSP Goto Implentation")
  ("lfr" 'lsp-find-references "LSP Find References")
- ("lfd" 'lsp-find-declaration "LSP Find Declaration")
+ ("lfd" 'lsp-find-definition "LSP Find Definition")
+ ("lfE" 'lsp-find-declaration "LSP Find dEclaration")
  ("tv" 'visual-line-mode "Visual line mode")
  ("tw" 'whitespace-mode "Whitespace mode")
  ("w1" 'winum-select-window-1 "Select 1")
@@ -312,14 +323,57 @@
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-switch-buffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
   (with-eval-after-load 'ivy
-    (define-key ivy-minibuffer-map (kbd "M-v") 'yank)))
+    (define-key ivy-minibuffer-map (kbd "M-v") 'yank))
+
+  (use-package ivy-rich
+    :ensure t
+    :init
+      (setq ivy-rich-display-transformers-list
+          '(ivy-switch-buffer
+            (:columns
+             ((ivy-rich-candidate (:width 25))
+              (ivy-rich-switch-buffer-project (:width 15 :face success))
+              (ivy-rich-switch-buffer-major-mode (:width 20 :face warning)))
+             :predicate
+             (lambda (cand) (get-buffer cand)))
+            counsel-M-x
+            (:columns
+             ((counsel-M-x-transformer (:width 35))
+              (ivy-rich-counsel-function-docstring
+               (:width 34 :face font-lock-doc-face))))
+            counsel-describe-function
+            (:columns
+             ((counsel-describe-function-transformer (:width 35))
+              (ivy-rich-counsel-function-docstring
+               (:width 34 :face font-lock-doc-face))))
+            counsel-describe-variable
+            (:columns
+             ((counsel-describe-variable-transformer (:width 35))
+              (ivy-rich-counsel-variable-docstring
+               (:width 34 :face font-lock-doc-face))))
+            package-install
+            (:columns
+             ((ivy-rich-candidate (:width 35))
+              (ivy-rich-package-version (:width 22 :face font-lock-comment-face))
+              (ivy-rich-package-archive-summary
+               (:width 7 :face font-lock-builtin-face))
+              (ivy-rich-package-install-summary
+               (:width 33 :face font-lock-doc-face))))))
+    :config
+    (ivy-rich-mode +1)
+    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)))
+
+(use-package posframe
+  :custom-face
+  (internal-border ((t (:background "#cccccc")))))
 
 (use-package ivy-posframe
   :custom-face
   (internal-border ((t (:background "#cccccc"))))
   :after (ivy)
   :config
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
+  (setq ivy-posframe-display-functions-alist
+        '((t . ivy-posframe-display-at-frame-top-center))
         ivy-posframe-height-alist '((t . 20))
         ivy-posframe-parameters '((internal-border-width . 10))
         ivy-posframe-parameters
@@ -330,39 +384,6 @@
         ivy-posframe-width 110)
   (ivy-posframe-mode 1))
 
-(use-package ivy-rich
-  :ensure t
-  :after (ivy)
-  :init
-    (setq ivy-rich-display-transformers-list ; max column width sum = (ivy-poframe-width - 1)
-        '(ivy-switch-buffer
-          (:columns
-           ((ivy-rich-candidate (:width 25))
-            (ivy-rich-switch-buffer-project (:width 15 :face success))
-            (ivy-rich-switch-buffer-major-mode (:width 20 :face warning)))
-           :predicate
-           (lambda (cand) (get-buffer cand)))
-          counsel-M-x
-          (:columns
-           ((counsel-M-x-transformer (:width 35))
-            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
-          counsel-describe-function
-          (:columns
-           ((counsel-describe-function-transformer (:width 35))
-            (ivy-rich-counsel-function-docstring (:width 34 :face font-lock-doc-face))))
-          counsel-describe-variable
-          (:columns
-           ((counsel-describe-variable-transformer (:width 35))
-            (ivy-rich-counsel-variable-docstring (:width 34 :face font-lock-doc-face))))
-          package-install
-          (:columns
-           ((ivy-rich-candidate (:width 35))
-            (ivy-rich-package-version (:width 22 :face font-lock-comment-face))
-            (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
-            (ivy-rich-package-install-summary (:width 33 :face font-lock-doc-face))))))
-  :config
-  (ivy-rich-mode +1)
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
 
 (use-package ranger
   :ensure t
@@ -393,8 +414,10 @@
 
 (use-package lsp-ui
   :config
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  (define-key lsp-ui-mode-map
+    [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map
+    [remap xref-find-references] #'lsp-ui-peek-find-references)
   (setq lsp-ui-sideline-enable nil
         lsp-ui-doc-enable nil
         lsp-signature-auto-activate nil
@@ -843,7 +866,7 @@ SCHEDULED: %t
   (set (make-local-variable 'compile-command)
        "go build -v && go test -v && go vet")
   :bind
-  ("M-]" . godef-jump)         ; Go to definition
+  ("M-]" . lsp-find-definition)         ; Go to definition
   ("M-}" . pop-tag-mark)       ; Return from whence you came
   ("M-p" . compile)            ; Invoke compiler
   ("M-P" . recompile)          ; Redo most recent compile cmd
@@ -853,6 +876,7 @@ SCHEDULED: %t
   ;; Define function to call when go-mode loads
   (defun my-go-mode-hook ()
     (flycheck-mode)
+    (lsp-deferred)
     (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
     (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
     (if (not (string-match "go" compile-command))   ; set compile command default
@@ -865,18 +889,13 @@ SCHEDULED: %t
   (with-eval-after-load 'go-mode
     (require 'go-autocomplete))
 
-  (use-package go-autocomplete
-    :defer t)
-
-  (use-package go-projectile
-    :defer t)
+  (use-package go-autocomplete)
+  (use-package go-projectile)
 
   (use-package go-guru
     :defer t
     :config
-    (go-guru-hl-identifier-mode))
-
-  (add-hook 'go-mode-hook 'lsp-deferred))
+    (go-guru-hl-identifier-mode)))
 
 (use-package slime
   :defer t
