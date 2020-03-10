@@ -5,6 +5,7 @@ exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-screensaver
 #exec --no-startup-id gnome-flashback
 exec --no-startup-id compton --config ~/.config/compton/compton.conf -b
+exec --no-startup-id dunst -config ~/.config/i3/dunst
 
 #i3 gaps
 #
@@ -17,7 +18,7 @@ set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango: Sans Regular 10
+font pango: IBM Plex Sans Regular 8
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -29,7 +30,7 @@ bindsym $mod+Return exec --no-startup-id gnome-terminal
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+space exec "rofi -font 'Sans Regular 18' -combi-modi window,drun -show combi -modi combi"
+bindsym $mod+space exec "rofi -font 'IBM Plex Sans Regular 18' -combi-modi window,drun -show combi -modi combi"
 
 # change focus
 bindsym $mod+h focus left
@@ -56,10 +57,10 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-bindsym $mod+minus split h
+bindsym $mod+minus split v
 
 # split in vertical orientation
-bindsym $mod+bar split v
+bindsym $mod+bar split h
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
@@ -172,7 +173,7 @@ for_window [title="^quake"] move window to scratchpad, scratchpad show
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        font pango: Sans, FontAwesome 10
+        font pango: IBM Plex Sans, FontAwesome 10
         position top
         status_command i3status
         tray_output none
