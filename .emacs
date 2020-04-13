@@ -182,7 +182,7 @@
 
 (setq use-package-compute-statistics t)
 
-(add-to-list 'default-frame-alist '(font . "SF Mono 11"))
+(add-to-list 'default-frame-alist '(font . "Hack 11"))
 
 (use-package doom-themes
   :load-path "~/src/emacs-doom-themes"

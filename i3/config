@@ -1,9 +1,9 @@
 # i3 configuration for running alongside Gnome
+# See also https://github.com/i3-gnome/i3-gnome
 #
-exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-xsettings
+exec --no-startup-id /usr/libexec/gsd-xsettings
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-screensaver
-#exec --no-startup-id gnome-flashback
 exec --no-startup-id compton --config ~/.config/compton/compton.conf -b
 exec --no-startup-id dunst -config ~/.config/i3/dunst
 
@@ -29,8 +29,8 @@ bindsym $mod+Return exec --no-startup-id gnome-terminal
 # kill focused window
 bindsym $mod+Shift+q kill
 
-# start dmenu (a program launcher)
-bindsym $mod+space exec "rofi -font 'IBM Plex Sans Regular 14' -combi-modi window,drun -show combi -modi combi"
+# start rofi (a program launcher)
+bindsym $mod+space exec "rofi -theme 'oxide' -font 'IBM Plex Sans Regular 14' -combi-modi window,drun -show combi -modi combi"
 
 # change focus
 bindsym $mod+h focus left
@@ -137,7 +137,16 @@ bindsym $mod+r mode "resize"
 
 # class border  backgr. text indicator child_border
 #client.focused #555555 #AA4444 #ffffff #2e9ef4 #AA4444
-client.focused #0FFFD4 #087287 #ffffff #087287 #0FFFD4
+# client.focused #0FFFD4 #087287 #ffffff #087287 #0FFFD4
+
+
+# class                 border  backgr. text    indicator child_border
+client.focused          #2b83a6 #2b83a6 #ffffff #dddddd   #2b83a6
+client.focused_inactive #212121 #212121 #86888c #292d2e   #5a5a5a
+client.unfocused        #212121 #212121 #86888c #292d2e   #5a5a5a
+client.urgent           #d64e4e #d64e4e #ffffff #d64e4e   #d64e4e
+client.placeholder      #212121 #0c0c0c #ffffff #212121   #262626
+client.background       #212121
 
 # Make the currently focused window a scratchpad
 bindsym $mod+q move scratchpad
@@ -150,33 +159,43 @@ bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 4 +5% #increase sound vo
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume 4 -5% #decrease sound volume
 bindsym XF86AudioMute exec pactl set-sink-mute 4 toggle # mute sound
 
-# Show / hide Neomutt from the scratchpad workspace
-bindsym $mod+Shift+i exec --no-startup-id gnome-terminal --title=irc --class=irc --name=irc --geometry=120x40 --hide-menubar
-bindsym $mod+Shift+m exec --no-startup-id gnome-terminal --title=mail --class=mail --name=mail --geometry=120x40 --hide-menubar -e neomutt
-bindsym $mod+Shift+t exec --no-startup-id gnome-terminal --title=quake --class=quake --name=quake --hide-menubar
-
 # Have a handy terminal instance on the scratchpad as well
-bindsym $mod+i [title="^irc"] scratchpad show
-bindsym $mod+m [title="^mail"] scratchpad show
-bindsym $mod+t [title="^quake"] scratchpad show
+bindsym $mod+Shift+t exec --no-startup-id gnome-terminal --title=quake --class=quake --name=quake --hide-menubar
+bindsym $mod+t [class="^quake"] scratchpad show
 
 for_window [class="Pavucontrol"] floating enable
 for_window [class="Nvidia-settings"] floating enable
 for_window [class="Lxappearance"] floating enable
 for_window [class="Firefox" instance="Browser"] floating enable
-for_window [title="iTunes"] floating enable
 for_window [title="Mini Player"] floating enable
-for_window [title="^irc"] move window to scratchpad, scratchpad show
-for_window [title="^mail"] move window to scratchpad, scratchpad show
 for_window [title="^quake"] move window to scratchpad, scratchpad show
 for_window [class="Org.gnome.Nautilus"] floating enable
 for_window [class="Evince"] floating enable
+for_window [class="Gnome-tweaks"] floating enable
+for_window [class="Gnome-control-center"] floating enable
+for_window [class="feh"] floating enable
+for_window [class="zoom"] floating enable
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
 bar {
-        font pango: IBM Plex Sans, FontAwesome 9
-        position top
-        status_command i3status
-        tray_output none
+    font pango: IBM Plex Sans, FontAwesome 10
+    status_command          i3blocks
+    bindsym button4         nop
+    bindsym button5         nop
+    position                top
+    tray_output             primary
+    separator_symbol        "·"
+    workspace_buttons       yes
+    strip_workspace_numbers yes
+
+    colors {
+        background  #212121
+        statusline  #dddddd
+        separator   #666666
+        # class             border  backgr. text
+        focused_workspace   #2b83a6 #2b83a6 #ffffff
+        active_workspace    #212121 #212121 #ffffff
+        inactive_workspace  #212121 #212121 #86888c
+        urgent_workspace    #d64e4e #d64e4e #ffffff
+        binding_mode        #229c56 #229c56 #ffffff
+    }
 }
