@@ -1,0 +1,81 @@
+{
+    "border": "normal",
+    "floating": "auto_off",
+    "layout": "splith",
+    "percent": 1,
+    "type": "con",
+    "nodes": [
+        {
+            "border": "normal",
+            "floating": "auto_off",
+            "layout": "tabbed",
+            "percent": 0.636328125,
+            "type": "con",
+            "nodes": [
+                {
+                    "border": "pixel",
+                    "current_border_width": 2,
+                    "floating": "auto_off",
+                    "geometry": {
+                       "height": 1394,
+                       "width": 1651,
+                       "x": 0,
+                       "y": 0
+                    },
+                    "name": "Slack",
+                    "percent": 0.5,
+                    "swallows": [
+                       {
+                       "class": "^Slack$",
+                       "instance": "^slack$"
+                       }
+                    ],
+                    "type": "con"
+                },
+                {
+                    "border": "pixel",
+                    "current_border_width": 2,
+                    "floating": "auto_off",
+                    "geometry": {
+                       "height": 1396,
+                       "width": 2556,
+                       "x": 2,
+                       "y": 42
+                    },
+                    "name": "WhatsApp",
+                    "percent": 0.5,
+                    "swallows": [
+                       {
+                       "class": "^Google\\-chrome$",
+                       "title": "^WhatsApp$",
+                       "window_role": "^pop\\-up$"
+                       }
+                    ],
+                    "type": "con"
+                }
+            ]
+        },
+        {
+            "border": "pixel",
+            "current_border_width": 2,
+            "floating": "auto_off",
+            "geometry": {
+               "height": 1414,
+               "width": 2556,
+               "x": 2,
+               "y": 24
+            },
+            "name": "Twitter",
+            "percent": 0.363671875,
+            "swallows": [
+               {
+               "class": "^Google\\-chrome$",
+               "title": "^Twitter$",
+               "window_role": "^pop\\-up$"
+               }
+            ],
+            "type": "con"
+        }
+    ]
+}
+
