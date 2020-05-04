@@ -32,9 +32,6 @@ fi
 # usual suspects
 #
 export EDITOR="vim"
-export VAGRANT_DEFAULT_PROVIDER="vmware_fusion"
-export PURE_PROMPT_SYMBOL="$"
-export PURE_PROMPT_SYMBOL_COLOR="black"
 export GPG_TTY=$(tty)
 
 # history and general options
@@ -54,6 +51,18 @@ setopt HIST_IGNORE_ALL_DUPS
 setopt nohup
 umask 022
 
+# stuff that makes zsh worthwhile
+#
+autoload -U compinit && compinit
+autoload -U promptinit && promptinit
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+local knownhosts
+knownhosts=( ${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[0-9]*}%%\ *}%%,*} )
+zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
+
 # some other {sensible,useful} shortcuts
 #
 alias pg='ps auwwx | grep -i -e ^USER -e '
@@ -72,8 +81,10 @@ alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
-alias vim='/usr/local/bin/nvim'
+alias vim='nvim'
 alias k='kubectl'
+source <(kubectl completion zsh)
+complete -F __start_kubectl k
 
 # <3 vagrant
 #
@@ -95,19 +106,7 @@ alias gitsup='git submodule sync ; git submodule update --init'
 
 # emacs
 #
-alias emacs='/usr/local/opt/emacs-mac/bin/emacsclient -n'
-
-# stuff that makes zsh worthwhile
-#
-autoload -U compinit && compinit
-autoload -U promptinit && promptinit
-autoload -U up-line-or-beginning-search
-autoload -U down-line-or-beginning-search
-zle -N up-line-or-beginning-search
-zle -N down-line-or-beginning-search
-local knownhosts
-knownhosts=( ${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[0-9]*}%%\ *}%%,*} )
-zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
+alias emacs='emacsclient -n'
 
 # prompt
 #
@@ -193,15 +192,13 @@ zle -N zle-keymap-select
 # pyenv and rbenv junk
 #
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+#
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
 
-if which pyenv > /dev/null; then
-  export PYENV_ROOT="$HOME/.pyenv"
-  export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init -)"
-fi
-if which pyenv-virtualenv-init > /dev/null; then
-  eval "$(pyenv virtualenv-init -)"
-fi
+# krew
+export PATH="${PATH}:${HOME}/.krew/bin"
 
 # load zgen and plugins
 # https://github.com/tarjoilija/zgen
