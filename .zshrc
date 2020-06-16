@@ -31,7 +31,7 @@ fi
 
 # usual suspects
 #
-export EDITOR="vim"
+export EDITOR="nvim"
 export GPG_TTY=$(tty)
 
 # history and general options
@@ -83,8 +83,14 @@ alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
 alias docekr='docker'
 alias vim='nvim'
 alias k='kubectl'
+alias rdecs='xprop -f _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS "0x2, 0x0, 0x0, 0x0, 0x0"'
 source <(kubectl completion zsh)
 complete -F __start_kubectl k
+alias lgc='sudo chown nick:kvm /dev/shm/looking-glass ; chmod 660 /dev/shm/looking-glass ; looking-glass-client -F'
+alias mp='multipass'
+alias tfapply="terraform apply plan.out"
+alias tfplan="terraform plan -out plan.out"
+alias tfdestroy="terraform destroy -force"
 
 # <3 vagrant
 #
