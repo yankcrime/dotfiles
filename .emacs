@@ -23,6 +23,8 @@
 (setq user-mail-address "nick@dischord.org")
 (setq create-lockfiles nil)
 
+(setq x-super-keysym 'meta)
+
 ;; User-interface stuff
 (add-to-list 'default-frame-alist '(width . 110))
 (scroll-bar-mode 0)
@@ -54,7 +56,22 @@
               '((ns-appearance . light)
                 (ns-transparent-titlebar . t)
                 )))
+(defun get-frame-name (&optional frame)
+  "Return the string that names FRAME (a frame).  Default is selected frame."
+  (unless frame (setq frame  (selected-frame)))
+  (if (framep frame)
+      (cdr (assq 'name (frame-parameters frame)))
+    (error "Function `get-frame-name': Argument not a frame: `%s'" frame)))
 
+(defun set-selected-frame-dark ()
+  (interactive)
+  (let ((frame-name (get-frame-name (selected-frame))))
+    (call-process-shell-command (concat "xprop -f _GTK_THEME_VARIANT 8u -set _GTK_THEME_VARIANT \"dark\" -name \""
+                                        frame-name
+                                        "\""))))
+
+(if (window-system)
+    (set-selected-frame-dark))
 ;; Shut up
 (setq ring-bell-function 'ignore)
 
@@ -182,7 +199,7 @@
 
 (setq use-package-compute-statistics t)
 
-(add-to-list 'default-frame-alist '(font . "Hack 11"))
+(add-to-list 'default-frame-alist '(font . "SF Mono 11"))
 
 (use-package doom-themes
   :load-path "~/src/emacs-doom-themes"
@@ -409,8 +426,15 @@
   (prescient-persist-mode))
 
 (use-package lsp-mode
-  :init (setq lsp-keymap-prefix "C-SPC")
-  :commands (lsp lsp-deferred))
+  :init
+  (setq lsp-keymap-prefix "C-SPC")
+  :commands (lsp lsp-deferred)
+  :custom
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-prefer-flymake nil)
+  (lsp-completion-provider :capf)
+  (read-process-output-max (* 1024 1024))
+  (lsp-file-watch-threshold 2000))
 
 (use-package lsp-ui
   :config
@@ -712,13 +736,14 @@
   (define-key global-map (kbd "C-c l") 'org-store-link)
   (define-key global-map (kbd "C-c t a") 'pop-to-org-agenda)
   (define-key global-map (kbd "C-c t l") 'org-todo-list)
+  (require 'org-tempo)
   (setq org-log-done 'time
         org-adapt-indentation nil
         org-startup-indented 'true
         org-src-tab-acts-natively t
         org-src-window-setup 'other-window
         org-startup-with-inline-images t
-        org-image-actual-width nil)
+        org-image-actual-width (/ (display-pixel-width) 10))
 
   (add-hook
    'org-babel-after-execute-hook
