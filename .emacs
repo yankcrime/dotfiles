@@ -221,7 +221,8 @@
                          flyspell-mode
                          flycheck-mode
                          company-mode
-                         overwrite-mode)))
+                         overwrite-mode
+                         lsp-mode)))
 
 (use-package all-the-icons
   :custom
@@ -434,7 +435,10 @@
   (lsp-prefer-flymake nil)
   (lsp-completion-provider :capf)
   (read-process-output-max (* 1024 1024))
-  (lsp-file-watch-threshold 2000))
+  (lsp-file-watch-threshold 2000)
+  :config
+  (with-eval-after-load 'lsp-mode
+    (setq lsp-modeline-diagnostics-enable nil)))
 
 (use-package lsp-ui
   :config
