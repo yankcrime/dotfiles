@@ -153,9 +153,9 @@ if [[ $(hostname -s) == deadline ]]; then
             print_st
         fi
     }
-    PS1='%{$(git_status)%}%n@%m:%25<..<%~%(!.#.%%) %(1j.%F{green}·%j%f .)'
+    PS1='%{$(git_status)%}%n@%m %25<..<%~%(!.#. %%) %(1j.%F{green}·%j%f .)'
  else
-    PS1='%n@%m:%25<..<%~%(!.#.%%) %(1j.%F{green}·%j%f .)'
+    PS1='%n@%m %25<..<%~%(!.#. %%) %(1j.%F{green}·%j%f .)'
 fi
 
 # make it work like vim

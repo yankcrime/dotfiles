@@ -2,7 +2,7 @@
 # See also https://github.com/i3-gnome/i3-gnome
 #
 exec --no-startup-id /usr/libexec/gsd-xsettings
-exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec --no-startup-id /usr/libexec/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-screensaver
 exec --no-startup-id compton --config ~/.config/compton/compton.conf -b
 exec --no-startup-id dunst -config ~/.config/i3/dunst
@@ -30,7 +30,7 @@ bindsym $mod+Return exec --no-startup-id gnome-terminal
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-bindsym $mod+space exec "rofi -theme 'oxide' -font 'IBM Plex Sans Regular 14' -combi-modi window,drun -show combi -modi combi"
+bindsym $mod+space exec "rofi -font 'IBM Plex Sans Regular 14' -theme oxide -combi-modi window,drun -show combi -modi combi"
 
 # change focus
 bindsym $mod+h focus left
@@ -175,9 +175,10 @@ for_window [class="Gnome-tweaks"] floating enable
 for_window [class="Gnome-control-center"] floating enable
 for_window [class="feh"] floating enable
 for_window [class="zoom"] floating enable
+for_window [window_role="pop-up"] floating enable
 
 bar {
-    font pango: IBM Plex Sans, FontAwesome 10
+    font pango: IBM Plex Sans, FontAwesome 9
     status_command          i3blocks
     bindsym button4         nop
     bindsym button5         nop

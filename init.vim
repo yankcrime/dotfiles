@@ -15,11 +15,11 @@ Plug 'pearofducks/ansible-vim'
 Plug 'godlygeek/tabular'
 Plug 'cespare/vim-sbd'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'neoclide/coc.nvim', { 'branch': 'release', 'for': ['go', 'python', 'ansible', 'yaml'] }
+Plug 'neoclide/coc.nvim', { 'branch': 'release', 'for': ['go', 'python', 'ansible', 'yaml', 'terraform'] }
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
 Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
-Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby', 'ansible'] }
+Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby', 'ansible', 'terraform'] }
 Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
@@ -125,14 +125,14 @@ set termguicolors
 let iterm_profile = $ITERM_PROFILE
 
 if iterm_profile == "Dark"
-    set background=dark
     colorscheme monotone
+    set background=dark
     hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
 else
-    set background=light        " Set solarized background color
+    set background=light
     colorscheme nofrils-light
     hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
-    hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
+    " hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
     hi Terminal ctermbg=none ctermfg=none
 endif
 
@@ -141,10 +141,6 @@ set laststatus=2
 
 " insert a datestamp at the top of a file
 nnoremap <leader>N ggi# <C-R>=strftime("%Y-%m-%d - %A")<CR><CR><CR>
-
-" super quick search and replace
-nnoremap <Space><Space> :'{,'}s/\<<C-r>=expand("<cword>")<CR>\>/
-nnoremap <Space>%       :%s/\<<C-r>=expand("<cword>")<CR>\>/
 
 " fugitive shortcuts
 noremap <leader>ga :Gwrite<CR>
@@ -167,25 +163,6 @@ nnoremap <BS>       :buffer#<CR>
 " super quick search and replace
 nnoremap <Space><Space> :'{,'}s/\<<C-r>=expand("<cword>")<CR>\>/
 nnoremap <Space>%       :%s/\<<C-r>=expand("<cword>")<CR>\>/
-
-" do some sensible things with listings
-cnoremap <expr> <CR> <SID>CCR()
-function! s:CCR()
-	command! -bar Z silent set more|delcommand Z
-	if getcmdtype() == ":"
-		let cmdline = getcmdline()
-		    if cmdline =~ '\v\C^(dli|il)' | return "\<CR>:" . cmdline[0] . "jump   " . split(cmdline, " ")[1] . "\<S-Left>\<Left>\<Left>"
-		elseif cmdline =~ '\v\C^(cli|lli)' | return "\<CR>:silent " . repeat(cmdline[0], 2) . "\<Space>"
-		elseif cmdline =~ '\C^changes' | set nomore | return "\<CR>:Z|norm! g;\<S-Left>"
-		elseif cmdline =~ '\C^ju' | set nomore | return "\<CR>:Z|norm! \<C-o>\<S-Left>"
-		elseif cmdline =~ '\v\C(#|nu|num|numb|numbe|number)$' | return "\<CR>:"
-		elseif cmdline =~ '\C^ol' | set nomore | return "\<CR>:Z|e #<"
-		elseif cmdline =~ '\v\C^(ls|files|buffers)' | return "\<CR>:b"
-		elseif cmdline =~ '\C^marks' | return "\<CR>:norm! `"
-		elseif cmdline =~ '\C^undol' | return "\<CR>:u "
-		else | return "\<CR>" | endif
-	else | return "\<CR>" | endif
-endfunction
 
 " }}} End basic settings
 " {{{ Folding
@@ -257,6 +234,9 @@ au FileType go nnoremap <Leader>gv <Plug>(go-doc-vertical)
 au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
 let g:go_term_enabled = 1
 let g:go_term_mode = "split"
+" disable vim-go :GoDef short cut (gd)
+" this is handled by LanguageClient [LC]
+let g:go_def_mapping_enabled = 0
 " }}}
 " {{{ Neovim
 if has('nvim')
@@ -308,6 +288,8 @@ au FileType go nnoremap <Leader>gv <Plug>(go-doc-vertical)
 au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
 let g:go_term_enabled = 1
 let g:go_term_mode = "split"
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
 " }}}
 " {{{ Markdown
 nnoremap <leader>m :silent !open -a Marked 2.app '%:p'<cr>
@@ -346,6 +328,22 @@ inoremap <silent><expr> <S-Tab>
       \ coc#refresh()
 
 inoremap <expr> <Tab> pumvisible() ? "\<C-y>" : "\<C-g>u\<Tab>"
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use U to show documentation in preview window
+nnoremap <silent> U :call <SID>show_documentation()<CR>
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+vmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
 
 " }}}
 
