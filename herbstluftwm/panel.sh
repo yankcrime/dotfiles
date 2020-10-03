@@ -77,12 +77,6 @@ hc pad $monitor $panel_height
         sleep 1 || break
     done > >(uniq_linebuffered) &
     childpid=$!
-    while true ; do
-        echo -n "battery "
-        acpi -b
-        sleep 1 || break
-    done > >(uniq_linebuffered)  &
-    childpid+=" $!"
     hc --idle
     kill $childpid
 } 2> /dev/null | {
@@ -125,15 +119,39 @@ hc pad $monitor $panel_height
                 echo -n " ${i:1} "
             fi
         done
+
+        # uptime
+        #
+        upSeconds=`cat /proc/uptime`;
+        upSeconds=${upSeconds%%.*};
+        let secs=$((${upSeconds}%60))
+        let mins=$((${upSeconds}/60%60))
+        let hours=$((${upSeconds}/3600%24))
+        let days=$((${upSeconds}/86400))
+        uptime="^fg($xicon)^i(/usr/share/icons/stlarch_icons/uparrow1.xbm) ^fg($xtitle)uptime ^fg($xfg)${days}^fg($xext)d ^fg($xfg)${hours}^fg($xext)h ^fg($xfg)${mins}^fg($xext)m"
+
+        # battery
+        #
+        bat=`cat /sys/class/power_supply/BAT0/capacity`
+        batstat=`cat /sys/class/power_supply/BAT0/status`
+        if (($batstat=='Charging'))
+        then
+            batico="^i(/usr/share/icons/stlarch_icons/ac10.xbm)"
+        else
+            batico="^i(/usr/share/icons/stlarch_icons/batt5full.xbm)"
+        fi
+        bat="^fg($xicon)$batico ^fg($xtitle)battery ^fg($xfg)$bat^fg($xext)%"
+
         echo -n "$separator"
         echo -n "^bg()^fg() ${windowtitle//^/^^}"
         # small adjustments
-        right="$separator^bg() $date $separator"
+        right="$separator^bg() $uptime $separator $bat $separator $date $separator"
         right_text_only=$(echo -n "$right" | sed 's.\^[^(]*([^)]*)..g')
         # get width of right aligned text.. and add some space..
         width=$($textwidth "$font" "$right_text_only ")
         echo -n "^pa($(($panel_width - $width)))$right"
         echo
+
 
         ### Data handling ###
         # This part handles the events generated in the event loop, and sets
