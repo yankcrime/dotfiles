@@ -38,6 +38,9 @@ hc keybind $Mod-j     focus down
 hc keybind $Mod-k     focus up
 hc keybind $Mod-l     focus right
 
+# float a single window
+hc keybind $Mod-Shift-f attr clients.focus.floating toggle
+
 # moving clients
 hc keybind $Mod-Shift-Left  shift left
 hc keybind $Mod-Shift-Down  shift down
@@ -106,9 +109,9 @@ hc mousebind $Mod-Button3 resize
 
 # focus
 hc keybind $Mod-BackSpace   cycle_monitor
-hc keybind Mod1-Tab cycle
 hc keybind $Mod-Tab         cycle_all +1
 hc keybind $Mod-Shift-Tab   cycle_all -1
+hc keybind $Mod-Control-Tab cycle
 # hc keybind $Mod-c cycle
 hc keybind $Mod-i jumpto urgent
 
@@ -176,10 +179,10 @@ for monitor in $(hc list_monitors | cut -d: -f1) ; do
     "$panel" "$monitor" &
 done
 
+~/.config/herbstluftwm/alttab.sh &
 /usr/lib/gsd-xsettings &
 compton --config ~/.config/compton/compton.conf &
 ~/.fehbg
 ~/bin/overrides.sh
 pgrep dunst || dunst -config ~/.config/i3/dunst &
-
 
