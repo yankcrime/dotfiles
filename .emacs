@@ -228,6 +228,18 @@
   :custom
   (all-the-icons-scale-factor 1.0))
 
+
+;; Increase or decrease default font size for all buffers / frames
+;; with C-M-= and C-M--
+(use-package default-text-scale
+  :ensure t
+  :config
+  (default-text-scale-mode))
+
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode))
+
 ;; Which-key - command previews
 (use-package which-key
   :custom-face
