@@ -728,7 +728,17 @@
     (evil-define-key 'operator global-map "s" 'evil-surround-edit)
     (evil-define-key 'operator global-map "S" 'evil-Surround-edit)
     (evil-define-key 'visual global-map "S" 'evil-surround-region)
-    (evil-define-key 'visual global-map "gS" 'evil-Surround-region)))
+    (evil-define-key 'visual global-map "gS" 'evil-Surround-region))
+
+  (use-package evil-owl
+    :config
+    (define-key evil-owl-popup-map (kbd "C-k") #'evil-owl-scroll-popup-up)
+    (define-key evil-owl-popup-map (kbd "C-j") #'evil-owl-scroll-popup-down)
+    (setq evil-owl-register-char-limit 100
+          evil-owl-display-method 'posframe
+          evil-owl-extra-posframe-args '(:internal-border-width 1
+                                         :internal-border-color "#cccccc"))
+    (evil-owl-mode)))
 
 (use-package yasnippet
   :defer t
