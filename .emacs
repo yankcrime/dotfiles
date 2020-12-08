@@ -678,10 +678,6 @@
             company))
     (evil-collection-init))
 
-  ;; and in magit
-  (use-package evil-magit
-    :after magit)
-
   ;; gl and gL operators, like vim-lion (alignment operators)
   (use-package evil-lion
     :bind (:map evil-normal-state-map
