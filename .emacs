@@ -211,6 +211,19 @@
   :config
   (load-theme 'doom-one-light t))
 
+(use-package mini-frame
+  :ensure t
+  :custom
+  (mini-frame-show-parameters
+   '((top . 10)
+     (width . 0.7)
+     (left . 0.5)
+     (background-color . "#f2f2f2")
+     (border-color . "#cccccc")
+     (internal-border-width . 1)))
+  :config
+  (mini-frame-mode))
+
 (use-package minions
   :init (minions-mode)
   :config
