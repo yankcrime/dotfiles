@@ -902,6 +902,24 @@ SCHEDULED: %t
   (add-hook 'json-mode-hook 'flycheck-mode)
   (add-hook 'yaml-mode-hook 'flycheck-mode))
 
+(use-package flycheck-posframe
+  :after (flycheck posframe company)
+  :config
+  (setq flycheck-posframe-border-width 1)
+
+  (add-to-list 'flycheck-posframe-inhibit-functions
+               '(lambda (&rest _)
+                  (bound-and-true-p company-backend)))
+
+  (flycheck-posframe-configure-pretty-defaults)
+  (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
+
+  (set-face-attribute 'flycheck-posframe-background-face nil :inherit 'ivy-posframe)
+  (set-face-attribute 'flycheck-posframe-border-face nil :inherit 'ivy-posframe-border)
+  (set-face-attribute 'flycheck-posframe-warning-face nil :inherit 'flycheck-warning-list-warning)
+  (set-face-attribute 'flycheck-posframe-error-face nil :inherit 'flycheck-error-list-error)
+  (set-face-attribute 'flycheck-posframe-info-face nil :inherit 'flycheck-error-list-info))
+
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
