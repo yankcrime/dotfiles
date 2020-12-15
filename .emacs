@@ -1056,7 +1056,8 @@ SCHEDULED: %t
   :config
   (add-to-list 'display-buffer-alist
                '("^v?term.*"
-                 (display-buffer-reuse-window display-buffer-at-bottom)
+                 (display-buffer-reuse-window display-buffer-in-direction)
+                 (direction . top)
                  (reusable-frames . visible)
                  (window-height . 0.5))))
 
