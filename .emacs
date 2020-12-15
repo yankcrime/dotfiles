@@ -199,7 +199,25 @@
 
 (setq use-package-compute-statistics t)
 
-(add-to-list 'default-frame-alist '(font . "SF Mono 11"))
+(use-package highlight-indent-guides
+  :ensure t
+  :init
+  (setq highlight-indent-guides-method 'character
+        ;; default is \x2502 but it is very slow on Mac
+        highlight-indent-guides-character ?\xFFE8
+        highlight-indent-guides-responsive 'top))
+
+(use-package ns-auto-titlebar
+  :ensure t
+  :config
+  (ns-auto-titlebar-mode))
+
+(setq default-frame-alist
+      '((vertical-scroll-bars . nil)
+        (internal-border-width . 0)
+        (height . 60)
+        (width . 150)
+        (font . "SF Mono 11")))
 
 (use-package doom-themes
   :load-path "~/src/emacs-doom-themes"
