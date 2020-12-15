@@ -225,6 +225,7 @@
   (mini-frame-mode))
 
 (use-package minions
+  :disabled
   :init (minions-mode)
   :config
   (setq minions-mode-line-lighter "#"
@@ -237,12 +238,49 @@
                          overwrite-mode
                          lsp-mode)))
 
+(use-package diminish
+  :config
+  (diminish '(auto-revert-mode
+              org-indent-mode)))
+
+(eval-after-load "eldoc" '(diminish 'eldoc-mode))
+(eval-after-load 'org-indent '(diminish 'org-indent-mode))
+(eval-after-load 'magit '(diminish 'auto-revert-mode))
+
+(use-package smart-mode-line
+  :config
+  (setq sml/mode-width 'right
+        sml/pre-modes-separator "  "
+        sml/theme nil)
+  ;; Override this function to get better spacing once we rearrange.
+  (defun sml/fill-for-buffer-identification () "  ")
+  (column-number-mode) ;; Show column number next to the line number.
+  (sml/setup)
+  ;; Rearrange mode-line to put position and line number on the right.
+  (setq-default
+   mode-line-format
+   '("%e"
+     mode-line-client
+     mode-line-modified
+     mode-line-remote
+     "  "
+     mode-line-frame-identification
+     mode-line-buffer-identification
+     sml/pos-id-separator
+     (vc-mode vc-mode)
+     sml/pre-modes-separator
+     mode-line-modes
+     mode-line-misc-info
+     mode-line-front-space
+     mode-line-position
+     mode-line-end-spaces
+     " ")))
+
 (use-package all-the-icons
   :custom
   (all-the-icons-scale-factor 1.0))
 
-
-;; Increase or decrease default font size for all buffers / frames
+;; Zoom (increase or decrease) default font size for all buffers / frames
 ;; with C-M-= and C-M--
 (use-package default-text-scale
   :ensure t
@@ -250,11 +288,13 @@
   (default-text-scale-mode))
 
 (use-package undo-tree
+  :diminish
   :config
   (global-undo-tree-mode))
 
 ;; Which-key - command previews
 (use-package which-key
+  :diminish
   :custom-face
   (which-key-posframe ((t (:background "#f2f2f2"))))
   (which-key-posframe-border ((t (:background "#cccccc"))))
@@ -352,8 +392,31 @@
   "SPC w" "Windows"
   "SPC v" "Venvs")
 
+
+;; Tame windows
+
+(use-package shackle
+  :config
+  (progn
+    (setq shackle-lighter "")
+    (setq shackle-select-reused-windows nil) ; default nil
+    (setq shackle-default-alignment 'below) ; default below
+    (setq shackle-default-size 0.4) ; default 0.5
+
+    (setq shackle-rules
+          '((compilation-mode :select nil)
+            ("*undo-tree*" :size 0.25 :align right)
+            ("*Help*" :select t   :inhibit-window-quit t :other t)
+            ("*Completions*" :size 0.3 :align t)
+            ("*Messages*" :select nil :inhibit-window-quit t :other t)
+            ("*Calendar*" :select t :size 0.3 :align below)
+            ("*info*" :select t :inhibit-window-quit t :same t)))
+
+    (shackle-mode 1)))
+
 ;; Completion frontend
 (use-package ivy
+  :diminish
   :demand t
   :config
   (ivy-mode 1)
@@ -366,67 +429,68 @@
   (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
   (define-key ivy-switch-buffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
   (with-eval-after-load 'ivy
-    (define-key ivy-minibuffer-map (kbd "M-v") 'yank))
+    (define-key ivy-minibuffer-map (kbd "M-v") 'yank)))
 
-  (use-package ivy-rich
-    :ensure t
-    :init
-      (setq ivy-rich-display-transformers-list
-          '(ivy-switch-buffer
-            (:columns
-             ((ivy-rich-candidate (:width 25))
-              (ivy-rich-switch-buffer-project (:width 15 :face success))
-              (ivy-rich-switch-buffer-major-mode (:width 20 :face warning)))
-             :predicate
-             (lambda (cand) (get-buffer cand)))
-            counsel-M-x
-            (:columns
-             ((counsel-M-x-transformer (:width 35))
-              (ivy-rich-counsel-function-docstring
-               (:width 34 :face font-lock-doc-face))))
-            counsel-describe-function
-            (:columns
-             ((counsel-describe-function-transformer (:width 35))
-              (ivy-rich-counsel-function-docstring
-               (:width 34 :face font-lock-doc-face))))
-            counsel-describe-variable
-            (:columns
-             ((counsel-describe-variable-transformer (:width 35))
-              (ivy-rich-counsel-variable-docstring
-               (:width 34 :face font-lock-doc-face))))
-            package-install
-            (:columns
-             ((ivy-rich-candidate (:width 35))
-              (ivy-rich-package-version (:width 22 :face font-lock-comment-face))
-              (ivy-rich-package-archive-summary
-               (:width 7 :face font-lock-builtin-face))
-              (ivy-rich-package-install-summary
-               (:width 33 :face font-lock-doc-face))))))
-    :config
-    (ivy-rich-mode +1)
-    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)))
+(use-package ivy-rich
+ :defer t
+ :after counsel
+ :init
+   (setq ivy-rich-display-transformers-list
+       '(ivy-switch-buffer
+         (:columns
+          ((ivy-rich-candidate (:width 35))
+           (ivy-rich-switch-buffer-project (:width 25 :face success))
+           (ivy-rich-switch-buffer-major-mode (:width 20 :face warning)))
+          :predicate
+          (lambda (cand) (get-buffer cand)))
+         counsel-M-x
+         (:columns
+          ((counsel-M-x-transformer (:width 35))
+           (ivy-rich-counsel-function-docstring
+            (:width 60 :face font-lock-doc-face))))
+         counsel-describe-function
+         (:columns
+          ((counsel-describe-function-transformer (:width 35))
+           (ivy-rich-counsel-function-docstring
+            (:width 34 :face font-lock-doc-face))))
+         counsel-describe-variable
+         (:columns
+          ((counsel-describe-variable-transformer (:width 35))
+           (ivy-rich-counsel-variable-docstring
+            (:width 34 :face font-lock-doc-face))))
+         package-install
+         (:columns
+          ((ivy-rich-candidate (:width 35))
+           (ivy-rich-package-version (:width 22 :face font-lock-comment-face))
+           (ivy-rich-package-archive-summary
+            (:width 7 :face font-lock-builtin-face))
+           (ivy-rich-package-install-summary
+            (:width 33 :face font-lock-doc-face))))))
+ :config
+ (ivy-rich-mode +1)
+ (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
 
 (use-package posframe
   :custom-face
   (internal-border ((t (:background "#cccccc")))))
-
-(use-package ivy-posframe
-  :custom-face
-  (internal-border ((t (:background "#cccccc"))))
-  :after (ivy)
-  :config
-  (setq ivy-posframe-display-functions-alist
-        '((t . ivy-posframe-display-at-frame-top-center))
-        ivy-posframe-height-alist '((t . 20))
-        ivy-posframe-parameters '((internal-border-width . 10))
-        ivy-posframe-parameters
-        '((left-fringe . 8)
-          (right-fringe . 8))
-        ivy-posframe-border-width 1
-        ivy-posframe-hide-minibuffer t
-        ivy-posframe-width 110)
-  (ivy-posframe-mode 1))
-
+  
+;;(use-package ivy-posframe
+;;  :custom-face
+;;  (internal-border ((t (:background "#cccccc"))))
+;;  :after (ivy)
+;;  :config
+;;  (setq ivy-posframe-display-functions-alist
+;;        '((t . ivy-posframe-display-at-frame-top-center))
+;;        ivy-posframe-height-alist '((t . 20))
+;;        ivy-posframe-parameters '((internal-border-width . 10))
+;;        ivy-posframe-parameters
+;;        '((left-fringe . 8)
+;;          (top-fringe . 10)
+;;          (right-fringe . 8))
+;;        ivy-posframe-border-width 1
+;;        ivy-posframe-hide-minibuffer t
+;;        ivy-posframe-width 110)
+;;  (ivy-posframe-mode 1))
 
 (use-package ranger
   :ensure t
@@ -436,7 +500,7 @@
 ;; Completion framework
 (use-package counsel
   :after ivy
-  :demand t
+  :defer t
   :bind (("M-x" . counsel-M-x))
   :config
   (setq ivy-height 20)
@@ -479,6 +543,7 @@
         lsp-ui-sideline-ignore-duplicate t))
 
 (use-package company
+  :diminish
   :defer t
   :bind (("C-<tab>" . company-complete))
   :init
@@ -497,98 +562,22 @@
 (use-package company-go
   :defer t)
 
+(use-package company-box
+  :diminish
+  :hook (company-mode . company-box-mode)
+  :init
+  (setq company-box-doc-delay 0)
+  (setq company-box-max-candidates 1000)
+  (setq company-box-show-single-candidate t)
+  (setq company-tooltip-align-annotations t)
+  (setq company-box-doc-frame-parameters
+        `((internal-border-width . 1))))
+
 (use-package avy
   :config
   :bind
   ("M-c" . avy-goto-char)
   ("M-C" . avy-goto-char-2))
-
-
-;; Elements of the `shackle-rules' alist:
-;;
-;; |-----------+------------------------+--------------------------------------------------|
-;; | CONDITION | symbol                 | Major mode of the buffer to match                |
-;; |           | string                 | Name of the buffer                               |
-;; |           |                        | - which can be turned into regexp matching       |
-;; |           |                        | by using the :regexp key with a value of t       |
-;; |           |                        | in the key-value part                            |
-;; |           | list of either         | a list groups either symbols or strings          |
-;; |           | symbol or string       | (as described earlier) while requiring at        |
-;; |           |                        | least one element to match                       |
-;; |           | t                      | t as the fallback rule to follow when no         |
-;; |           |                        | other match succeeds.                            |
-;; |           |                        | If you set up a fallback rule, make sure         |
-;; |           |                        | it's the last rule in shackle-rules,             |
-;; |           |                        | otherwise it will always be used.                |
-;; |-----------+------------------------+--------------------------------------------------|
-;; | KEY-VALUE | :select t              | Select the popped up window. The                 |
-;; |           |                        | `shackle-select-reused-windows' option makes     |
-;; |           |                        | this the default for windows already             |
-;; |           |                        | displaying the buffer.                           |
-;; |-----------+------------------------+--------------------------------------------------|
-;; |           | :inhibit-window-quit t | Special buffers usually have `q' bound to        |
-;; |           |                        | `quit-window' which commonly buries the buffer   |
-;; |           |                        | and deletes the window. This option inhibits the |
-;; |           |                        | latter which is especially useful in combination |
-;; |           |                        | with :same, but can also be used with other keys |
-;; |           |                        | like :other as well.                             |
-;; |-----------+------------------------+--------------------------------------------------|
-;; |           | :ignore t              | Skip handling the display of the buffer in       |
-;; |           |                        | question. Keep in mind that while this avoids    |
-;; |           |                        | switching buffers, popping up windows and        |
-;; |           |                        | displaying frames, it does not inhibit what may  |
-;; |           |                        | have preceded this command, such as the          |
-;; |           |                        | creation/update of the buffer to be displayed.   |
-;; |-----------+------------------------+--------------------------------------------------|
-;; |           | :same t                | Display buffer in the current window.            |
-;; |           | :popup t               | Pop up a new window instead of displaying        |
-;; |           | *mutually exclusive*   | the buffer in the current one.                   |
-;; |-----------+------------------------+--------------------------------------------------|
-;; |           | :other t               | Reuse the window `other-window' would select if  |
-;; |           | *must not be used      | there's more than one window open, otherwise pop |
-;; |           | with :align, :size*    | up a new window. When used in combination with   |
-;; |           |                        | the :frame key, do the equivalent to             |
-;; |           |                        | other-frame or a new frame                       |
-;; |-----------+------------------------+--------------------------------------------------|
-;; |           | :align                 | Align a new window at the respective side of     |
-;; |           | 'above, 'below,        | the current frame or with the default alignment  |
-;; |           | 'left, 'right,         | (customizable with `shackle-default-alignment')  |
-;; |           | or t (default)         | by deleting every other window than the          |
-;; |           |                        | currently selected one, then wait for the window |
-;; |           |                        | to be "dealt" with. This can either happen by    |
-;; |           |                        | burying its buffer with q or by deleting its     |
-;; |           |                        | window with C-x 0.                               |
-;; |           | :size                  | Aligned window use a default ratio of 0.5 to     |
-;; |           | a floating point       | split up the original window in half             |
-;; |           | value between 0 and 1  | (customizable with `shackle-default-size'), the  |
-;; |           | is interpreted as a    | size can be changed on a per-case basis by       |
-;; |           | ratio. An integer >=1  | providing a different floating point value like  |
-;; |           | is interpreted as a    | 0.33 to make it occupy a third of the original   |
-;; |           | number of lines.       | window's size.                                   |
-;; |-----------+------------------------+--------------------------------------------------|
-;; |           | :frame t               | Pop buffer to a frame instead of a window.       |
-;; |-----------+------------------------+--------------------------------------------------|
-(use-package shackle
-  :if (not (bound-and-true-p disable-pkg-shackle))
-  :config
-  (progn
-    (setq shackle-lighter "")
-    (setq shackle-select-reused-windows nil) ; default nil
-    (setq shackle-default-alignment 'below) ; default below
-    (setq shackle-default-size 0.4) ; default 0.5
-
-    (setq shackle-rules
-          ;; CONDITION(:regexp) :select :inhibit-window-quit :size+:align|:other :same|:popup
-          '((compilation-mode :select nil)
-            ("*undo-tree*" :size 0.25 :align right)
-            ("*Help*" :select t   :inhibit-window-quit t :other t)
-            ("*Completions*" :size 0.3 :align t)
-            ("*Messages*" :select nil :inhibit-window-quit t :other t)
-            ("*Calendar*" :select t :size 0.3 :align below)
-            ("*info*" :select t :inhibit-window-quit t :same t)
-            ))
-
-    (shackle-mode 1)))
 
 (use-package eyebrowse
   :config
@@ -612,7 +601,7 @@
 
 (use-package winum
   :config
-  (setq winum-mode-line-position   7
+  (setq winum-mode-line-position 6
         winum-format "%s "
         winum-auto-setup-mode-line t)
   (winum-mode))
@@ -646,6 +635,7 @@
   :init
   (setq evil-normal-state-cursor '(box "#4078f2")
       evil-emacs-state-cursor  '(box "#7F5AB6")
+      evil-insert-state-cursor '("pink" (bar . 2))
       evil-want-integration t
       evil-want-keybinding nil
       evil-search-module 'evil-search
@@ -655,18 +645,19 @@
       evil-shift-round nil
       evil-echo-state nil
       evil-want-C-u-scroll t
-      evil-mode-line-format '(before . mode-line-mule-info)
-      evil-normal-state-tag (propertize "N ")
-      evil-insert-state-tag (propertize "I ")
-      evil-visual-state-tag "V "
-      evil-motion-state-tag "M "
-      evil-operator-state-tag "O "
-      evil-emacs-state-tag "E ")
+      evil-mode-line-format '(before . mode-line-client)
+      evil-normal-state-tag (propertize " N ")
+      evil-insert-state-tag (propertize " I ")
+      evil-visual-state-tag " V "
+      evil-motion-state-tag " M "
+      evil-operator-state-tag " O "
+      evil-emacs-state-tag " E ")
   :bind (:map evil-normal-state-map
               ("-" . deer)
               :map ranger-mode-map ("-" . ranger-up-directory))
   :config
   (evil-mode)
+  (evil-set-undo-system 'undo-tree)
 
   (defun my-exit-evil-command-window ()
     "Exit evil command window."
@@ -722,6 +713,7 @@
 
   ;; visual hints while editing
   (use-package evil-goggles
+    :diminish
     :config
     (evil-goggles-use-diff-faces)
     (evil-goggles-mode))
@@ -740,6 +732,7 @@
     (evil-define-key 'visual global-map "gS" 'evil-Surround-region))
 
   (use-package evil-owl
+    :diminish
     :config
     (define-key evil-owl-popup-map (kbd "C-k") #'evil-owl-scroll-popup-up)
     (define-key evil-owl-popup-map (kbd "C-j") #'evil-owl-scroll-popup-down)
@@ -750,6 +743,7 @@
     (evil-owl-mode)))
 
 (use-package yasnippet
+  :diminish (yas-minor-mode)
   :defer t
   :config
   (unless yas-global-mode (yas-global-mode 1))
@@ -846,6 +840,7 @@ SCHEDULED: %t
 
 ;; Magit
 (use-package magit
+  :diminish
   :defer t
   :init
   (setq magit-completing-read-function 'ivy-completing-read)
@@ -855,6 +850,7 @@ SCHEDULED: %t
 
 ;; Projectile
 (use-package projectile
+  :diminish
   :defer t
   :config
   (defun projectile-short-mode-line ()
@@ -875,13 +871,12 @@ SCHEDULED: %t
 
 ;; Resize active frame according to 'golden ratio' principles
 (use-package zoom
+  :diminish
   :config
-  (custom-set-variables
-   '(zoom-ignored-buffer-name-regexps '("^*magit" "^*magit-diff" "^*COMMIT_EDITMSG")))
   (setq zoom-size '(0.618 . 0.618))
   (zoom-mode t))
 
-;;;; Which modes are active?
+;; Which modes are active?
 (defun which-active-modes ()
   "Give a message of which minor modes are enabled in the current buffer."
   (interactive)
@@ -1011,6 +1006,7 @@ SCHEDULED: %t
   (add-hook 'terraform-mode-hook 'terraform-format-on-save-mode))
 
 (use-package highlight-indent-guides
+  :diminish
   :config
   (setq highlight-indent-guides-method 'character)
   ;; Indent character samples: | ┆ ┊
