@@ -927,12 +927,56 @@ SCHEDULED: %t
 
 ;; Modes
 
+(use-package polymode
+  :defer t)
+
+(use-package poly-markdown
+  :after polymode
+  :ensure t
+  :config
+  ;; Wrap lines at column limit, but don't put hard returns in
+  (add-hook 'markdown-mode-hook (lambda () (visual-line-mode 1)))
+  ;; Flyspell on
+  (add-hook 'markdown-mode-hook (lambda () (flyspell-mode 1))))
+
+(use-package poly-ansible
+  :after polymode
+  :ensure t
+  :mode
+  ("playbook\\.ya?ml\\'" . poly-ansible-mode)
+  ("/ansible/.*\\.ya?ml\\'" . poly-ansible-mode)
+  ("/\\(?:group\\|host\\)_vars/" . poly-ansible-mode)
+
+  :init
+  (with-eval-after-load 'fill-column-indicator
+    (add-hook 'ansible-hook 'fci-mode))
+
+  :config
+  (setq pm-inner/jinja2
+        (pm-inner-chunkmode :mode #'jinja2-mode
+                            :head-matcher "{[%{#][+-]?"
+                            :tail-matcher "[+-]?[%}#]}"
+                            :head-mode 'body
+                            :tail-mode 'body
+                            :head-adjust-face nil
+                            :tail-adjust-face nil)))
+
 ;; Golang
 ;; Need to install some Go tools seperately
 ;; go get -u github.com/mdempsky/gocode
 ;; go get -u github.com/rogpeppe/godef
 ;; go get -u golang.org/x/tools/cmd/goimports
 ;; go get -u github.com/jstemmer/gotags
+(use-package go-autocomplete
+  :defer t)
+(use-package go-projectile
+  :defer t)
+
+(use-package go-guru
+  :defer t
+  :config
+  (go-guru-hl-identifier-mode))
+
 (use-package go-mode
   :defer t
   :init
@@ -960,15 +1004,7 @@ SCHEDULED: %t
 
   ;; Ensure the go specific autocomplete is active in go-mode.
   (with-eval-after-load 'go-mode
-    (require 'go-autocomplete))
-
-  (use-package go-autocomplete)
-  (use-package go-projectile)
-
-  (use-package go-guru
-    :defer t
-    :config
-    (go-guru-hl-identifier-mode)))
+    (require 'go-autocomplete)))
 
 (use-package slime
   :defer t
