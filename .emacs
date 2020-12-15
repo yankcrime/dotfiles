@@ -545,9 +545,16 @@
   (lsp-file-watch-threshold 2000)
   :config
   (with-eval-after-load 'lsp-mode
-    (setq lsp-modeline-diagnostics-enable nil)))
+    (setq lsp-modeline-diagnostics-enable nil))
+  (lsp-enable-which-key-integration)
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection '("/usr/local/bin/terraform-ls" "serve"))
+                    :major-modes '(terraform-mode)
+                    :server-id 'terraform-ls))
+  (add-hook 'terraform-mode-hook #'lsp))
 
 (use-package lsp-ui
+  :defer t
   :config
   (define-key lsp-ui-mode-map
     [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
