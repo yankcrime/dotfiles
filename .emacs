@@ -1,4 +1,5 @@
 ;; Startup speed tweaks
+
 (defvar file-name-handler-alist-old file-name-handler-alist)
 
 ;; Only run this code once, even when reloading the file.
@@ -26,7 +27,6 @@
 (setq x-super-keysym 'meta)
 
 ;; User-interface stuff
-(add-to-list 'default-frame-alist '(width . 110))
 (scroll-bar-mode 0)
 (tool-bar-mode -1)
 (column-number-mode 1)
@@ -51,11 +51,8 @@
       initial-scratch-message nil
       frame-inhibit-implied-resize t
       initial-major-mode 'fundamental-mode)
-(setq initial-frame-alist
-      (append initial-frame-alist
-              '((ns-appearance . light)
-                (ns-transparent-titlebar . t)
-                )))
+
+
 (defun get-frame-name (&optional frame)
   "Return the string that names FRAME (a frame).  Default is selected frame."
   (unless frame (setq frame  (selected-frame)))
@@ -76,9 +73,14 @@
 (setq ring-bell-function 'ignore)
 
 ;; Buffer switching
+
 (winner-mode t)
 
 (setq ispell-dictionary "english")
+
+(setq auto-window-vscroll nil)
+(setq fast-but-imprecise-scrolling 't)
+(setq jit-lock-defer-time 0)
 
 ;; Fix window splitting now we all have widescreen monitors
 ;; See https://lists.gnu.org/archive/html/help-gnu-emacs/2015-08/msg00339.html
@@ -150,9 +152,6 @@
 ;; Activate line numbers on programming modes
 (add-hook 'prog-mode-hook
           'display-line-numbers-mode)
-
-;; Better scrolling
-(pixel-scroll-mode)
 
 ;; Highlight matching parens
 (show-paren-mode)
@@ -241,20 +240,6 @@
      (internal-border-width . 1)))
   :config
   (mini-frame-mode))
-
-(use-package minions
-  :disabled
-  :init (minions-mode)
-  :config
-  (setq minions-mode-line-lighter "#"
-        minions-direct '(cider-mode
-                         projectile-mode
-                         visual-line-mode
-                         flyspell-mode
-                         flycheck-mode
-                         company-mode
-                         overwrite-mode
-                         lsp-mode)))
 
 (use-package diminish
   :config
@@ -357,6 +342,7 @@
  ("aol" 'org-todo-list "Todo list")
  ("aoa" 'org-agenda "Agenda")
  ("aoc" 'org-task-capture "Capture task")
+ ("aot" 'org-time-stamp-inactive "Insert timestamp")
  ("afl" 'list-flycheck-errors "List errors")
  ("asc" 'flyspell-correct-word-before-point "Correct word")
  ("ts" 'flyspell-mode "Flyspell")
@@ -534,6 +520,7 @@
   (prescient-persist-mode))
 
 (use-package lsp-mode
+  :defer t
   :init
   (setq lsp-keymap-prefix "C-SPC")
   :commands (lsp lsp-deferred)
@@ -576,7 +563,7 @@
   (add-hook 'terraform-mode-hook 'company-terraform-init)
   (add-hook 'go-mode-hook 'company-mode)
   :config
-  (setq company-idle-delay 0.2))
+  (setq company-idle-delay 0.6))
 
 (use-package company-prescient
   :after company)
@@ -798,6 +785,13 @@
         org-src-window-setup 'other-window
         org-startup-with-inline-images t
         org-image-actual-width (/ (display-pixel-width) 10))
+  (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
+                                   (timeline . "  % s")
+                                   (todo .
+                                         " %i %-12:c %(concat \"[ \"(org-format-outline-path (org-get-outline-path)) \" ]\") ")
+                                   (tags .
+                                         " %i %-12:c %(concat \"[ \"(org-format-outline-path (org-get-outline-path)) \" ]\") ")
+                                   (search . " %i %-12:c")))
 
   (add-hook
    'org-babel-after-execute-hook
@@ -833,6 +827,9 @@ SCHEDULED: %t
     (org-journal-dir "~/Sync/org/journal/"))
 
   (use-package ob-async
+    :defer t)
+
+  (use-package ox-gfm
     :defer t)
 
   (defun org-task-capture ()
@@ -1252,4 +1249,11 @@ SCHEDULED: %t
   (write-region "" nil custom-file))
 (load custom-file)
 
+;; Start a server so we can use emacsclient
 (server-start)
+
+;; (add-to-list 'load-path ".")
+;; (add-to-list 'load-path "/Users/nick/.emacs.d/nano")
+;; (require 'nano-modeline)
+;; (require 'nano-theme-light)
+
