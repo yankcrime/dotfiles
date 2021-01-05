@@ -435,66 +435,310 @@
   (with-eval-after-load 'ivy
     (define-key ivy-minibuffer-map (kbd "M-v") 'yank)))
 
-(use-package ivy-rich
- :defer t
- :after counsel
- :init
-   (setq ivy-rich-display-transformers-list
-       '(ivy-switch-buffer
-         (:columns
-          ((ivy-rich-candidate (:width 35))
-           (ivy-rich-switch-buffer-project (:width 25 :face success))
-           (ivy-rich-switch-buffer-major-mode (:width 20 :face warning)))
-          :predicate
-          (lambda (cand) (get-buffer cand)))
-         counsel-M-x
-         (:columns
-          ((counsel-M-x-transformer (:width 35))
-           (ivy-rich-counsel-function-docstring
-            (:width 60 :face font-lock-doc-face))))
-         counsel-describe-function
-         (:columns
-          ((counsel-describe-function-transformer (:width 35))
-           (ivy-rich-counsel-function-docstring
-            (:width 34 :face font-lock-doc-face))))
-         counsel-describe-variable
-         (:columns
-          ((counsel-describe-variable-transformer (:width 35))
-           (ivy-rich-counsel-variable-docstring
-            (:width 34 :face font-lock-doc-face))))
-         package-install
-         (:columns
-          ((ivy-rich-candidate (:width 35))
-           (ivy-rich-package-version (:width 22 :face font-lock-comment-face))
-           (ivy-rich-package-archive-summary
-            (:width 7 :face font-lock-builtin-face))
-           (ivy-rich-package-install-summary
-            (:width 33 :face font-lock-doc-face))))))
- :config
- (ivy-rich-mode +1)
- (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
-
 (use-package posframe
   :custom-face
   (internal-border ((t (:background "#cccccc")))))
   
-;;(use-package ivy-posframe
-;;  :custom-face
-;;  (internal-border ((t (:background "#cccccc"))))
-;;  :after (ivy)
-;;  :config
-;;  (setq ivy-posframe-display-functions-alist
-;;        '((t . ivy-posframe-display-at-frame-top-center))
-;;        ivy-posframe-height-alist '((t . 20))
-;;        ivy-posframe-parameters '((internal-border-width . 10))
-;;        ivy-posframe-parameters
-;;        '((left-fringe . 8)
-;;          (top-fringe . 10)
-;;          (right-fringe . 8))
-;;        ivy-posframe-border-width 1
-;;        ivy-posframe-hide-minibuffer t
-;;        ivy-posframe-width 110)
-;;  (ivy-posframe-mode 1))
+(use-package ivy-posframe
+  :diminish
+  :custom-face
+  (internal-border ((t (:background "#cccccc"))))
+  :after (ivy)
+  :config
+  (setq ivy-posframe-display-functions-alist
+        '((t . ivy-posframe-display-at-frame-top-center))
+        ivy-posframe-height-alist '((t . 20))
+        ivy-posframe-parameters '((internal-border-width . 10))
+        ivy-posframe-parameters
+        '((left-fringe . 8)
+          (top-fringe . 10)
+          (right-fringe . 8))
+        ivy-posframe-border-width 1
+        ivy-posframe-hide-minibuffer t
+        ivy-posframe-width 110)
+  (ivy-posframe-mode 1))
+
+(use-package ivy-prescient
+  :after ivy
+  :config
+  (ivy-prescient-mode)
+  (prescient-persist-mode))
+
+(use-package ivy-rich
+  :after ivy
+  :init
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
+
+;; Run ivy-rich-mode only after loading all-the-icons-ivy-rich
+(use-package emacs
+  :after (ivy-rich all-the-icons-ivy-rich)
+  :config
+  ;; Toggle `ivy-rich-mode' after modifying `ivy-rich-display-transformers-list'.
+  (setq ivy-rich-display-transformers-list
+        `(ivy-switch-buffer
+          (:columns ((all-the-icons-ivy-rich-buffer-icon)
+                     (ivy-switch-buffer-transformer
+                      (:width 0.2))
+                     (ivy-rich-switch-buffer-major-mode
+                      (:width 18 :face warning))
+                     (ivy-rich-switch-buffer-project
+                      (:width 15 :face success))
+                     (ivy-rich-switch-buffer-indicators
+                      (:width 4 :face error :align right))
+                     (ivy-rich-switch-buffer-size
+                      (:width 7))
+                     (ivy-rich-switch-buffer-path
+                      (:width (lambda (candidate)
+                                (ivy-rich-switch-buffer-shorten-path
+                                 candidate (ivy-rich-minibuffer-width 0.2))))))
+           :predicate (lambda (candidate)
+                        (get-buffer candidate))
+           :delimiter "	")
+          ivy-switch-buffer-other-window
+          (:columns ((all-the-icons-ivy-rich-buffer-icon)
+                     (ivy-rich-candidate
+                      (:width 30))
+                     (ivy-rich-switch-buffer-size
+                      (:width 7))
+                     (ivy-rich-switch-buffer-indicators
+                      (:width 4 :face error :align right))
+                     (ivy-rich-switch-buffer-major-mode
+                      (:width 18 :face warning))
+                     (ivy-rich-switch-buffer-project
+                      (:width 15 :face success))
+                     (ivy-rich-switch-buffer-path
+                      (:width (lambda
+                                (candidate)
+                                (ivy-rich-switch-buffer-shorten-path
+                                 candidate (ivy-rich-minibuffer-width 0.3))))))
+           :predicate (lambda (candidate)
+                        (get-buffer candidate))
+           :delimiter "	")
+          counsel-switch-buffer
+          (:columns ((all-the-icons-ivy-rich-buffer-icon)
+                     (ivy-rich-candidate
+                      (:width 30))
+                     (ivy-rich-switch-buffer-size
+                      (:width 7))
+                     (ivy-rich-switch-buffer-indicators
+                      (:width 4 :face error :align right))
+                     (ivy-rich-switch-buffer-major-mode
+                      (:width 18 :face warning))
+                     (ivy-rich-switch-buffer-project
+                      (:width 15 :face success))
+                     (ivy-rich-switch-buffer-path
+                      (:width (lambda (candidate)
+                                (ivy-rich-switch-buffer-shorten-path
+                                 candidate (ivy-rich-minibuffer-width 0.3))))))
+           :predicate (lambda (candidate)
+                        (get-buffer candidate))
+           :delimiter "	")
+          counsel-projectile-switch-to-buffer
+          (:columns ((all-the-icons-ivy-rich-buffer-icon)
+                     (ivy-rich-candidate
+                      (:width 30))
+                     (ivy-rich-switch-buffer-size
+                      (:width 7))
+                     (ivy-rich-switch-buffer-indicators
+                      (:width 4 :face error :align right))
+                     (ivy-rich-switch-buffer-major-mode
+                      (:width 18 :face warning))
+                     (ivy-rich-switch-buffer-project
+                      (:width 15 :face success))
+                     (ivy-rich-switch-buffer-path
+                      (:width (lambda (candidate)
+                                (ivy-rich-switch-buffer-shorten-path
+                                 candidate (ivy-rich-minibuffer-width 0.3))))))
+           :predicate (lambda (candidate)
+                        (get-buffer candidate))
+           :delimiter "	")
+          counsel-switch-buffer-other-window
+          (:columns ((all-the-icons-ivy-rich-buffer-icon)
+                     (ivy-rich-candidate
+                      (:width 30))
+                     (ivy-rich-switch-buffer-size
+                      (:width 7))
+                     (ivy-rich-switch-buffer-indicators
+                      (:width 4 :face error :align right))
+                     (ivy-rich-switch-buffer-major-mode
+                      (:width 18 :face warning))
+                     (ivy-rich-switch-buffer-project
+                      (:width 15 :face success))
+                     (ivy-rich-switch-buffer-path
+                      (:width (lambda (candidate)
+                                (ivy-rich-switch-buffer-shorten-path
+                                 candidate (ivy-rich-minibuffer-width 0.3))))))
+           :predicate (lambda (candidate)
+                        (get-buffer candidate))
+           :delimiter "	")
+          package-install
+          (:columns ((ivy-rich-candidate (:width 30))
+                     (ivy-rich-package-version (:width 16 :face font-lock-comment-face)) ; package version
+                     (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face)) ; archive summary
+                     (ivy-rich-package-install-summary (:face font-lock-doc-face)))) ; package description
+          counsel-M-x
+          (:columns ((all-the-icons-ivy-rich-function-icon)
+                     (counsel-M-x-transformer
+                      (:width 50))
+                     (ivy-rich-counsel-function-docstring
+                      (:face font-lock-doc-face))))
+          counsel-describe-function
+          (:columns ((all-the-icons-ivy-rich-function-icon)
+                     (counsel-describe-function-transformer
+                      (:width 50))
+                     (ivy-rich-counsel-function-docstring
+                      (:face font-lock-doc-face))))
+          counsel-describe-variable
+          (:columns ((all-the-icons-ivy-rich-variable-icon
+                      (:width 0.01))
+                     (counsel-describe-variable-transformer
+                      (:width 0.29))
+                     (ivy-rich-counsel-variable-docstring
+                      (:width 0.5
+                       :face font-lock-doc-face))))
+          counsel-set-variable
+          (:columns ((all-the-icons-ivy-rich-variable-icon)
+                     (counsel-describe-variable-transformer
+                      (:width 50))
+                     (ivy-rich-counsel-variable-docstring
+                      (:face font-lock-doc-face))))
+          counsel-apropos
+          (:columns ((all-the-icons-ivy-rich-symbol-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-info-lookup-symbol
+          (:columns ((all-the-icons-ivy-rich-symbol-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-descbinds
+          (:columns ((all-the-icons-ivy-rich-keybinding-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-find-file
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-read-file-transformer))
+           :delimiter "	")
+          counsel-file-jump
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-dired
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-read-file-transformer))
+           :delimiter "	")
+          counsel-dired-jump
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-fzf
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-git
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-recentf
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-rich-candidate
+                      (:width 0.2))
+                     (ivy-rich-file-last-modified-time
+                      (:face font-lock-comment-face)))
+           :delimiter "	")
+          counsel-buffer-or-recentf
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (counsel-buffer-or-recentf-transformer
+                      (:width 0.2))
+                     (ivy-rich-file-last-modified-time
+                      (:face font-lock-comment-face)))
+           :delimiter "	")
+          counsel-bookmark
+          (:columns ((ivy-rich-bookmark-type)
+                     (all-the-icons-ivy-rich-bookmark-name
+                      (:width 40))
+                     (ivy-rich-bookmark-info))
+           :delimiter "	")
+          counsel-bookmarked-directory
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-package
+          (:columns ((all-the-icons-ivy-rich-package-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-fonts
+          (:columns ((all-the-icons-ivy-rich-font-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-major
+          (:columns ((all-the-icons-ivy-rich-function-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-find-library
+          (:columns ((all-the-icons-ivy-rich-library-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-load-library
+          (:columns ((all-the-icons-ivy-rich-library-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-load-theme
+          (:columns ((all-the-icons-ivy-rich-theme-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-world-clock
+          (:columns ((all-the-icons-ivy-rich-world-clock-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-tramp
+          (:columns ((all-the-icons-ivy-rich-tramp-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-git-checkout
+          (:columns ((all-the-icons-ivy-rich-git-branch-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-list-processes
+          (:columns ((all-the-icons-ivy-rich-process-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-projectile-switch-project
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          projectile-switch-project
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-projectile-find-file
+          (:columns ((all-the-icons-ivy-rich-file-icon)
+                     (counsel-projectile-find-file-transformer))
+           :delimiter "	")
+          counsel-projectile-find-dir
+          (:columns ((all-the-icons-ivy-rich-project-icon)
+                     (counsel-projectile-find-dir-transformer))
+           :delimiter "	")
+          counsel-minor
+          (:columns ((all-the-icons-ivy-rich-mode-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")
+          counsel-imenu
+          (:columns ((all-the-icons-ivy-rich-imenu-icon)
+                     (ivy-rich-candidate))
+           :delimiter "	")))
+  (ivy-rich-mode 1))
+
+(use-package all-the-icons-ivy-rich
+  :after (ivy-rich all-the-icons)
+  :init
+  ;; For some reason, if the icon size is 1 their widths are different.
+  ;; https://github.com/seagle0128/all-the-icons-ivy-rich/issues/7
+  ;;
+  ;; Also, setting a size bigger than 0.7 seems to cause candidates in the
+  ;; bottom to not appear in the frame.
+  (setq all-the-icons-ivy-rich-icon-size 0.7)
+  :config
+  (all-the-icons-ivy-rich-mode 1))
 
 (use-package ranger
   :ensure t
