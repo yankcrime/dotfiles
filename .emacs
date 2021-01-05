@@ -1,5 +1,4 @@
 ;; Startup speed tweaks
-
 (defvar file-name-handler-alist-old file-name-handler-alist)
 
 ;; Only run this code once, even when reloading the file.
@@ -198,6 +197,13 @@
 
 (setq use-package-compute-statistics t)
 
+(use-package exec-path-from-shell
+  :defer 2
+  :config
+  (dolist (var '("GOPATH" "NVM_BIN" "PATH"))
+    (add-to-list 'exec-path-from-shell-variables var))
+  (exec-path-from-shell-initialize))
+
 (use-package highlight-indent-guides
   :ensure t
   :init
@@ -227,19 +233,6 @@
         doom-themes-org-config t)
   :config
   (load-theme 'doom-one-light t))
-
-(use-package mini-frame
-  :ensure t
-  :custom
-  (mini-frame-show-parameters
-   '((top . 10)
-     (width . 0.7)
-     (left . 0.5)
-     (background-color . "#f2f2f2")
-     (border-color . "#cccccc")
-     (internal-border-width . 1)))
-  :config
-  (mini-frame-mode))
 
 (use-package diminish
   :config
@@ -306,11 +299,6 @@
   :config
   (which-key-mode))
 
-;;(use-package which-key-posframe
-;;  :config
-;;  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-top-center)
-;;  (which-key-posframe-mode))
-
 (use-package general
   :config
   (setq general-override-states '(normal visual motion))
@@ -331,7 +319,7 @@
 (my-leader
  ("bb" 'ivy-switch-buffer "Switch buffer")
  ("bd" 'kill-this-buffer "Kill this buffer")
- ("pp" 'projectile-switch-project "Switch project")
+ ("pp" 'counsel-projectile-switch-project "Switch project")
  ("pf" 'counsel-projectile-find-file "Find file")
  ("ps" 'counsel-projectile-rg "Search in files")
  ("gs" 'magit-status "Status")
@@ -396,9 +384,7 @@
   "SPC w" "Windows"
   "SPC v" "Venvs")
 
-
 ;; Tame windows
-
 (use-package shackle
   :config
   (progn
@@ -757,12 +743,6 @@
 (use-package counsel-projectile
   :defer t)
 
-(use-package ivy-prescient
-  :after ivy
-  :config
-  (ivy-prescient-mode)
-  (prescient-persist-mode))
-
 (use-package lsp-mode
   :defer t
   :init
@@ -807,10 +787,17 @@
   (add-hook 'terraform-mode-hook 'company-terraform-init)
   (add-hook 'go-mode-hook 'company-mode)
   :config
+  (setq company-backends '((company-capf company-tabnine)
+                           company-cmake
+                           company-clang
+                           company-files
+                           (company-dabbrev-code company-gtags company-etags company-keywords)
+                           company-dabbrev))
   (setq company-idle-delay 0.6))
 
 (use-package company-prescient
-  :after company)
+  :after company
+  (company-prescient-mode))
 
 (use-package company-terraform
   :defer t)
@@ -971,7 +958,7 @@
   (use-package evil-goggles
     :diminish
     :config
-    (evil-goggles-use-diff-faces)
+    (setq evil-goggles-pulse t)
     (evil-goggles-mode))
 
   ;; like vim-surround
@@ -1028,6 +1015,7 @@
         org-src-tab-acts-natively t
         org-src-window-setup 'other-window
         org-startup-with-inline-images t
+        org-startup-folded t
         org-image-actual-width (/ (display-pixel-width) 10))
   (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
                                    (timeline . "  % s")
@@ -1074,7 +1062,7 @@ SCHEDULED: %t
     :defer t)
 
   (use-package ox-gfm
-    :defer t)
+    :ensure t)
 
   (defun org-task-capture ()
     (interactive)
@@ -1153,13 +1141,6 @@ SCHEDULED: %t
                            (error nil) ))
           minor-mode-list)
     (message "Active modes are %s" active-modes)))
-
-(use-package exec-path-from-shell
-  :defer 2
-  :config
-  (dolist (var '("GOPATH"  "NVM_BIN"))
-    (add-to-list 'exec-path-from-shell-variables var))
-  (exec-path-from-shell-initialize))
 
 ;; Flycheck
 (use-package flycheck
