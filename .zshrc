@@ -91,6 +91,8 @@ alias mp='multipass'
 alias tfapply="terraform apply plan.out"
 alias tfplan="terraform plan -out plan.out"
 alias tfdestroy="terraform destroy -force"
+alias k9s='k9s --headless'
+alias kchere='export KUBECONFIG=$(pwd)/kube_config_cluster.yml'
 
 # <3 vagrant
 #
@@ -126,6 +128,8 @@ setopt PROMPT_SUBST
 #
 precmd() { print -Pn "\e]0;%n@%m:%~\a" }
 
+# deadline is my Mac with a TouchBar
+#
 if [[ $(hostname -s) == deadline ]]; then
     print_osc() {
         if [[ $TERM == tmux* ]] ; then
@@ -159,7 +163,6 @@ if [[ $(hostname -s) == deadline ]]; then
 fi
 
 # make it work like vim
-# thanks dougblack - http://dougblack.io/words/zsh-vi-mode.html
 #
 bindkey -v
 bindkey '^P' up-line-or-beginning-search
@@ -217,7 +220,7 @@ if ! zgen saved; then
   zgen load junegunn/fzf
   zgen load junegunn/fzf shell/completion.zsh
   zgen load junegunn/fzf shell/key-bindings.zsh
-  zgen load skywind3000/z.lua
+  zgen load agkozak/zsh-z
   zgen load ~/src/k
 
   zgen save
