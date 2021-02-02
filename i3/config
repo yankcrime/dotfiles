@@ -6,6 +6,7 @@ exec --no-startup-id /usr/libexec/polkit-gnome-authentication-agent-1
 exec --no-startup-id gnome-screensaver
 exec --no-startup-id compton --config ~/.config/compton/compton.conf -b
 exec --no-startup-id dunst -config ~/.config/i3/dunst
+exec --no-startup-id ~/.fehbg
 
 #i3 gaps
 #
@@ -30,7 +31,10 @@ bindsym $mod+Return exec --no-startup-id gnome-terminal
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-bindsym $mod+space exec "rofi -font 'IBM Plex Sans Regular 14' -theme oxide -combi-modi window,drun -show combi -modi combi"
+bindsym $mod+space exec "rofi -font 'IBM Plex Sans Regular 18' -theme oxide -combi-modi window,drun -show combi -modi combi"
+
+# rename workspace
+bindsym Mod4+g exec i3-msg \"rename workspace to \\\"$(rofi -theme oxide -font 'IBM Plex Sans Regular 18' -dmenu -p rename)\\\"\"
 
 # change focus
 bindsym $mod+h focus left
@@ -83,16 +87,27 @@ bindsym $mod+a focus parent
 # bindsym $mod+c focus child
 
 # switch to workspace
-bindsym $mod+1 workspace 1
-bindsym $mod+2 workspace 2
-bindsym $mod+3 workspace 3
-bindsym $mod+4 workspace 4
-bindsym $mod+5 workspace 5
-bindsym $mod+6 workspace 6
-bindsym $mod+7 workspace 7
-bindsym $mod+8 workspace 8
-bindsym $mod+9 workspace 9
-bindsym $mod+0 workspace 0
+set $ws1 "1:term"
+set $ws2 "2:www"
+set $ws3 "3:chat"
+set $ws4 "4:mail"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace 1
@@ -160,8 +175,13 @@ bindsym XF86AudioLowerVolume exec pactl set-sink-volume 4 -5% #decrease sound vo
 bindsym XF86AudioMute exec pactl set-sink-mute 4 toggle # mute sound
 
 # Have a handy terminal instance on the scratchpad as well
-bindsym $mod+Shift+t exec --no-startup-id gnome-terminal --title=quake --class=quake --name=quake --hide-menubar
-bindsym $mod+t [class="^quake"] scratchpad show
+#
+for_window [title="dropdown"] floating enable
+for_window [title="dropdown"] resize set 1400 700
+for_window [title="dropdown"] move scratchpad, scratchpad show
+for_window [title="dropdown"] border pixel 3
+bindsym $mod+Shift+grave exec gnome-terminal --title 'dropdown' --window-with-profile='Dark'
+bindsym $mod+grave [instance=gnome-terminal] scratchpad show; move position center
 
 for_window [class="Pavucontrol"] floating enable
 for_window [class="Nvidia-settings"] floating enable
@@ -183,7 +203,7 @@ bar {
     bindsym button4         nop
     bindsym button5         nop
     position                top
-    tray_output             primary
+    tray_output             none
     separator_symbol        "·"
     workspace_buttons       yes
     strip_workspace_numbers yes
