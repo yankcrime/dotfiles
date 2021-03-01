@@ -1362,6 +1362,11 @@ SCHEDULED: %t
                  (reusable-frames . visible)
                  (window-height . 0.5))))
 
+(use-package gist
+  :defer t
+  :bind (:map gist-mode
+              ("M-s" . gist-mode-save-buffer)))
+
 (use-package writeroom-mode
   :defer t
   :commands (writeroom-mode)
