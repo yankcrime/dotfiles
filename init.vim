@@ -15,14 +15,15 @@ Plug 'pearofducks/ansible-vim'
 Plug 'godlygeek/tabular'
 Plug 'cespare/vim-sbd'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'neoclide/coc.nvim', { 'branch': 'release', 'for': ['go', 'python', 'ansible', 'yaml', 'terraform'] }
+Plug 'neoclide/coc.nvim', { 'branch': 'release', 'for': ['go', 'python', 'ansible', 'yaml', 'tf'] }
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
 Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
-Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby', 'ansible', 'terraform'] }
+Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby', 'ansible', 'terraform', 'tf'] }
 Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'junegunn/vim-peekaboo'
 Plug 'Lokaltog/vim-monotone'
 Plug 'Lokaltog/neoranger'
 Plug 'chriskempson/base16-vim'
@@ -30,6 +31,7 @@ Plug 'romainl/vim-sweet16'
 Plug 'yankcrime/vim-colors-off'
 Plug 'sjl/badwolf'
 Plug 'robertmeta/nofrils'
+Plug 'yasukotelin/shirotelin'
 
 call plug#end()
 
@@ -119,8 +121,8 @@ nnoremap <Tab> <C-w>w
 nnoremap <S-Tab> <C-w>W
 
 " appearance
-set t_Co=256
-set termguicolors
+" set t_Co=256
+" set termguicolors
 
 let iterm_profile = $ITERM_PROFILE
 
@@ -130,7 +132,7 @@ if iterm_profile == "Dark"
     hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
 else
     set background=light
-    colorscheme nofrils-light
+    colorscheme shirotelin
     hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
     " hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
     hi Terminal ctermbg=none ctermfg=none
@@ -202,15 +204,15 @@ let g:fzf_action = {
   \ 'ctrl-v': 'vsplit' }
 
 " In Neovim, you can set up fzf window using a Vim command
-let g:fzf_layout = { 'window': 'enew' }
-let g:fzf_layout = { 'window': '-tabnew' }
+" let g:fzf_layout = { 'window': 'enew' }
+" let g:fzf_layout = { 'window': '-tabnew' }
 
 let g:fzf_buffers_jump = 1
 let g:fzf_tags_command = 'ctags -R'
 
 " Default fzf layout
 " - down / up / left / right
-let g:fzf_layout = { 'down': '~40%' }
+" let g:fzf_layout = { 'down': '~40%' }
 
 command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
@@ -221,6 +223,31 @@ command! -bang -nargs=* Rg
   \   <bang>0 ? fzf#vim#with_preview('up:60%')
   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
   \   <bang>0)
+
+function! CreateCenteredFloatingWindow()
+    let width = min([&columns - 4, max([80, &columns - 20])])
+    let height = min([&lines - 4, max([20, &lines - 10])])
+    let top = ((&lines - height) / 2) - 1
+    let left = (&columns - width) / 2
+    let opts = {'relative': 'editor', 'row': top, 'col': left, 'width': width, 'height': height, 'style': 'minimal'}
+
+    let top = "╭" . repeat("─", width - 2) . "╮"
+    let mid = "│" . repeat(" ", width - 2) . "│"
+    let bot = "╰" . repeat("─", width - 2) . "╯"
+    let lines = [top] + repeat([mid], height - 2) + [bot]
+    let s:buf = nvim_create_buf(v:false, v:true)
+    call nvim_buf_set_lines(s:buf, 0, -1, v:true, lines)
+    call nvim_open_win(s:buf, v:true, opts)
+    set winhl=Normal:Floating
+    let opts.row += 1
+    let opts.height -= 2
+    let opts.col += 2
+    let opts.width -= 4
+    call nvim_open_win(nvim_create_buf(v:false, v:true), v:true, opts)
+    au BufWipeout <buffer> exe 'bw '.s:buf
+endfunction
+
+let g:fzf_layout = { 'window': 'call CreateCenteredFloatingWindow()' }
 
 " }}}
 " {{{ Golang
@@ -344,6 +371,10 @@ nmap <leader>rn <Plug>(coc-rename)
 " Remap for format selected region
 vmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
+
+let g:LanguageClient_serverCommands = {
+    \ 'tf': ['terraform-ls', 'serve'],
+    \ }
 
 " }}}
 
