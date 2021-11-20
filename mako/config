@@ -1,0 +1,6 @@
+font=Inter 16
+background-color=#ffffff
+text-color=#222222
+width=500
+height=150
+default-timeout=10000
