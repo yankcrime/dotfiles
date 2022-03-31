@@ -167,6 +167,8 @@
 (setq frame-title-format '(buffer-file-name "%f" ("%b - GNU Emacs"))
       icon-title-format frame-title-format)
 
+(add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
+
 ;; Disable auto-save and auto-backup
 (setq auto-save-default nil
   make-backup-files nil)
@@ -222,7 +224,7 @@
         (internal-border-width . 0)
         (height . 60)
         (width . 150)
-        (font . "SF Mono 11")))
+        (font . "PragmataPro 15")))
 
 (use-package doom-themes
   :load-path "~/src/emacs-doom-themes"
@@ -234,16 +236,21 @@
   :config
   (load-theme 'doom-one-light t))
 
-(use-package diminish
+(use-package minions
+  :init (minions-mode)
   :config
-  (diminish '(auto-revert-mode
-              org-indent-mode)))
-
-(eval-after-load "eldoc" '(diminish 'eldoc-mode))
-(eval-after-load 'org-indent '(diminish 'org-indent-mode))
-(eval-after-load 'magit '(diminish 'auto-revert-mode))
+  (setq minions-mode-line-lighter "#"
+        minions-direct '(cider-mode
+                         projectile-mode
+                         visual-line-mode
+                         flyspell-mode
+                         flycheck-mode
+                         company-mode
+                         overwrite-mode
+                         lsp-mode)))
 
 (use-package smart-mode-line
+  :disabled
   :config
   (setq sml/mode-width 'right
         sml/pre-modes-separator "  "
@@ -284,13 +291,12 @@
   (default-text-scale-mode))
 
 (use-package undo-tree
-  :diminish
   :config
+  (setq undo-tree-auto-save-history nil)
   (global-undo-tree-mode))
 
 ;; Which-key - command previews
 (use-package which-key
-  :diminish
   :custom-face
   (which-key-posframe ((t (:background "#f2f2f2"))))
   (which-key-posframe-border ((t (:background "#cccccc"))))
@@ -317,48 +323,47 @@
                      (general-define-key :prefix "SPC" :states '(normal motion) :keymaps 'override ,key ,func))))))
 
 (my-leader
- ("bb" 'ivy-switch-buffer "Switch buffer")
- ("bd" 'kill-this-buffer "Kill this buffer")
- ("pp" 'counsel-projectile-switch-project "Switch project")
- ("pf" 'counsel-projectile-find-file "Find file")
- ("ps" 'counsel-projectile-rg "Search in files")
- ("gs" 'magit-status "Status")
- ("ga" 'magit-stage-file "stAge file")
- ("gb" 'magit-blame "Blame")
- ("gc" 'magit-commit "Commit")
- ("gp" 'magit-push "Push")
- ("aol" 'org-todo-list "Todo list")
- ("aoa" 'org-agenda "Agenda")
- ("aoc" 'org-task-capture "Capture task")
- ("aot" 'org-time-stamp-inactive "Insert timestamp")
- ("afl" 'list-flycheck-errors "List errors")
- ("asc" 'flyspell-correct-word-before-point "Correct word")
- ("ts" 'flyspell-mode "Flyspell")
- ("tc" 'company-mode "Company")
- ("tf" 'flycheck-mode "Flycheck")
- ("ldt" 'lsp-describe-thing-at-point "LSP Describe Thing at point")
- ("lgd" 'lsp-goto-type-definition "LSP Goto type Definition")
- ("lgi" 'lsp-goto-implementation "LSP Goto Implentation")
- ("lfr" 'lsp-find-references "LSP Find References")
- ("lfd" 'lsp-find-definition "LSP Find Definition")
- ("lfE" 'lsp-find-declaration "LSP Find dEclaration")
- ("tv" 'visual-line-mode "Visual line mode")
- ("tw" 'whitespace-mode "Whitespace mode")
- ("w1" 'winum-select-window-1 "Select 1")
- ("w2" 'winum-select-window-2 "Select 2")
- ("w3" 'winum-select-window-3 "Select 3")
- ("w4" 'winum-select-window-4 "Select 4")
- ("w5" 'winum-select-window-5 "Select 5")
- ("w6" 'winum-select-window-6 "Select 6")
- ("w7" 'winum-select-window-7 "Select 7")
- ("w8" 'winum-select-window-8 "Select 8")
- ("w9" 'winum-select-window-9 "Select 9")
- ("ww" 'winum-select-window-by-number "Select by number")
- ("w|" 'evil-window-vsplit "Vertical split")
- ("w-" 'evil-window-split "Horizontal split")
- ("wd" 'evil-window-delete "Delete")
- ("wo" 'delete-other-windows "delete Other windows")
- ("wf" 'toggle-frame-fullscreen "make Frame Fullscreen"))
+  ("bb" 'consult-buffer "Switch to buffer")
+  ("bd" 'kill-this-buffer "Kill this buffer")
+  ("pp" 'projectile-switch-project "Switch project")
+  ("pf" 'projectile-find-file "Find file")
+  ("gs" 'magit-status "Status")
+  ("ga" 'magit-stage-file "stAge file")
+  ("gb" 'magit-blame "Blame")
+  ("gc" 'magit-commit "Commit")
+  ("gp" 'magit-push "Push")
+  ("aol" 'org-todo-list "Todo list")
+  ("aoa" 'org-agenda "Agenda")
+  ("aoc" 'org-task-capture "Capture task")
+  ("aot" 'org-time-stamp-inactive "Insert timestamp")
+  ("afl" 'list-flycheck-errors "List errors")
+  ("asc" 'flyspell-correct-word-before-point "Correct word")
+  ("ts" 'flyspell-mode "Flyspell")
+  ("tc" 'company-mode "Company")
+  ("tf" 'flycheck-mode "Flycheck")
+  ("ldt" 'lsp-describe-thing-at-point "LSP Describe Thing at point")
+  ("lgd" 'lsp-goto-type-definition "LSP Goto type Definition")
+  ("lgi" 'lsp-goto-implementation "LSP Goto Implentation")
+  ("lfr" 'lsp-find-references "LSP Find References")
+  ("lfd" 'lsp-find-definition "LSP Find Definition")
+  ("lfE" 'lsp-find-declaration "LSP Find dEclaration")
+  ("tv" 'visual-line-mode "Visual line mode")
+  ("tw" 'whitespace-mode "Whitespace mode")
+  ("w1" 'winum-select-window-1 "Select 1")
+  ("w2" 'winum-select-window-2 "Select 2")
+  ("w3" 'winum-select-window-3 "Select 3")
+  ("w4" 'winum-select-window-4 "Select 4")
+  ("w5" 'winum-select-window-5 "Select 5")
+  ("w6" 'winum-select-window-6 "Select 6")
+  ("w7" 'winum-select-window-7 "Select 7")
+  ("w8" 'winum-select-window-8 "Select 8")
+  ("w9" 'winum-select-window-9 "Select 9")
+  ("ww" 'winum-select-window-by-number "Select by number")
+  ("w|" 'evil-window-vsplit "Vertical split")
+  ("w-" 'evil-window-split "Horizontal split")
+  ("wd" 'evil-window-delete "Delete")
+  ("wo" 'delete-other-windows "delete Other windows")
+  ("wf" 'toggle-frame-fullscreen "make Frame Fullscreen"))
 
 (which-key-add-key-based-replacements
   "SPC a" "Apps"
@@ -404,344 +409,101 @@
 
     (shackle-mode 1)))
 
-;; Completion frontend
-(use-package ivy
-  :diminish
-  :demand t
+(use-package prescient
   :config
-  (ivy-mode 1)
-  (setq ivy-height 20
-        ivy-use-virtual-buffers t
-        enable-recursive-minibuffers t)
-  (define-key ivy-switch-buffer-map (kbd "C-j") 'ivy-next-line)
-  (define-key ivy-switch-buffer-map (kbd "C-k") 'ivy-previous-line)
-  (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
-  (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
-  (define-key ivy-switch-buffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
-  (with-eval-after-load 'ivy
-    (define-key ivy-minibuffer-map (kbd "M-v") 'yank)))
+  (prescient-persist-mode))
+
+(use-package company-prescient)
+
+(use-package vertico
+  :init
+  (vertico-mode)
+  (setq completion-styles '(flex))
+  (setq vertico-count 20))
+
+(use-package emacs
+  :init
+  ;; TAB cycle if there are only few candidates
+  (setq completion-cycle-threshold 3)
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (setq tab-always-indent 'complete)
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; Alternatively try `consult-completing-read-multiple'.
+  (defun crm-indicator (args)
+    (cons (concat "[CRM] " (car args)) (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+
+;; Use `consult-completion-in-region' if Vertico is enabled.
+;; Otherwise use the default `completion--in-region' function.
+(setq completion-in-region-function
+      (lambda (&rest args)
+        (apply (if vertico-mode
+                   #'consult-completion-in-region
+                 #'completion--in-region)
+               args)))
+
+(use-package corfu
+  :disabled
+  :after evil
+  :config
+  (define-key corfu-map (kbd "C-j") 'corfu-next)
+  (define-key corfu-map (kbd "C-k") 'corfu-previous)
+  (define-key corfu-map (kbd "C-n") 'corfu-next)
+  (define-key corfu-map (kbd "C-p") 'corfu-previous)
+  ;; unset "C-k" in evil insert, fixes binding for corfu
+  (define-key evil-insert-state-map (kbd "C-k") nil)
+  (define-key evil-insert-state-map (kbd "C-n") nil)
+  (define-key evil-insert-state-map (kbd "C-p") nil)
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  :init
+  (corfu-global-mode))
+
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion))))))
+
+(use-package consult
+  :init
+    (advice-add #'register-preview :override #'consult-register-window)
+  :config
+  (autoload 'projectile-project-root "projectile")
+  (setq consult-project-root-function #'projectile-project-root))
+
+(use-package marginalia
+  :after vertico
+  :init
+  (marginalia-mode)
+  (setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil)))
+
+(use-package consult-flycheck
+  :bind (:map flycheck-command-map
+              ("!" . consult-flycheck)))
 
 (use-package posframe
   :custom-face
   (internal-border ((t (:background "#cccccc")))))
-  
-(use-package ivy-posframe
-  :diminish
-  :custom-face
-  (internal-border ((t (:background "#cccccc"))))
-  :after (ivy)
-  :config
-  (setq ivy-posframe-display-functions-alist
-        '((t . ivy-posframe-display-at-frame-top-center))
-        ivy-posframe-height-alist '((t . 20))
-        ivy-posframe-parameters '((internal-border-width . 10))
-        ivy-posframe-parameters
-        '((left-fringe . 8)
-          (top-fringe . 10)
-          (right-fringe . 8))
-        ivy-posframe-border-width 1
-        ivy-posframe-hide-minibuffer t
-        ivy-posframe-width 110)
-  (ivy-posframe-mode 1))
-
-(use-package ivy-prescient
-  :after ivy
-  :config
-  (ivy-prescient-mode)
-  (prescient-persist-mode))
-
-(use-package ivy-rich
-  :after ivy
-  :init
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
-
-;; Run ivy-rich-mode only after loading all-the-icons-ivy-rich
-(use-package emacs
-  :after (ivy-rich all-the-icons-ivy-rich)
-  :config
-  ;; Toggle `ivy-rich-mode' after modifying `ivy-rich-display-transformers-list'.
-  (setq ivy-rich-display-transformers-list
-        `(ivy-switch-buffer
-          (:columns ((all-the-icons-ivy-rich-buffer-icon)
-                     (ivy-switch-buffer-transformer
-                      (:width 0.2))
-                     (ivy-rich-switch-buffer-major-mode
-                      (:width 18 :face warning))
-                     (ivy-rich-switch-buffer-project
-                      (:width 15 :face success))
-                     (ivy-rich-switch-buffer-indicators
-                      (:width 4 :face error :align right))
-                     (ivy-rich-switch-buffer-size
-                      (:width 7))
-                     (ivy-rich-switch-buffer-path
-                      (:width (lambda (candidate)
-                                (ivy-rich-switch-buffer-shorten-path
-                                 candidate (ivy-rich-minibuffer-width 0.2))))))
-           :predicate (lambda (candidate)
-                        (get-buffer candidate))
-           :delimiter "	")
-          ivy-switch-buffer-other-window
-          (:columns ((all-the-icons-ivy-rich-buffer-icon)
-                     (ivy-rich-candidate
-                      (:width 30))
-                     (ivy-rich-switch-buffer-size
-                      (:width 7))
-                     (ivy-rich-switch-buffer-indicators
-                      (:width 4 :face error :align right))
-                     (ivy-rich-switch-buffer-major-mode
-                      (:width 18 :face warning))
-                     (ivy-rich-switch-buffer-project
-                      (:width 15 :face success))
-                     (ivy-rich-switch-buffer-path
-                      (:width (lambda
-                                (candidate)
-                                (ivy-rich-switch-buffer-shorten-path
-                                 candidate (ivy-rich-minibuffer-width 0.3))))))
-           :predicate (lambda (candidate)
-                        (get-buffer candidate))
-           :delimiter "	")
-          counsel-switch-buffer
-          (:columns ((all-the-icons-ivy-rich-buffer-icon)
-                     (ivy-rich-candidate
-                      (:width 30))
-                     (ivy-rich-switch-buffer-size
-                      (:width 7))
-                     (ivy-rich-switch-buffer-indicators
-                      (:width 4 :face error :align right))
-                     (ivy-rich-switch-buffer-major-mode
-                      (:width 18 :face warning))
-                     (ivy-rich-switch-buffer-project
-                      (:width 15 :face success))
-                     (ivy-rich-switch-buffer-path
-                      (:width (lambda (candidate)
-                                (ivy-rich-switch-buffer-shorten-path
-                                 candidate (ivy-rich-minibuffer-width 0.3))))))
-           :predicate (lambda (candidate)
-                        (get-buffer candidate))
-           :delimiter "	")
-          counsel-projectile-switch-to-buffer
-          (:columns ((all-the-icons-ivy-rich-buffer-icon)
-                     (ivy-rich-candidate
-                      (:width 30))
-                     (ivy-rich-switch-buffer-size
-                      (:width 7))
-                     (ivy-rich-switch-buffer-indicators
-                      (:width 4 :face error :align right))
-                     (ivy-rich-switch-buffer-major-mode
-                      (:width 18 :face warning))
-                     (ivy-rich-switch-buffer-project
-                      (:width 15 :face success))
-                     (ivy-rich-switch-buffer-path
-                      (:width (lambda (candidate)
-                                (ivy-rich-switch-buffer-shorten-path
-                                 candidate (ivy-rich-minibuffer-width 0.3))))))
-           :predicate (lambda (candidate)
-                        (get-buffer candidate))
-           :delimiter "	")
-          counsel-switch-buffer-other-window
-          (:columns ((all-the-icons-ivy-rich-buffer-icon)
-                     (ivy-rich-candidate
-                      (:width 30))
-                     (ivy-rich-switch-buffer-size
-                      (:width 7))
-                     (ivy-rich-switch-buffer-indicators
-                      (:width 4 :face error :align right))
-                     (ivy-rich-switch-buffer-major-mode
-                      (:width 18 :face warning))
-                     (ivy-rich-switch-buffer-project
-                      (:width 15 :face success))
-                     (ivy-rich-switch-buffer-path
-                      (:width (lambda (candidate)
-                                (ivy-rich-switch-buffer-shorten-path
-                                 candidate (ivy-rich-minibuffer-width 0.3))))))
-           :predicate (lambda (candidate)
-                        (get-buffer candidate))
-           :delimiter "	")
-          package-install
-          (:columns ((ivy-rich-candidate (:width 30))
-                     (ivy-rich-package-version (:width 16 :face font-lock-comment-face)) ; package version
-                     (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face)) ; archive summary
-                     (ivy-rich-package-install-summary (:face font-lock-doc-face)))) ; package description
-          counsel-M-x
-          (:columns ((all-the-icons-ivy-rich-function-icon)
-                     (counsel-M-x-transformer
-                      (:width 50))
-                     (ivy-rich-counsel-function-docstring
-                      (:face font-lock-doc-face))))
-          counsel-describe-function
-          (:columns ((all-the-icons-ivy-rich-function-icon)
-                     (counsel-describe-function-transformer
-                      (:width 50))
-                     (ivy-rich-counsel-function-docstring
-                      (:face font-lock-doc-face))))
-          counsel-describe-variable
-          (:columns ((all-the-icons-ivy-rich-variable-icon
-                      (:width 0.01))
-                     (counsel-describe-variable-transformer
-                      (:width 0.29))
-                     (ivy-rich-counsel-variable-docstring
-                      (:width 0.5
-                       :face font-lock-doc-face))))
-          counsel-set-variable
-          (:columns ((all-the-icons-ivy-rich-variable-icon)
-                     (counsel-describe-variable-transformer
-                      (:width 50))
-                     (ivy-rich-counsel-variable-docstring
-                      (:face font-lock-doc-face))))
-          counsel-apropos
-          (:columns ((all-the-icons-ivy-rich-symbol-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-info-lookup-symbol
-          (:columns ((all-the-icons-ivy-rich-symbol-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-descbinds
-          (:columns ((all-the-icons-ivy-rich-keybinding-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-find-file
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-read-file-transformer))
-           :delimiter "	")
-          counsel-file-jump
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-dired
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-read-file-transformer))
-           :delimiter "	")
-          counsel-dired-jump
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-fzf
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-git
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-recentf
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-rich-candidate
-                      (:width 0.2))
-                     (ivy-rich-file-last-modified-time
-                      (:face font-lock-comment-face)))
-           :delimiter "	")
-          counsel-buffer-or-recentf
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (counsel-buffer-or-recentf-transformer
-                      (:width 0.2))
-                     (ivy-rich-file-last-modified-time
-                      (:face font-lock-comment-face)))
-           :delimiter "	")
-          counsel-bookmark
-          (:columns ((ivy-rich-bookmark-type)
-                     (all-the-icons-ivy-rich-bookmark-name
-                      (:width 40))
-                     (ivy-rich-bookmark-info))
-           :delimiter "	")
-          counsel-bookmarked-directory
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-package
-          (:columns ((all-the-icons-ivy-rich-package-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-fonts
-          (:columns ((all-the-icons-ivy-rich-font-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-major
-          (:columns ((all-the-icons-ivy-rich-function-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-find-library
-          (:columns ((all-the-icons-ivy-rich-library-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-load-library
-          (:columns ((all-the-icons-ivy-rich-library-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-load-theme
-          (:columns ((all-the-icons-ivy-rich-theme-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-world-clock
-          (:columns ((all-the-icons-ivy-rich-world-clock-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-tramp
-          (:columns ((all-the-icons-ivy-rich-tramp-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-git-checkout
-          (:columns ((all-the-icons-ivy-rich-git-branch-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-list-processes
-          (:columns ((all-the-icons-ivy-rich-process-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-projectile-switch-project
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          projectile-switch-project
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-projectile-find-file
-          (:columns ((all-the-icons-ivy-rich-file-icon)
-                     (counsel-projectile-find-file-transformer))
-           :delimiter "	")
-          counsel-projectile-find-dir
-          (:columns ((all-the-icons-ivy-rich-project-icon)
-                     (counsel-projectile-find-dir-transformer))
-           :delimiter "	")
-          counsel-minor
-          (:columns ((all-the-icons-ivy-rich-mode-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")
-          counsel-imenu
-          (:columns ((all-the-icons-ivy-rich-imenu-icon)
-                     (ivy-rich-candidate))
-           :delimiter "	")))
-  (ivy-rich-mode 1))
-
-(use-package all-the-icons-ivy-rich
-  :after (ivy-rich all-the-icons)
-  :init
-  ;; For some reason, if the icon size is 1 their widths are different.
-  ;; https://github.com/seagle0128/all-the-icons-ivy-rich/issues/7
-  ;;
-  ;; Also, setting a size bigger than 0.7 seems to cause candidates in the
-  ;; bottom to not appear in the frame.
-  (setq all-the-icons-ivy-rich-icon-size 0.7)
-  :config
-  (all-the-icons-ivy-rich-mode 1))
-
+ 
 (use-package ranger
   :ensure t
   :config
   (ranger-override-dired-mode t))
-
-;; Completion framework
-(use-package counsel
-  :after ivy
-  :defer t
-  :bind (("M-x" . counsel-M-x))
-  :config
-  (setq ivy-height 20)
-  (add-to-list 'ivy-height-alist '(counsel-evil-registers . 10)))
-
-(use-package counsel-projectile
-  :defer t)
 
 (use-package lsp-mode
   :defer t
@@ -759,9 +521,9 @@
     (setq lsp-modeline-diagnostics-enable nil))
   (lsp-enable-which-key-integration)
   (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection '("/usr/local/bin/terraform-ls" "serve"))
+   (make-lsp-client :new-connection (lsp-stdio-connection '("~/bin/terraform-lsp" "serve"))
                     :major-modes '(terraform-mode)
-                    :server-id 'terraform-ls))
+                    :server-id 'terraform-lsp))
   (add-hook 'terraform-mode-hook #'lsp))
 
 (use-package lsp-ui
@@ -778,10 +540,11 @@
         lsp-ui-imenu-enable t
         lsp-ui-sideline-ignore-duplicate t))
 
+(use-package company-tabnine)
+
 (use-package company
-  :diminish
   :defer t
-  :bind (("C-<tab>" . company-complete))
+  :bind (:map company-active-map ("<tab>" . company-complete-selection))
   :init
   (add-hook 'terraform-mode-hook 'company-mode)
   (add-hook 'terraform-mode-hook 'company-terraform-init)
@@ -806,7 +569,7 @@
   :defer t)
 
 (use-package company-box
-  :diminish
+  :disabled
   :hook (company-mode . company-box-mode)
   :init
   (setq company-box-doc-delay 0)
@@ -844,7 +607,7 @@
 
 (use-package winum
   :config
-  (setq winum-mode-line-position 6
+  (setq winum-mode-line-position 7
         winum-format "%s "
         winum-auto-setup-mode-line t)
   (winum-mode))
@@ -888,13 +651,13 @@
       evil-shift-round nil
       evil-echo-state nil
       evil-want-C-u-scroll t
-      evil-mode-line-format '(before . mode-line-client)
-      evil-normal-state-tag (propertize " N ")
-      evil-insert-state-tag (propertize " I ")
-      evil-visual-state-tag " V "
-      evil-motion-state-tag " M "
-      evil-operator-state-tag " O "
-      evil-emacs-state-tag " E ")
+      evil-mode-line-format '(before . mode-line-mule-info)
+      evil-normal-state-tag (propertize "N ")
+      evil-insert-state-tag (propertize "I ")
+      evil-visual-state-tag "V "
+      evil-motion-state-tag "M "
+      evil-operator-state-tag "O "
+      evil-emacs-state-tag "E ")
   :bind (:map evil-normal-state-map
               ("-" . deer)
               :map ranger-mode-map ("-" . ranger-up-directory))
@@ -956,7 +719,6 @@
 
   ;; visual hints while editing
   (use-package evil-goggles
-    :diminish
     :config
     (setq evil-goggles-pulse t)
     (evil-goggles-mode))
@@ -975,7 +737,6 @@
     (evil-define-key 'visual global-map "gS" 'evil-Surround-region))
 
   (use-package evil-owl
-    :diminish
     :config
     (define-key evil-owl-popup-map (kbd "C-k") #'evil-owl-scroll-popup-up)
     (define-key evil-owl-popup-map (kbd "C-j") #'evil-owl-scroll-popup-down)
@@ -986,7 +747,6 @@
     (evil-owl-mode)))
 
 (use-package yasnippet
-  :diminish (yas-minor-mode)
   :defer t
   :config
   (unless yas-global-mode (yas-global-mode 1))
@@ -1094,23 +854,19 @@ SCHEDULED: %t
 
 ;; Magit
 (use-package magit
-  :diminish
   :defer t
   :init
-  (setq magit-completing-read-function 'ivy-completing-read)
   (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
   :config
   (global-set-key (kbd "<f10>") 'magit-status))
 
 ;; Projectile
 (use-package projectile
-  :diminish
   :defer t
   :config
   (defun projectile-short-mode-line ()
     (format " [%s]" (projectile-project-name)))
   (setq projectile-mode-line-function 'projectile-short-mode-line)
-  (setq projectile-completion-system 'ivy)
   (setq projectile-enable-caching nil)
   (setq projectile-switch-project-action #'projectile-dired)
   (projectile-global-mode +1))
@@ -1125,7 +881,6 @@ SCHEDULED: %t
 
 ;; Resize active frame according to 'golden ratio' principles
 (use-package zoom
-  :diminish
   :config
   (setq zoom-size '(0.618 . 0.618))
   (zoom-mode t))
@@ -1161,8 +916,6 @@ SCHEDULED: %t
   (flycheck-posframe-configure-pretty-defaults)
   (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
 
-  (set-face-attribute 'flycheck-posframe-background-face nil :inherit 'ivy-posframe)
-  (set-face-attribute 'flycheck-posframe-border-face nil :inherit 'ivy-posframe-border)
   (set-face-attribute 'flycheck-posframe-warning-face nil :inherit 'flycheck-warning-list-warning)
   (set-face-attribute 'flycheck-posframe-error-face nil :inherit 'flycheck-error-list-error)
   (set-face-attribute 'flycheck-posframe-info-face nil :inherit 'flycheck-error-list-info))
@@ -1306,8 +1059,13 @@ SCHEDULED: %t
   :config
   (add-hook 'terraform-mode-hook 'terraform-format-on-save-mode))
 
+(use-package rego-mode
+  :ensure t
+  :custom
+  (rego-repl-executable "/usr/local/bin/opa")
+  (rego-opa-command "/usr/local/bin/opa"))
+
 (use-package highlight-indent-guides
-  :diminish
   :config
   (setq highlight-indent-guides-method 'character)
   ;; Indent character samples: | ┆ ┊
@@ -1445,9 +1203,9 @@ SCHEDULED: %t
 (global-set-key (kbd "M-F") 'query-replace)
 (global-set-key (kbd "M-\=") 'text-scale-increase)
 (global-set-key (kbd "M--") 'text-scale-decrease)
-(global-set-key (kbd "M-o") 'counsel-find-file)
-(global-set-key (kbd "C-s") 'counsel-rg)
-(global-set-key (kbd "C-,") 'counsel-imenu)
+(global-set-key (kbd "M-o") 'find-file)
+(global-set-key (kbd "C-s") 'consult-ripgrep)
+(global-set-key (kbd "C-,") 'consult-imenu)
 (global-set-key (kbd "M-a") 'mark-whole-buffer)
 (global-set-key [(kbd "M-w")]
                 (lambda () (interactive) (delete-window)))
@@ -1473,6 +1231,7 @@ SCHEDULED: %t
 (setq mac-option-modifier nil
       mac-command-modifier 'meta)
 
+
 ;; Keep custom junk that Emacs generates in a seperate file
 (setq custom-file "~/.emacs.d/custom.el")
 (unless (file-exists-p custom-file)
@@ -1481,9 +1240,4 @@ SCHEDULED: %t
 
 ;; Start a server so we can use emacsclient
 (server-start)
-
-;; (add-to-list 'load-path ".")
-;; (add-to-list 'load-path "/Users/nick/.emacs.d/nano")
-;; (require 'nano-modeline)
-;; (require 'nano-theme-light)
 
