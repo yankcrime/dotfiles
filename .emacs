@@ -761,6 +761,7 @@
 (use-package org
   :defer t
   :config
+  (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
   (setq org-directory "~/Sync/org"
         org-agenda-files (directory-files-recursively "~/Sync/org/" "\.org$")
         org-default-notes-file (concat org-directory "/notes.org"))
