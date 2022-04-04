@@ -80,12 +80,14 @@ alias keyplz='openssl rand -hex 10'
 alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
+if [[ $(hostname -s) == ignition ]]; then
+  alias docker='lima nerdctl'
+fi
 alias docekr='docker'
 alias vim='nvim'
 alias k='kubectl'
 alias rdecs='xprop -f _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS "0x2, 0x0, 0x0, 0x0, 0x0"'
 source <(kubectl completion zsh)
-complete -F __start_kubectl k
 alias lgc='sudo chown nick:kvm /dev/shm/looking-glass ; chmod 660 /dev/shm/looking-glass ; looking-glass-client -F'
 alias mp='multipass'
 alias tfapply="terraform apply plan.out"
@@ -124,43 +126,10 @@ alias emacs='emacsclient -n'
 setopt print_exit_value
 setopt PROMPT_SUBST
 
-# set the window title
+# set the window title and prompt
 #
 precmd() { print -Pn "\e]0;%n@%m:%~\a" }
-
-# deadline is my Mac with a TouchBar
-#
-if [[ $(hostname -s) == deadline ]]; then
-    print_osc() {
-        if [[ $TERM == tmux* ]] ; then
-            printf "\033Ptmux;\033\033]"
-        else
-            printf "\033]"
-        fi
-    }
-    print_st() {
-        if [[ $TERM == tmux* ]] ; then
-            printf "\a\033\\"
-        else
-            printf "\a"
-        fi
-    }
-    git_status() {
-        local bname="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
-        if [ -n "$bname" ]; then
-            print_osc
-            printf "1337;SetKeyLabel=%s=%s" "status" "🌱 $(git rev-parse --abbrev-ref HEAD)"
-            print_st
-        else
-            print_osc
-            printf "1337;SetKeyLabel=%s=%s" "status" "🙈"
-            print_st
-        fi
-    }
-    PS1='%{$(git_status)%}%n@%m %25<..<%~%(!.#. %%) %(1j.%F{green}·%j%f .)'
- else
-    PS1='%n@%m %25<..<%~%(!.#. %%) %(1j.%F{green}·%j%f .)'
-fi
+PS1='%n@%m %25<..<%~%(!.#. %%) %(1j.%F{green}·%j%f .)'
 
 # make it work like vim
 #
