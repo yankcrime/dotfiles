@@ -33,6 +33,7 @@ fi
 #
 export EDITOR="nvim"
 export GPG_TTY=$(tty)
+export BAT_THEME="ansi"
 
 # history and general options
 #
@@ -75,7 +76,7 @@ alias view='vim -R'
 alias se='sudoedit'
 alias topmem='ps -eo pmem,pcpu,rss,vsize,args | sort -k 1 -r | less'
 alias sshx='ssh -c arcfour,blowfish-cbc -XC'
-alias pwplz='pwgen -n -y -s 12 1'
+alias pwplz='pwgen -n -y -s 18 1'
 alias keyplz='openssl rand -hex 10'
 alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
@@ -118,18 +119,19 @@ alias gitsup='git submodule sync ; git submodule update --init'
 #
 alias emacs='emacsclient -n'
 
-# prompt
-#
-# salient bits pilfered from
-# https://github.com/gnachman/iterm2-website/tree/master/source/utilities
+# prompt and window title
 #
 setopt print_exit_value
 setopt PROMPT_SUBST
 
-# set the window title and prompt
-#
-precmd() { print -Pn "\e]0;%n@%m:%~\a" }
-PS1='%n@%m %25<..<%~%(!.#. %%) %(1j.%F{green}·%j%f .)'
+autoload -Uz vcs_info
+zstyle ':vcs_info:git:*' formats 'on %b '
+
+precmd() {
+    vcs_info
+    print -Pn "\e]0;%n@%m:%~\a"
+    PROMPT='%n@%m %25<..<%~%(!.#. ${vcs_info_msg_0_}%%) %(1j.%F{green}·%j%f .)'
+}
 
 # make it work like vim
 #
@@ -169,13 +171,12 @@ zle -N zle-keymap-select
 
 # pyenv and rbenv junk
 #
-if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+#if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 #
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
 # krew
+#
 export PATH="${PATH}:${HOME}/.krew/bin"
 
 # load zgen and plugins
@@ -199,10 +200,8 @@ fi
 #
 stty -ixon
 
-
-# Last but definitely not least - FZF
+# Fuzzy history search via fzf
 #
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # vim:ts=4:sw=4:ft=zsh:et
-
