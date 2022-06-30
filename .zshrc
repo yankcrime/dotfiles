@@ -67,7 +67,7 @@ zstyle ':completion:*:(ssh|scp|sftp):*' hosts $knownhosts
 # some other {sensible,useful} shortcuts
 #
 alias pg='ps auwwx | grep -i -e ^USER -e '
-alias publicip='curl http://ifconfig.me'
+alias publicip='curl http://icanhazip.com'
 alias webserver="ifconfig | grep 'inet ' | grep -v 127.0.0.1; python -m SimpleHTTPServer"
 alias cls='clear'
 alias ls='ls -F'
