@@ -203,4 +203,10 @@ stty -ixon
 #
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+# init junk via evalcache
+#
+_evalcache pyenv init -
+_evalcache rbenv init -
+_evalcache starship init zsh
+
 # vim:ts=4:sw=4:ft=zsh:et
