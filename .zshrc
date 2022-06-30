@@ -186,12 +186,11 @@ source "${HOME}/.zgen/zgen.zsh"
 if ! zgen saved; then
   echo "Creating a zgen save"
 
-  zgen load mafredri/zsh-async
   zgen load junegunn/fzf
   zgen load junegunn/fzf shell/completion.zsh
   zgen load junegunn/fzf shell/key-bindings.zsh
   zgen load agkozak/zsh-z
-  zgen load ~/src/k
+  zgen load mroth/evalcache
 
   zgen save
 fi
