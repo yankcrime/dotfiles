@@ -52,9 +52,29 @@ setopt HIST_IGNORE_ALL_DUPS
 setopt nohup
 umask 022
 
-# stuff that makes zsh worthwhile
+autoload -Uz +X compaudit compinit
+autoload -Uz +X bashcompinit
+
+# only bother with rebuilding, auditing, and compiling the compinit
+# file once a whole day has passed. The -C flag bypasses both the
+# check for rebuilding the dump file and the usual call to compaudit.
+# via @emilyst
 #
-autoload -U compinit && compinit
+setopt EXTENDEDGLOB
+for dump in $HOME/.zcompdump(N.mh+24); do
+  echo 'Re-initializing ZSH completions'
+  touch $dump
+  compinit
+  bashcompinit
+  if [[ -s "$dump" && (! -s "$dump.zwc" || "$dump" -nt "$dump.zwc") ]]; then
+    zcompile "$dump"
+  fi
+done
+unsetopt EXTENDEDGLOB
+compinit -C
+
+# other stuff that makes zsh worthwhile
+#
 autoload -U promptinit && promptinit
 autoload -U up-line-or-beginning-search
 autoload -U down-line-or-beginning-search
@@ -128,9 +148,9 @@ autoload -Uz vcs_info
 zstyle ':vcs_info:git:*' formats 'on %b '
 
 precmd() {
-    vcs_info
+#    vcs_info
     print -Pn "\e]0;%n@%m:%~\a"
-    PROMPT='%n@%m %25<..<%~%(!.#. ${vcs_info_msg_0_}%%) %(1j.%F{green}·%j%f .)'
+#    PROMPT='%n@%m %25<..<%~%(!.#. ${vcs_info_msg_0_}%%) %(1j.%F{green}·%j%f .)'
 }
 
 # make it work like vim
@@ -168,12 +188,6 @@ function zle-line-finish
 zle -N zle-line-init
 zle -N zle-line-finish
 zle -N zle-keymap-select
-
-# pyenv and rbenv junk
-#
-#if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
-#
-eval "$(pyenv init -)"
 
 # krew
 #
