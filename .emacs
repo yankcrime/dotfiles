@@ -544,11 +544,13 @@
 
 (use-package company
   :defer t
-  :bind (:map company-active-map ("<tab>" . company-complete-selection))
+  :bind (:map company-mode-map ("C-SPC" . company-complete)
+              :map company-active-map ([escape] . company-abort))
   :init
   (add-hook 'terraform-mode-hook 'company-mode)
   (add-hook 'terraform-mode-hook 'company-terraform-init)
   (add-hook 'go-mode-hook 'company-mode)
+  (add-hook 'yaml-mode-hook 'company-mode)
   :config
   (setq company-backends '((company-capf company-tabnine)
                            company-cmake
@@ -556,7 +558,7 @@
                            company-files
                            (company-dabbrev-code company-gtags company-etags company-keywords)
                            company-dabbrev))
-  (setq company-idle-delay 0.6))
+  (setq company-idle-delay 0.3))
 
 (use-package company-prescient
   :after company
