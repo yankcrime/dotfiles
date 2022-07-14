@@ -224,7 +224,7 @@
         (internal-border-width . 0)
         (height . 60)
         (width . 150)
-        (font . "PragmataPro 15")))
+        (font . "SF Mono 11")))
 
 (use-package doom-themes
   :load-path "~/src/emacs-doom-themes"
@@ -234,20 +234,61 @@
         doom-themes-visual-bell-config t
         doom-themes-org-config t)
   :config
-  (load-theme 'doom-one-light t))
+  (load-theme 'doom-one-light t)
+  (let ((line (face-attribute 'mode-line :underline)))
+    (set-face-attribute 'mode-line nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :underline  line)
+    (set-face-attribute 'mode-line nil :box nil)
+    (set-face-attribute 'mode-line-inactive nil :box nil)
+    (set-face-attribute 'mode-line-inactive nil :background "#f0f0f0" :foreground "#c6c7c7")))
 
-(use-package minions
-  :init (minions-mode)
+(use-package mindre-theme
+  :disabled
+  :ensure t
+  :custom
+  (mindre-use-more-bold nil)
+  (mindre-use-faded-lisp-parens t)
   :config
-  (setq minions-mode-line-lighter "#"
-        minions-direct '(cider-mode
-                         projectile-mode
-                         visual-line-mode
-                         flyspell-mode
-                         flycheck-mode
-                         company-mode
-                         overwrite-mode
-                         lsp-mode)))
+  (load-theme 'mindre t))
+
+(use-package moody
+  :ensure t
+  :config
+  (setq x-underline-at-descent-line t)
+  (customize-set-variable 'moody-mode-line-height 20)
+  (setq-default mode-line-format
+                '(""
+                  mode-line-front-space
+                  " "
+                  mode-line-buffer-identification
+                  (:eval
+                   (cond ((buffer-modified-p) "  ")
+                         (t " ")))
+                  mode-line-position
+                  (vc-mode vc-mode)
+                  (multiple-cursors-mode mc/mode-line)
+                  " " mode-line-modes
+                  mode-line-end-spaces))
+
+  (use-package minions
+    :ensure t
+    :init (minions-mode)
+    :custom
+    (minions-mode-line-lighter "…")
+    (minions-mode-line-delimiters '("" . ""))
+    :config
+    (setq minions-mode-line-lighter "#"
+          minions-direct '(cider-mode
+                           projectile-mode
+                           visual-line-mode
+                           flyspell-mode
+                           flycheck-mode
+                           company-mode
+                           overwrite-mode
+                           lsp-mode))
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode)))
 
 (use-package smart-mode-line
   :disabled
@@ -609,8 +650,8 @@
 
 (use-package winum
   :config
-  (setq winum-mode-line-position 7
-        winum-format "%s "
+  (setq winum-mode-line-position 2
+        winum-format "⌘ %s"
         winum-auto-setup-mode-line t)
   (winum-mode))
 
@@ -653,13 +694,13 @@
       evil-shift-round nil
       evil-echo-state nil
       evil-want-C-u-scroll t
-      evil-mode-line-format '(before . mode-line-mule-info)
-      evil-normal-state-tag (propertize "N ")
-      evil-insert-state-tag (propertize "I ")
-      evil-visual-state-tag "V "
-      evil-motion-state-tag "M "
-      evil-operator-state-tag "O "
-      evil-emacs-state-tag "E ")
+      evil-mode-line-format '(before . mode-line-front-space)
+      evil-normal-state-tag (propertize " N")
+      evil-insert-state-tag (propertize " I")
+      evil-visual-state-tag " V"
+      evil-motion-state-tag " M"
+      evil-operator-state-tag " O"
+      evil-emacs-state-tag " E")
   :bind (:map evil-normal-state-map
               ("-" . deer)
               :map ranger-mode-map ("-" . ranger-up-directory))
@@ -853,6 +894,8 @@ SCHEDULED: %t
 
   (use-package org-bullets
     :defer t
+    :config
+    (setq org-bullets-bullet-list '("✸" "✸" "✸" "✸" "✸" "✸" "✸"))
     :hook (org-mode . org-bullets-mode)))
 
 ;; Magit
