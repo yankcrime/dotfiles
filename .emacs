@@ -12,16 +12,20 @@
         package-enable-at-startup nil
         package--init-file-ensured t))
 
-(add-hook 'after-init-hook
-          `(lambda ()
-             (setq file-name-handler-alist file-name-handler-alist-old
-                   gc-cons-threshold 800000
-                   gc-cons-percentage 0.1)
-             (garbage-collect))
-          t)
+(setq gc-cons-threshold (* 384 1024 1024)
+      gc-cons-percentage 0.6)
+
+(setq load-prefer-newer t)
+(setq read-process-output-max (* 3 1024 1024)) ;; 3mb
+(setq max-lisp-eval-depth 10000)
+(setq max-specpdl-size 10000)
+;; End startup speed tweaks
 
 (setq user-mail-address "nick@dischord.org")
 (setq create-lockfiles nil)
+
+(setq warning-minimum-level :error)
+(setq native-comp-async-report-warnings-errors 'nil)
 
 (setq x-super-keysym 'meta)
 
@@ -51,7 +55,6 @@
       frame-inhibit-implied-resize t
       initial-major-mode 'fundamental-mode)
 
-
 (defun get-frame-name (&optional frame)
   "Return the string that names FRAME (a frame).  Default is selected frame."
   (unless frame (setq frame  (selected-frame)))
@@ -68,11 +71,19 @@
 
 (if (window-system)
     (set-selected-frame-dark))
-;; Shut up
+
 (setq ring-bell-function 'ignore)
 
-;; Buffer switching
+(when (memq window-system '(mac ns))
+  ;; No icon on window.
+  (setq ns-use-proxy-icon nil)
+  (setq ns-use-srgb-colorspace nil))
 
+(when (memq system-type '(darwin))
+  (set-fontset-font t nil "SF Pro Display" nil 'append)
+  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+
+;; Buffer switching
 (winner-mode t)
 
 (setq ispell-dictionary "english")
@@ -200,7 +211,6 @@
 (setq use-package-compute-statistics t)
 
 (use-package exec-path-from-shell
-  :defer 2
   :config
   (dolist (var '("GOPATH" "NVM_BIN" "PATH"))
     (add-to-list 'exec-path-from-shell-variables var))
@@ -219,11 +229,14 @@
   :config
   (ns-auto-titlebar-mode))
 
+(setq ns-use-thin-smoothing t)
+
 (setq default-frame-alist
       '((vertical-scroll-bars . nil)
         (internal-border-width . 0)
         (height . 60)
         (width . 150)
+        (weight . light)
         (font . "SF Mono 11")))
 
 (use-package doom-themes
@@ -234,6 +247,8 @@
         doom-themes-visual-bell-config t
         doom-themes-org-config t)
   :config
+  (when (>= emacs-major-version 27)
+    (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
   (load-theme 'doom-one-light t)
   (let ((line (face-attribute 'mode-line :underline)))
     (set-face-attribute 'mode-line nil :overline   line)
@@ -241,16 +256,7 @@
     (set-face-attribute 'mode-line-inactive nil :underline  line)
     (set-face-attribute 'mode-line nil :box nil)
     (set-face-attribute 'mode-line-inactive nil :box nil)
-    (set-face-attribute 'mode-line-inactive nil :background "#f0f0f0" :foreground "#c6c7c7")))
-
-(use-package mindre-theme
-  :disabled
-  :ensure t
-  :custom
-  (mindre-use-more-bold nil)
-  (mindre-use-faded-lisp-parens t)
-  :config
-  (load-theme 'mindre t))
+    (set-face-attribute 'mode-line-inactive nil :background "#dedede" :foreground "#acacac")))
 
 (use-package moody
   :ensure t
@@ -258,16 +264,14 @@
   (setq x-underline-at-descent-line t)
   (customize-set-variable 'moody-mode-line-height 20)
   (setq-default mode-line-format
-                '(""
+                '(" "
                   mode-line-front-space
-                  " "
                   mode-line-buffer-identification
                   (:eval
                    (cond ((buffer-modified-p) "  ")
                          (t " ")))
                   mode-line-position
                   (vc-mode vc-mode)
-                  (multiple-cursors-mode mc/mode-line)
                   " " mode-line-modes
                   mode-line-end-spaces))
 
@@ -278,8 +282,7 @@
     (minions-mode-line-lighter "…")
     (minions-mode-line-delimiters '("" . ""))
     :config
-    (setq minions-mode-line-lighter "#"
-          minions-direct '(cider-mode
+    (setq minions-direct '(cider-mode
                            projectile-mode
                            visual-line-mode
                            flyspell-mode
@@ -289,36 +292,6 @@
                            lsp-mode))
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode)))
-
-(use-package smart-mode-line
-  :disabled
-  :config
-  (setq sml/mode-width 'right
-        sml/pre-modes-separator "  "
-        sml/theme nil)
-  ;; Override this function to get better spacing once we rearrange.
-  (defun sml/fill-for-buffer-identification () "  ")
-  (column-number-mode) ;; Show column number next to the line number.
-  (sml/setup)
-  ;; Rearrange mode-line to put position and line number on the right.
-  (setq-default
-   mode-line-format
-   '("%e"
-     mode-line-client
-     mode-line-modified
-     mode-line-remote
-     "  "
-     mode-line-frame-identification
-     mode-line-buffer-identification
-     sml/pos-id-separator
-     (vc-mode vc-mode)
-     sml/pre-modes-separator
-     mode-line-modes
-     mode-line-misc-info
-     mode-line-front-space
-     mode-line-position
-     mode-line-end-spaces
-     " ")))
 
 (use-package all-the-icons
   :custom
@@ -497,23 +470,6 @@
                  #'completion--in-region)
                args)))
 
-(use-package corfu
-  :disabled
-  :after evil
-  :config
-  (define-key corfu-map (kbd "C-j") 'corfu-next)
-  (define-key corfu-map (kbd "C-k") 'corfu-previous)
-  (define-key corfu-map (kbd "C-n") 'corfu-next)
-  (define-key corfu-map (kbd "C-p") 'corfu-previous)
-  ;; unset "C-k" in evil insert, fixes binding for corfu
-  (define-key evil-insert-state-map (kbd "C-k") nil)
-  (define-key evil-insert-state-map (kbd "C-n") nil)
-  (define-key evil-insert-state-map (kbd "C-p") nil)
-  :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  :init
-  (corfu-global-mode))
-
 (use-package orderless
   :init
   (setq completion-styles '(orderless)
@@ -623,6 +579,7 @@
         `((internal-border-width . 1))))
 
 (use-package avy
+  :ensure t
   :config
   :bind
   ("M-c" . avy-goto-char)
@@ -651,7 +608,7 @@
 (use-package winum
   :config
   (setq winum-mode-line-position 2
-        winum-format "⌘ %s"
+        winum-format "⌘ %s "
         winum-auto-setup-mode-line t)
   (winum-mode))
 
@@ -684,6 +641,7 @@
   :init
   (setq evil-normal-state-cursor '(box "#4078f2")
       evil-emacs-state-cursor  '(box "#7F5AB6")
+      evil-visual-state-cursor '(hollow "orange")
       evil-insert-state-cursor '("pink" (bar . 2))
       evil-want-integration t
       evil-want-keybinding nil
@@ -694,6 +652,7 @@
       evil-shift-round nil
       evil-echo-state nil
       evil-want-C-u-scroll t
+      evil-mode-line-format nil
       evil-mode-line-format '(before . mode-line-front-space)
       evil-normal-state-tag (propertize " N")
       evil-insert-state-tag (propertize " I")
@@ -703,14 +662,17 @@
       evil-emacs-state-tag " E")
   :bind (:map evil-normal-state-map
               ("-" . deer)
-              :map ranger-mode-map ("-" . ranger-up-directory))
+              ("C-u" . evil-scroll-up)
+         :map ranger-mode-map
+              ("-" . ranger-up-directory))
   :config
   (evil-mode)
   (evil-set-undo-system 'undo-tree)
-
+  
   (defun my-exit-evil-command-window ()
     "Exit evil command window."
-    (interactive)
+    (interactive
+)
     (other-window -1)
     (other-window 1)
     (kill-this-buffer)
@@ -790,6 +752,7 @@
     (evil-owl-mode)))
 
 (use-package yasnippet
+  :disabled
   :defer t
   :config
   (unless yas-global-mode (yas-global-mode 1))
@@ -823,6 +786,7 @@
         org-image-actual-width (/ (display-pixel-width) 10))
   (setq org-agenda-prefix-format '((agenda . " %i %-12:c%?-12t% s")
                                    (timeline . "  % s")
+
                                    (todo .
                                          " %i %-12:c %(concat \"[ \"(org-format-outline-path (org-get-outline-path)) \" ]\") ")
                                    (tags .
@@ -869,6 +833,7 @@ SCHEDULED: %t
     :ensure t)
 
   (defun org-task-capture ()
+
     (interactive)
     (org-capture nil "a"))
 
@@ -1112,6 +1077,8 @@ SCHEDULED: %t
   (rego-opa-command "/usr/local/bin/opa"))
 
 (use-package highlight-indent-guides
+  :disabled
+  :ensure t
   :config
   (setq highlight-indent-guides-method 'character)
   ;; Indent character samples: | ┆ ┊
@@ -1272,11 +1239,11 @@ SCHEDULED: %t
 (global-set-key (kbd "M-8") 'winum-select-window-8)
 (global-set-key (kbd "M-9") 'winum-select-window-9)
 (global-set-key (kbd "M-`") 'ns-next-frame)
+(global-set-key (kbd "M-˙") 'ns-do-hide-others) 
 
 ;; Ensure we're using ⌘ as Meta
 (setq mac-option-modifier nil
       mac-command-modifier 'meta)
-
 
 ;; Keep custom junk that Emacs generates in a seperate file
 (setq custom-file "~/.emacs.d/custom.el")
@@ -1286,4 +1253,3 @@ SCHEDULED: %t
 
 ;; Start a server so we can use emacsclient
 (server-start)
-
