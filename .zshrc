@@ -9,7 +9,7 @@
 # do this early otherwise there's a noticable change
 #
 if [[ "$(uname -s)" == "Darwin" ]]; then
-    sith() {
+    darkmode() {
         val=$(defaults read -g AppleInterfaceStyle 2>/dev/null)
         if [[ $val == "Dark" ]]; then
             i
@@ -26,7 +26,7 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
         fi
     }
 
-    sith
+    darkmode
 fi
 
 # usual suspects
@@ -34,6 +34,8 @@ fi
 export EDITOR="nvim"
 export GPG_TTY=$(tty)
 export BAT_THEME="ansi"
+export FZF_DEFAULT_OPTS="--color=bw"
+export KEYTIMEOUT=1
 
 # history and general options
 #
@@ -101,21 +103,23 @@ alias keyplz='openssl rand -hex 10'
 alias md='open -a Marked\ 2.app'
 alias uuidgen="uuidgen | tr 'A-Z' 'a-z'"
 alias flushdns='sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder'
-if [[ $(hostname -s) == ignition ]]; then
-  alias docker='lima nerdctl'
-fi
+#if [[ $(hostname -s) == deadline ]]; then
+#  alias docker='lima nerdctl'
+#fi
 alias docekr='docker'
 alias vim='nvim'
 alias k='kubectl'
+alias klogs='kubectl logs'
 alias rdecs='xprop -f _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS "0x2, 0x0, 0x0, 0x0, 0x0"'
-source <(kubectl completion zsh)
+###source <(kubectl completion zsh)
+source ~/.kubectl_completion
 alias lgc='sudo chown nick:kvm /dev/shm/looking-glass ; chmod 660 /dev/shm/looking-glass ; looking-glass-client -F'
 alias mp='multipass'
 alias tfapply="terraform apply plan.out"
 alias tfplan="terraform plan -out plan.out"
 alias tfdestroy="terraform destroy -force"
 alias k9s='k9s --headless'
-alias kchere='export KUBECONFIG=$(pwd)/kube_config_cluster.yml'
+alias kchere='export KUBECONFIG=$(pwd)/kubeconfig.yaml'
 
 # <3 vagrant
 #
@@ -148,46 +152,11 @@ autoload -Uz vcs_info
 zstyle ':vcs_info:git:*' formats 'on %b '
 
 precmd() {
-#    vcs_info
+    vcs_info
     print -Pn "\e]0;%n@%m:%~\a"
-#    PROMPT='%n@%m %25<..<%~%(!.#. ${vcs_info_msg_0_}%%) %(1j.%F{green}·%j%f .)'
+    PROMPT='%n@%m %25<..<%~%(!.#. ${vcs_info_msg_0_}%%) %(1j.%F{green}·%j%f .)'
 }
 
-# make it work like vim
-#
-bindkey -v
-bindkey '^P' up-line-or-beginning-search
-bindkey '^N' down-line-or-beginning-search
-bindkey '^?' backward-delete-char
-bindkey '^h' backward-delete-char
-bindkey '^w' backward-kill-word
-bindkey '^r' history-incremental-pattern-search-backward
-export KEYTIMEOUT=1
-
-bindkey '^[[Z' reverse-menu-complete # make shift-tab work in reverse
-
-# change cursor shape based on which vi mode we're in
-# via https://emily.st/2013/05/03/zsh-vi-cursor/
-#
-function zle-keymap-select zle-line-init
-{
-    case $KEYMAP in
-        vicmd)      print -n -- "\E]50;CursorShape=0\C-G";;  # block cursor
-        viins|main) print -n -- "\E]50;CursorShape=1\C-G";;  # line cursor
-    esac
-
-    zle reset-prompt
-    zle -R
-}
-
-function zle-line-finish
-{
-    print -n -- "\E]50;CursorShape=0\C-G"  # block cursor
-}
-
-zle -N zle-line-init
-zle -N zle-line-finish
-zle -N zle-keymap-select
 
 # krew
 #
@@ -200,6 +169,7 @@ source "${HOME}/.zgen/zgen.zsh"
 if ! zgen saved; then
   echo "Creating a zgen save"
 
+  zgen load jeffreytse/zsh-vi-mode
   zgen load junegunn/fzf
   zgen load junegunn/fzf shell/completion.zsh
   zgen load junegunn/fzf shell/key-bindings.zsh
@@ -217,10 +187,17 @@ stty -ixon
 #
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+# Reinstate ctrl-r to use FZF
+#
+function zvm_after_init() {
+  zvm_bindkey viins '^R' fzf-history-widget
+}
+
 # init junk via evalcache
 #
+#_evalcache starship init zsh
 _evalcache pyenv init -
 _evalcache rbenv init -
-_evalcache starship init zsh
 
 # vim:ts=4:sw=4:ft=zsh:et
+
