@@ -71,10 +71,24 @@ success_symbol = "[%](default)"
 vicmd_symbol = "[%](default)"
 error_symbol = "[%](bold red)"
 
+[directory]
+truncation_symbol = "…/"
+
 [jobs]
 symbol = "·"
+style = "bold red"
 
 [terraform]
+disabled = true
+
+[python]
+detect_extensions = []
+detect_files = ['.python-version', 'Pipfile', '__init__.py', 'pyproject.toml', 'requirements.txt', 'setup.py', 'tox.ini']
+
+[package]
+disabled = true
+
+[java]
 disabled = true
 
 [kubernetes]
