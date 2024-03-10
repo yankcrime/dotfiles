@@ -155,8 +155,9 @@ precmd() {
     vcs_info
     print -Pn "\e]0;%n@%m:%~\a"
     PROMPT='%n@%m %25<..<%~%(!.#. ${vcs_info_msg_0_}%%) %(1j.%F{green}·%j%f .)'
+    RPROMPT='%F{#aaaaaa}%D{%H:%M:%S}%f%F{#000000}%f'
+    RPROMPT="%D{%H:%M:%S}"
 }
-
 
 # krew
 #
@@ -186,6 +187,10 @@ stty -ixon
 # Fuzzy history search via fzf
 #
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Assume we always want insert mode
+#
+ZVM_LINE_INIT_MODE=$ZVM_MODE_INSERT
 
 # Reinstate ctrl-r to use FZF
 #
