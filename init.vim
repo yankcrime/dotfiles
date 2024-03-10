@@ -10,26 +10,24 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-dispatch'
+Plug 'tpope/vim-eunuch'
 Plug 'machakann/vim-sandwich'
 Plug 'pearofducks/ansible-vim'
 Plug 'godlygeek/tabular'
 Plug 'cespare/vim-sbd'
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'neoclide/coc.nvim', { 'branch': 'release', 'for': ['go', 'python', 'ansible', 'yaml', 'tf'] }
+Plug 'neovim/nvim-lspconfig'
 Plug 'stephpy/vim-yaml', { 'for': ['yaml'] }
 Plug 'fatih/vim-go', { 'for': ['go'] }
 Plug 'rodjek/vim-puppet', { 'for': ['puppet'] }
+Plug 'hashivim/vim-terraform', { 'for': ['terraform', 'tf'] }
 Plug 'w0rp/ale', { 'for': ['puppet','go','yaml','python','ruby', 'ansible', 'terraform', 'tf'] }
 Plug 'justinmk/vim-dirvish'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vim-peekaboo'
-Plug 'Lokaltog/vim-monotone'
 Plug 'Lokaltog/neoranger'
 Plug 'chriskempson/base16-vim'
 Plug 'romainl/vim-sweet16'
-Plug 'yankcrime/vim-colors-off'
-Plug 'sjl/badwolf'
 Plug 'robertmeta/nofrils'
 Plug 'yasukotelin/shirotelin'
 
@@ -98,6 +96,8 @@ set ai
 vmap Q gq
 nnoremap Q gqap
 
+nnoremap v <c-v>
+
 " Clear search
 nnoremap <silent> ,/ :noh<cr>
 
@@ -122,20 +122,15 @@ nnoremap <S-Tab> <C-w>W
 
 " appearance
 " set t_Co=256
-" set termguicolors
+
+set termguicolors
 
 let iterm_profile = $ITERM_PROFILE
 
 if iterm_profile == "Dark"
-    colorscheme monotone
-    set background=dark
-    hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
+    colorscheme nofrils-dark
 else
-    set background=light
-    colorscheme shirotelin
-    hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
-    " hi Statusline cterm=bold ctermbg=237 ctermfg=231 gui=bold
-    hi Terminal ctermbg=none ctermfg=none
+    colorscheme nofrils-light
 endif
 
 hi clear SignColumn
@@ -319,6 +314,8 @@ let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
 " }}}
 " {{{ Markdown
+autocmd FileType markdown,text setlocal linebreak keywordprg=dict
+autocmd FileType markdown if !&tw && expand('%:e') =~# '\<\%(md\|markdown\)\>' | setlocal tw=78 | endif
 nnoremap <leader>m :silent !open -a Marked 2.app '%:p'<cr>
 " }}}
 " {{{ SBD (Smart Buffer Delete)
@@ -342,40 +339,8 @@ hi ALEErrorSign ctermfg=red ctermbg=none
 let g:ale_sign_error='●'
 hi ALEWarningSign ctermfg=yellow ctermbg=none
 " }}}
-" {{{ COC
-" use <tab> for trigger completion and navigate to the next complete item
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~ '\s'
-endfunction
-
-inoremap <silent><expr> <S-Tab>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<Tab>" :
-      \ coc#refresh()
-
-inoremap <expr> <Tab> pumvisible() ? "\<C-y>" : "\<C-g>u\<Tab>"
-
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Use U to show documentation in preview window
-nnoremap <silent> U :call <SID>show_documentation()<CR>
-
-" Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
-
-" Remap for format selected region
-vmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-
-let g:LanguageClient_serverCommands = {
-    \ 'tf': ['terraform-ls', 'serve'],
-    \ }
-
+" {{{ Lua config
+lua << EOF
+EOF
 " }}}
-
 " vim:ts=4:sw=4:ft=vimrc:et
