@@ -58,18 +58,25 @@ $crystal\
 $custom\
 $sudo\
 $cmd_duration\
+$fill\
+$time\
 $line_break\
 $jobs\
 $battery\
-$time\
 $status\
 $shell\
 $character"""
+
+[fill]
+symbol=" "
 
 [character]
 success_symbol = "[%](default)"
 vicmd_symbol = "[%](default)"
 error_symbol = "[%](bold red)"
+
+[git_branch]
+symbol = " "
 
 [directory]
 truncation_symbol = "…/"
@@ -77,6 +84,11 @@ truncation_symbol = "…/"
 [jobs]
 symbol = "·"
 style = "bold red"
+
+[time]
+disabled = false
+style = "fg:dark_grey"
+format = "[$time]($style)"
 
 [terraform]
 disabled = true
@@ -92,5 +104,8 @@ disabled = true
 disabled = true
 
 [kubernetes]
-format = '[☸️  ($cluster in) \($namespace\)](green) '
+format = '[󱃾 ($cluster in) \($namespace\)](green) '
 disabled = false
+
+[golang]
+format = 'via [󰟓 ($version )]($style)'
