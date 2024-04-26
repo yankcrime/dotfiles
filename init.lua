@@ -45,6 +45,14 @@ require("lazy").setup({
     },
 
     {
+        'tpope/vim-surround'
+    },
+
+    {
+        'robertmeta/nofrils'
+    },
+
+    {
       'nvim-telescope/telescope-fzf-native.nvim',
       build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
     },
@@ -85,6 +93,7 @@ require("lazy").setup({
       local capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
       capabilities.textDocument.completion.completionItem.snippetSupport = true
 
+      -- Golang
       require("lspconfig").gopls.setup({
         capabilities = capabilities,
         flags = { debounce_text_changes = 200 },
@@ -129,14 +138,38 @@ require("lazy").setup({
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities.textDocument.completion.completionItem.snippetSupport = true
 
+      -- Terraform / HCL
       require("lspconfig").terraformls.setup({
         on_attach = on_attach,
         flags = { debounce_text_changes = 150 },
         capabilities = capabilities,	
       })
+      vim.api.nvim_create_autocmd({"BufWritePre"}, {
+        pattern = {"*.tf", "*.tfvars"},
+        callback = function()
+          vim.lsp.buf.format()
+        end,
+      })
 
+      -- Ansible
       require("lspconfig").ansiblels.setup{}
-
+      require("lspconfig").yamlls.setup{
+         settings = {
+           yaml = {
+               schemaStore = {
+                   url = "https://www.schemastore.org/api/json/catalog.json",
+                   enable = true,
+               },
+               schemas = {
+                   ["https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json"] = {
+                       "cronjob.y*ml",
+                       "deployment.y*ml",
+                       "service.y*ml",
+                   },
+               },
+           },
+         },
+       }
     end,
   },
 
@@ -265,6 +298,7 @@ require("lazy").setup({
           'markdown',
           'markdown_inline',
           'mermaid',
+	  'yaml'
         },
         indent = { enable = true },
         incremental_selection = {
@@ -362,6 +396,7 @@ vim.g.mapleader = ' ' -- Space
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<C-p>', builtin.git_files, {})
 vim.keymap.set('n', '<C-f>', builtin.find_files, {})
+vim.keymap.set('n', '<C-s>', builtin.live_grep, {})
 vim.keymap.set('n', '<C-b>', builtin.buffers, {})
 vim.keymap.set('n', '<C-g>', builtin.lsp_document_symbols, {})
 vim.keymap.set('n', '<leader>td', builtin.diagnostics, {})
@@ -369,6 +404,8 @@ vim.keymap.set('n', '<leader>gs', builtin.grep_string, {})
 vim.keymap.set('n', '<leader>gg', builtin.live_grep, {})
 
 vim.keymap.set('n', '<Leader><space>', ':nohlsearch<CR>')
+vim.keymap.set('n', '<Leader>tn', ':tabnext<CR>')
+vim.keymap.set('n', '<Leader>tp', ':tabprevious<CR>')
 
 --- Standard (neo)vim options
 
@@ -384,6 +421,6 @@ vim.opt.mouse = ""
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
 vim.opt.modelines = 5
-
-
+vim.opt.signcolumn = "no"
+vim.opt.statuscolumn = "%=%s%C%l "
 
