@@ -59,13 +59,13 @@ $custom\
 $sudo\
 $cmd_duration\
 $fill\
-$time\
 $line_break\
 $jobs\
 $battery\
 $status\
 $shell\
 $character"""
+right_format = """$time"""
 
 [fill]
 symbol=" "
@@ -76,9 +76,20 @@ vicmd_symbol = "[%](default)"
 error_symbol = "[%](bold red)"
 
 [git_branch]
+style = "fg:dark_grey"
 symbol = " "
 
+[git_status]
+style = "fg:dark_grey"
+
+[git_state]
+style = "fg:dark_grey"
+
+[git_metrics]
+added_style = "fg:dark_grey"
+
 [directory]
+style = "fg:dark_grey"
 truncation_symbol = "…/"
 
 [jobs]
@@ -93,7 +104,13 @@ format = "[$time]($style)"
 [terraform]
 disabled = true
 
+[openstack]
+#style = "fg:blue"
+style = "fg:dark_grey"
+format = 'on [☁️ $cloud]($style)'
+
 [python]
+style = "fg:dark_grey"
 detect_extensions = []
 detect_files = ['.python-version', 'Pipfile', '__init__.py', 'pyproject.toml', 'requirements.txt', 'setup.py', 'tox.ini']
 
@@ -104,8 +121,18 @@ disabled = true
 disabled = true
 
 [kubernetes]
-format = '[󱃾 ($cluster in) \($namespace\)](green) '
+style = "fg:light_grey"
+format = '[󱃾 ($cluster in) \($namespace\)]($style) '
 disabled = false
 
 [golang]
+disabled = true
+style = "fg:dark_grey"
 format = 'via [󰟓 ($version )]($style)'
+
+[docker_context]
+disabled = true
+style = "fg:dark_grey"
+
+[lua]
+disabled = true
