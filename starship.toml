@@ -59,13 +59,14 @@ $custom\
 $sudo\
 $cmd_duration\
 $fill\
+$time\
 $line_break\
 $jobs\
 $battery\
 $status\
 $shell\
 $character"""
-right_format = """$time"""
+#right_format = """$time"""
 
 [fill]
 symbol=" "
@@ -98,7 +99,8 @@ style = "bold red"
 
 [time]
 disabled = false
-style = "fg:dark_grey"
+#style = "fg:241"
+style=""
 format = "[$time]($style)"
 
 [terraform]
@@ -106,8 +108,8 @@ disabled = true
 
 [openstack]
 #style = "fg:blue"
-style = "fg:dark_grey"
-format = 'on [☁️ $cloud]($style)'
+style = ""
+format = 'on [$cloud]($style) '
 
 [python]
 style = "fg:dark_grey"
@@ -120,19 +122,25 @@ disabled = true
 [java]
 disabled = true
 
+[helm]
+disabled = true
+
 [kubernetes]
-style = "fg:light_grey"
+style = ""
 format = '[󱃾 ($cluster in) \($namespace\)]($style) '
 disabled = false
 
 [golang]
 disabled = true
-style = "fg:dark_grey"
+style = ""
 format = 'via [󰟓 ($version )]($style)'
 
 [docker_context]
 disabled = true
-style = "fg:dark_grey"
+style = ""
 
 [lua]
+disabled = true
+
+[nodejs]
 disabled = true
