@@ -106,6 +106,7 @@ disabled = true
 style = ""
 format = '[󱃾 ($cluster in) \($namespace\)]($style) '
 disabled = false
+detect_env_vars = ['KUBECONFIG']
 
 [golang]
 disabled = true
