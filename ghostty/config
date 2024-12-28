@@ -1,9 +1,9 @@
 auto-update = off
-cursor-color = #4078f2
+auto-update-channel = tip
 
 font-family = "TX-02"
 font-style = "SemiCondensed"
-font-size = 16
+font-size = 15
 theme = "Github"
 
 window-padding-color = background
@@ -19,21 +19,17 @@ macos-option-as-alt = true
 macos-non-native-fullscreen = visible-menu
 macos-titlebar-style = tabs
 window-theme = light
+mouse-hide-while-typing = true
 
 keybind = global:control+grave_accent=toggle_quick_terminal
-keybind = super+shift+f=write_scrollback_file:open
+keybind = super+shift+f=write_screen_file:open
 
 #keybind = super+alt+right_arrow=goto_split:right
 #keybind = super+alt+left_arrow=goto_split:left
 #keybind = super+alt+up_arrow=goto_split:up
 #keybind = super+alt+down_arrow=goto_split:down
 
-palette= 2=#07962a
-palette= 10=#87d5a2
-
-# yellow
-#palette= 3=#dbc18e
-#palette= 11=#dbc18e
+cursor-color = #4078f2
 
 # https://github.com/yorickpeterse/dotfiles/blob/main/dotfiles/.config/ghostty/config
 #
@@ -59,6 +55,8 @@ palette = 9=#c4331d
 # green
 #palette = 2=#1C5708
 #palette = 10=#1C5708
+palette= 2=#07962a
+palette= 10=#87d5a2
 
 # yellow
 palette = 3=#b37f02
@@ -80,6 +78,3 @@ palette = 14=#007872
 palette = 7=#ffffff
 palette = 15=#ffffff
 
-#custom-shader = ./grad.glsl
-#background-opacity = 0.8
-#background-blur-radius = 20
