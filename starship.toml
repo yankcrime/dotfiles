@@ -88,7 +88,8 @@ style = ""
 format = 'on [$cloud]($style) '
 
 [python]
-disabled = true
+disabled = false
+format = 'via [ ($version )]($style)(($virtualenv))'
 style = "fg:dark_grey"
 detect_extensions = []
 detect_files = ['.python-version', 'Pipfile', '__init__.py', 'pyproject.toml', 'requirements.txt', 'setup.py', 'tox.ini']
@@ -112,6 +113,10 @@ detect_env_vars = ['KUBECONFIG']
 disabled = true
 style = ""
 format = 'via [󰟓 ($version )]($style)'
+
+[gcloud]
+disabled = true
+format = 'on [$project \($account(@$domain)\)]($style) '
 
 [docker_context]
 disabled = true
