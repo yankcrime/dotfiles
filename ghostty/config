@@ -8,15 +8,15 @@ font-style = "SemiCondensed"
 font-style-italic = "SemiCondensed Oblique"
 font-style-bold = "Bold SemiCondensed"
 font-style-bold-italic = "Bold SemiCondensed Oblique"
-font-size = 15
+font-size = 16
 
 theme = "GitHub Dark"
-cursor-color = #40f278
-cursor-text = 010101
+cursor-color = #4AF626
+cursor-text = #010101
 foreground = #ADC7E6
 
 custom-shader=lumon.glsl
-custom-shader=cursor_smear.glsl
+custom-shader=cursor_smear_fade.glsl
 
 window-padding-color = background
 window-padding-x = 5
