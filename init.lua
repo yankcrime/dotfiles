@@ -15,15 +15,31 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
+        'justinmk/vim-dirvish'
+    },
+
+    {
+        'romainl/vim-malotru'
+    },
+
+    {
+        'pbrisbin/vim-colors-off'
+    },
+
+    {
+        'tpope/vim-surround'
+    },
+
+    {
         'Lokaltog/vim-monotone',
         priority = 1000, -- load first
         config = function ()
             vim.cmd([[
                 augroup custom_appearance
                   autocmd!
-                  au ColorScheme * hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=none
+                  au ColorScheme * hi Normal gui=NONE guifg=NONE guibg=NONE ctermfg=none ctermbg=NONE
+		  " au ColorScheme * hi Statusline guifg=#000000 guibg=#e5e5e5 gui=bold
                 augroup END    
-                colorscheme monotone
                 function! s:statusline_expr()
                     let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
                     let ro  = "%{&readonly ? '[RO] ' : ''}"
@@ -36,22 +52,28 @@ require("lazy").setup({
                     return ' [%n] %.40F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
                   endfunction
                   let &statusline = s:statusline_expr()
+                  colorscheme monotone
             ]])
         end,
     },
-
     {
-        'justinmk/vim-dirvish'
+        'yankcrime/nvim-grey'
     },
-
     {
-        'tpope/vim-surround'
+	'greggh/claude-code.nvim',
+	requires = {
+		'nvim-lua/plenary.nvim', -- Required for git operations
+	},
+	config = function()
+		require('claude-code').setup()
+	end
     },
-
     {
-        'robertmeta/nofrils'
+        'yasukotelin/shirotelin',
     },
-
+    {
+	'robertmeta/nofrils'
+    },
     {
       'nvim-telescope/telescope-fzf-native.nvim',
       build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
@@ -59,15 +81,18 @@ require("lazy").setup({
     
     {'nvim-telescope/telescope-ui-select.nvim' },
 
+    {'towolf/vim-helm'},
+
     {
       "nvim-telescope/telescope.nvim", 
-      tag = '0.1.4',
+      tag = '0.1.8',
       dependencies = { 
         "nvim-lua/plenary.nvim" ,
         "nvim-treesitter/nvim-treesitter",
         "nvim-tree/nvim-web-devicons",
       },
       config = function ()
+	local actions = require("telescope.actions")
         require("telescope").setup({
           extensions = {
             fzf = {
@@ -76,22 +101,59 @@ require("lazy").setup({
               override_file_sorter = true,
               case_mode = "smart_case",
             }
-          }
+          },
+	  defaults = {
+            prompt_prefix = '',
+            entry_prefix = ' ',
+            selection_caret = ' ',
+            layout_config = {
+              prompt_position = 'bottom',
+              width = 0.7,
+              height = 0.7,
+              preview_width = 0.6,
+            },
+	    mappings = {
+              i = {
+                  ["<esc>"] = actions.close,
+		  ["<C-j>"] = actions.move_selection_next,
+                  ["<C-k>"] = actions.move_selection_previous
+              },
+	    },
+	  },
         })
-  
-        require('telescope').load_extension('fzf')
+        require("telescope").load_extension("fzf")
         require("telescope").load_extension("ui-select")
       end,
+    },
+
+    {
+    "astephanh/yaml-companion.nvim",
+      config = function()
+	branch = "kubernetes_crd_detection",
+        require("telescope").load_extension("yaml_schema")
+        require("yaml-companion").setup({
+  	  builtin_matchers = {
+  	    kubernetes = { enabled = true },
+  	    cloud_init = { enabled = true }
+  	  },
+ 	  schemas = {
+     	    name = "Kubernetes 1.30",
+	    uri = "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.30.1-standalone-strict/all.json",
+  	  },
+        })
+      end
     },
 
   -- Language server (LSP)
   {
     "neovim/nvim-lspconfig", 
+    dependencies = { 'saghen/blink.cmp' },
     config = function ()
       util = require "lspconfig/util"
 
-      local capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
       capabilities.textDocument.completion.completionItem.snippetSupport = true
+      local lspconfig = require('lspconfig')
 
       -- Golang
       require("lspconfig").gopls.setup({
@@ -151,119 +213,65 @@ require("lazy").setup({
         end,
       })
 
+      --- Helm
+      require("lspconfig").helm_ls.setup{
+        settings = {
+          ['helm-ls'] = {
+            yamlls = {
+              path = "yaml-language-server",
+            }
+          }
+	}
+      }
+
       -- Ansible
       require("lspconfig").ansiblels.setup{}
-      require("lspconfig").yamlls.setup{
-         settings = {
-           yaml = {
-               schemaStore = {
-                   url = "https://www.schemastore.org/api/json/catalog.json",
-                   enable = true,
-               },
-               schemas = {
-                   ["https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json"] = {
-                       "cronjob.y*ml",
-                       "deployment.y*ml",
-                       "service.y*ml",
-                   },
-               },
-           },
-         },
-       }
+      require("lspconfig").yamlls.setup{}
     end,
   },
 
   -- Autocompletion
   {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-      "L3MON4D3/LuaSnip",
-      "saadparwaiz1/cmp_luasnip",
-      "onsails/lspkind-nvim",
+    'saghen/blink.cmp',
+    -- optional: provides snippets for the snippet source
+    dependencies = { 'rafamadriz/friendly-snippets' },
+  
+    version = '1.*',
+    opts = {
+      -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
+      -- 'super-tab' for mappings similar to vscode (tab to accept)
+      -- 'enter' for enter to accept
+      -- 'none' for no mappings
+      --
+      -- All presets have the following mappings:
+      -- C-space: Open menu or open docs if already open
+      -- C-n/C-p or Up/Down: Select next/previous item
+      -- C-e: Hide menu
+      -- C-k: Toggle signature help (if signature.enabled = true)
+      --
+      -- See :h blink-cmp-config-keymap for defining your own keymap
+      keymap = { preset = 'super-tab' },
+  
+      appearance = {
+        -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+        -- Adjusts spacing to ensure icons are aligned
+        nerd_font_variant = 'mono'
+      },
+  
+      -- (Default) Only show the documentation popup when manually triggered
+      completion = { documentation = { auto_show = false } },
+  
+      -- Default list of enabled providers defined so that you can extend it
+      -- elsewhere in your config, without redefining it, due to `opts_extend`
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+      },
+  
+      fuzzy = { implementation = "prefer_rust_with_warning" }
     },
-    config = function()
-      local cmp = require("cmp")
-      local luasnip = require("luasnip")
-      local lspkind = require("lspkind")
-      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-
-      cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
-
-      luasnip.config.setup {}
-
-      local has_words_before = function()
-        unpack = unpack or table.unpack
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-      end
-
-      require('cmp').setup({
-        snippet = {
-            expand = function(args)
-              luasnip.lsp_expand(args.body)
-            end,
-        },
-        formatting = {
-          format = lspkind.cmp_format {
-            with_text = true,
-            menu = {
-              buffer = "[Buffer]",
-              nvim_lsp = "[LSP]",
-              nvim_lua = "[Lua]",
-            },
-          },
-        },
-        mapping = cmp.mapping.preset.insert {
-          ['<C-n>'] = cmp.mapping.select_next_item(),
-          ['<C-p>'] = cmp.mapping.select_prev_item(),
-          ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-          ['<C-f>'] = cmp.mapping.scroll_docs(4),
-          ['<CR>'] = cmp.mapping.confirm { select = true },
-          ['<Tab>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.expand_or_locally_jumpable() then 
-              luasnip.expand_or_jump()
-            elseif has_words_before() then
-              cmp.complete()
-            else
-              fallback()
-            end
-          end, { 'i', 's' }),
-          ['<S-Tab>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { 'i', 's' }),
-        },
-        -- don't auto select item
-        preselect = cmp.PreselectMode.None,
-        window = {
-          documentation = cmp.config.window.bordered(),
-        },
-        view = {
-          entries = {
-            name = "custom",
-            selection_order = "near_cursor",
-          },
-        },
-        confirm_opts = {
-          behavior = cmp.ConfirmBehavior.Insert,
-        },
-        sources = {
-          { name = 'nvim_lsp' },
-          { name = "luasnip", keyword_length = 2},
-          { name = "buffer", keyword_length = 5},
-        },
-      })
-    end,
+    opts_extend = { "sources.default" }
   },
+
 
   --- Highlight, edit, and navigate code
   {
@@ -389,6 +397,18 @@ vim.filetype.add({
   }
 })
 
+vim.api.nvim_create_augroup("YamlHelmSettings", { clear = true })
+vim.api.nvim_create_autocmd("FileType", {
+  group = "YamlHelmSettings",
+  pattern = { "yaml", "helm" },
+  callback = function()
+    vim.opt_local.tabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.softtabstop = 2
+    vim.opt_local.expandtab = true
+  end,
+})
+
 --- Keymappings
 
 vim.g.mapleader = ' ' -- Space
@@ -399,6 +419,7 @@ vim.keymap.set('n', '<C-f>', builtin.find_files, {})
 vim.keymap.set('n', '<C-s>', builtin.live_grep, {})
 vim.keymap.set('n', '<C-b>', builtin.buffers, {})
 vim.keymap.set('n', '<C-g>', builtin.lsp_document_symbols, {})
+vim.keymap.set('n', '<C-y>', ':Telescope yaml_schema<CR>', {})
 vim.keymap.set('n', '<leader>td', builtin.diagnostics, {})
 vim.keymap.set('n', '<leader>gs', builtin.grep_string, {})
 vim.keymap.set('n', '<leader>gg', builtin.live_grep, {})
@@ -409,7 +430,7 @@ vim.keymap.set('n', '<Leader>tp', ':tabprevious<CR>')
 
 --- Standard (neo)vim options
 
-vim.opt.termguicolors = true
+--- vim.opt.termguicolors = true
 vim.opt.number = true
 vim.opt.showmatch = true
 vim.opt.splitright = true
@@ -423,4 +444,5 @@ vim.opt.incsearch = true
 vim.opt.modelines = 5
 vim.opt.signcolumn = "no"
 vim.opt.statuscolumn = "%=%s%C%l "
+vim.opt.laststatus=3
 
